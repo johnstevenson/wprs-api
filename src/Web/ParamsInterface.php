@@ -6,5 +6,5 @@ interface ParamsInterface
 {
     public function getQueryParams(string $rankingDate): array;
 
-    public function getMeta(): array;
+    public function getDetails(): array;
 }

@@ -11,7 +11,7 @@ class CompetitionsParams implements ParamsInterface
         return ['rankingDate' => $rankingDate];
     }
 
-    public function getMeta(): array
+    public function getDetails(): array
     {
         return [];
     }

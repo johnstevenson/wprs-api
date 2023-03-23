@@ -36,7 +36,7 @@ class PilotsParams implements ParamsInterface
         return $params;
     }
 
-    public function getMeta(): array
+    public function getDetails(): array
     {
         $meta = [
             'region' => Ranking::getRegion($this->regionId),

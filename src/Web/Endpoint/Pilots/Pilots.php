@@ -22,7 +22,7 @@ class Pilots extends Application
     {
         $data = parent::run($rankingDate, $params);
         $meta = parent::getMeta();
-        $details = $params->getMeta();
+        $details = $params->getDetails();
 
         if (isset($details['nation']) && isset($data->items[0]['nation'])) {
             $details['nation'] = $data->items[0]['nation'];

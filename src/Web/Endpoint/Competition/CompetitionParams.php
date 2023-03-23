@@ -23,7 +23,7 @@ class CompetitionParams implements ParamsInterface
         return $params;
     }
 
-    public function getMeta(): array
+    public function getDetails(): array
     {
         $meta = [
             'id' => $this->id,

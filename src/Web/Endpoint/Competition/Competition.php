@@ -29,7 +29,7 @@ class Competition extends Application
 
         $data = parent::run($rankingDate, $params);
         $meta = parent::getMeta();
-        $details = array_merge($data->extras['details'], $params->getMeta());
+        $details = array_merge($data->extras['details'], $params->getDetails());
 
         $result = [
             'meta' => $meta,
