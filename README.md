@@ -7,7 +7,7 @@
 
 ## Usage
 
-1. Create an endpoint instance based on the type of data you want and the WPRS activity (discipline):
+**1.** Create an endpoint instance based on the type of data you want and the WPRS activity (discipline):
 
  ```php
 require __DIR__.'/app/vendor/autoload.php';
@@ -21,7 +21,7 @@ $activity = Ranking::ACTIVITY_PG_XC;
 $endpoint = Factory::createEndpoint($type, $activity);
 ```
 
-2. Use the `getData` method to return data for a specific ranking period.
+**2.** Use the `getData` method to return data for a specific ranking period.
 ```php
 $rankingDate = '2023-03-01';
 
@@ -96,11 +96,12 @@ floating-point values (`"355.9"`). Any missing string values are returned as an 
 
 ### Pilots endpoint
 
-_getData(?string $rankingDate, PilotsParams $params): array_
+**_getData_** (?string _$rankingDate_, PilotsParams _$params_): array
+
 
 This endpoint requires a `PilotsParams` instance, which takes the following parameters:
 
-_$regionId (int)_ Required. One of the `Ranking::REGION_` constants.
+**_$regionId_** (int) Required. One of the `Ranking::REGION_` constants.
 ```
 REGION_WORLD
 REGION_EUROPE
@@ -109,9 +110,9 @@ REGION_ASIA_OCEANIA
 REGION_PAN_AMERICA
 ```
 
-_$nationId (int)_ Optional. The nation id.
+**_$nationId_** (int) Optional. The nation id.
 
-_$scoring (int)_ Optional. One of the `Ranking::SCORING_` constants.
+**_$scoring_** (int) Optional. One of the `Ranking::SCORING_` constants.
 ```
 SCORING_OVERALL
 SCORING_FEMALE
@@ -194,10 +195,9 @@ $data = $endpoint->getData(null, $params);
 
 ### Competition endpoint
 
-_getData(string $rankingDate, int|CompetitionParams $param): array_
+**_getData_** (string _$rankingDate_, int _$id_): array
 
-`$param` is either the competition id or a `CompetitionParams` instance. Note that a `$rankingDate`
-is required and cannot be null.
+`$id` is the competition id and `$rankingDate` is required and cannot be null.
 
 #### Example
 
@@ -272,9 +272,9 @@ $data = $endpoint->getData($rankingDate, $compId);
 
 ### Competitions endpoint
 
-_getData(?string $rankingDate): array_
+**_getData_** (?string _$rankingDate): array_
 
-This endpoint only needs a `$rankingDate`, which can be null
+This endpoint only needs a `$rankingDate`, which can be null.
 
 #### Example
 
