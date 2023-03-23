@@ -23,8 +23,7 @@ class HttpWorker
 
         $this->multiHandle = $mh = curl_multi_init();
 
-        // CURLPIPE_MULTIPLEX = 2, CURLPIPE_HTTP1 | CURLPIPE_MULTIPLEX = 3
-        curl_multi_setopt($mh, CURLMOPT_PIPELINING, PHP_VERSION_ID >= 70400 ? 2 : 3);
+        curl_multi_setopt($mh, CURLMOPT_PIPELINING, CURLPIPE_MULTIPLEX );
         curl_multi_setopt($mh, CURLMOPT_MAX_HOST_CONNECTIONS, 8);
 
         $this->shareHandle = $sh = curl_share_init();
@@ -58,14 +57,9 @@ class HttpWorker
         curl_setopt($ch, CURLOPT_SHARE, $this->shareHandle);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($ch, CURLOPT_FILE, $job->bodyHandle);
-        curl_setopt($ch, CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS);
 
         curl_setopt($ch, CURLOPT_ENCODING, $this->gzip ? 'gzip' : '');
         curl_setopt($ch, CURLOPT_HTTP_CONTENT_DECODING, $this->gzip ? 0 : 1);
-
-        if (0 === stripos($job->url, 'https://')) {
-            curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_2_0);
-        }
 
         $this->checkMultiCode(curl_multi_add_handle($this->multiHandle, $ch));
     }
