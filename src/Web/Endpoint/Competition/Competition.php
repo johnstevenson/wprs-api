@@ -21,7 +21,6 @@ class Competition extends Application
     public function getData(string $rankingDate, $param): array
     {
         if (!($param instanceof CompetitionParams)) {
-
             if (!is_integer($param)) {
                 throw new \RuntimeException('The competition id must be an integer.');
             }

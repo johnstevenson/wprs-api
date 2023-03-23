@@ -98,7 +98,6 @@ floating-point values (`"355.9"`). Any missing string values are returned as an 
 
 **_getData_** (?string _$rankingDate_, PilotsParams _$params_): array
 
-
 This endpoint requires a `PilotsParams` instance, which takes the following parameters:
 
 **_$regionId_** (int) Required. One of the `Ranking::REGION_` constants.
@@ -118,6 +117,11 @@ SCORING_OVERALL
 SCORING_FEMALE
 SCORING_JUNIOR
 ```
+
+The current CIVL website only returns 20 pilots per page, so downloading the current World ranking
+data requires more than 300 requests. This takes some time and is prone to timeout errors when the
+server is busy. This endpoint also provides a `getOverallCount` method, with the same parameters
+as `getData`, which downloads a single page and returns the number of pilots in the ranking.
 
 #### Example
 Gets the ranking of all UK pilots (nation id 223) in Europe for the current ranking period.

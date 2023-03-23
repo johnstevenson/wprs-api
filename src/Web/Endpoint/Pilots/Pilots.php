@@ -38,4 +38,12 @@ class Pilots extends Application
 
         return $result;
     }
+
+    public function getOverallCount(?string $rankingDate, PilotsParams $params): int
+    {
+        $this->setRestricted();
+        $data = parent::run($rankingDate, $params);
+
+        return $data->overallCount;
+    }
 }

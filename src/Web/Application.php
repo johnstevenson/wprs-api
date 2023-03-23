@@ -162,7 +162,7 @@ abstract class Application
 
     private function getEndpoint(): int
     {
-        $class = get_class($this);
+        $class = strtr(get_class($this), '\\', '/');
         $name = basename($class);
 
         return Ranking::getEndpointFromName($name);
