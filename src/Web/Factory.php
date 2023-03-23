@@ -8,7 +8,7 @@ class Factory
 {
     public static function createEndpoint(
         int $endpointType,
-        int $activity,
+        int $discipline,
         ?FilterInterface $filter = null,
         ?DownloaderInterface $downloader = null
     ) {
@@ -19,7 +19,7 @@ class Factory
             self::notifyNotImplemented($name);
         }
 
-        return new $class($activity, $filter, $downloader);
+        return new $class($discipline, $filter, $downloader);
     }
 
     public static function createParams(int $endpointType, ...$args): ParamsInterface
@@ -36,7 +36,7 @@ class Factory
 
     private static function getEndpointName(int $endpoint): string
     {
-        return ucfirst(Ranking::getEndpoint($endpoint));
+        return ucfirst(Rank::getEndpoint($endpoint));
     }
 
     private static function getEndPointClass(string $name, string $suffix = ''): string

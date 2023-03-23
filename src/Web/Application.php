@@ -20,7 +20,7 @@ abstract class Application
     private ?DataCollector $dataCollector;
 
     public function __construct(
-        int $activity,
+        int $discipline,
         ParserInterface $parser,
         ?FilterInterface $filter = null,
         ?DownloaderInterface $downloader = null
@@ -30,8 +30,8 @@ abstract class Application
         $this->downloader = $downloader ?? new HttpDownloader();
 
         $this->endpoint = $this->getEndpoint();
-        $this->path = Ranking::getPath($activity, $this->endpoint);
-        $this->meta = Ranking::getMeta($activity, $this->endpoint);
+        $this->path = Rank::getPath($discipline, $this->endpoint);
+        $this->meta = Rank::getMeta($discipline, $this->endpoint);
     }
 
     public function run(?string $rankingDate, ParamsInterface $params): DataCollector
@@ -165,13 +165,13 @@ abstract class Application
         $class = strtr(get_class($this), '\\', '/');
         $name = basename($class);
 
-        return Ranking::getEndpointFromName($name);
+        return Rank::getEndpointFromName($name);
     }
 
     private function isMultiPageEndpoint()
     {
         // Currently this is the only endpoint that needs multiple pages
-        return $this->endpoint === Ranking::ENDPOINT_PILOTS;
+        return $this->endpoint === Rank::ENDPOINT_PILOTS;
     }
 
     private function buildQuery(ParamsInterface $params, string $rankingDate): string

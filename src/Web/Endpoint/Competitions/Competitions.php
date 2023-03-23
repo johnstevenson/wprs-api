@@ -11,14 +11,14 @@ class Competitions extends Application
     private CompetitionsParams $params;
 
     public function __construct(
-        int $activity,
+        int $discipline,
         ?FilterInterface $filter = null,
         ?DownloaderInterface $downloader = null
     ) {
         $this->params = new CompetitionsParams();
         $parser = new CompetitionsParser();
 
-        parent::__construct($activity, $parser, $filter, $downloader);
+        parent::__construct($discipline, $parser, $filter, $downloader);
     }
 
     public function getData(?string $rankingDate = null): array
@@ -35,16 +35,5 @@ class Competitions extends Application
         ];
 
         return $result;
-    }
-
-    private function setMeta(int $activity, string $rankingDate): void
-    {
-        $result = [
-            'endpoint' => Ranking::getEndpoint($this->endpoint),
-            'activity' => Ranking::getActivity($activity),
-            ''
-
-
-        ];
     }
 }

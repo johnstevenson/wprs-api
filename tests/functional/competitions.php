@@ -2,13 +2,13 @@
 
 require __DIR__.'/../../vendor/autoload.php';
 
-use Wprs\Api\Web\Ranking;
+use Wprs\Api\Web\Rank;
 use Wprs\Api\Web\Factory;
 
-$type = Ranking::ENDPOINT_COMPETITIONS;
-$activity = Ranking::ACTIVITY_PG_XC;
+$type = Rank::ENDPOINT_COMPETITIONS;
+$discipline = Rank::DISCIPLINE_PG_XC;
 
-$endpoint = Factory::createEndpoint($type, $activity);
+$endpoint = Factory::createEndpoint($type, $discipline);
 
 try {
     $data = $endpoint->getData(null);
@@ -34,8 +34,8 @@ foreach ($data['data']['items'] as $item) {
 
 printf('Competitions: %d, last update: %s, (%s)%s', $count, $lastDate, $name, PHP_EOL);
 
-$type = Ranking::ENDPOINT_COMPETITION;
-$endpoint = Factory::createEndpoint($type, $activity);
+$type = Rank::ENDPOINT_COMPETITION;
+$endpoint = Factory::createEndpoint($type, $discipline);
 
 try {
     $data = $endpoint->getData($rankingDate, $compId);

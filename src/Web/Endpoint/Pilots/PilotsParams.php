@@ -3,7 +3,7 @@
 namespace Wprs\Api\Web\Endpoint\Pilots;
 
 use Wprs\Api\Web\ParamsInterface;
-use Wprs\Api\Web\Ranking;
+use Wprs\Api\Web\Rank;
 
 class PilotsParams implements ParamsInterface
 {
@@ -29,8 +29,8 @@ class PilotsParams implements ParamsInterface
             $params['search[nation_id]'] = (string) $this->nationId;
         }
 
-        if (null !== $this->scoring && $this->scoring !== Ranking::SCORING_OVERALL) {
-            $params['search[scoringCategory]'] = (string) Ranking::getScoring($this->scoring) ;
+        if (null !== $this->scoring && $this->scoring !== Rank::SCORING_OVERALL) {
+            $params['search[scoringCategory]'] = (string) Rank::getScoring($this->scoring) ;
         }
 
         return $params;
@@ -39,7 +39,7 @@ class PilotsParams implements ParamsInterface
     public function getDetails(): array
     {
         $meta = [
-            'region' => Ranking::getRegion($this->regionId),
+            'region' => Rank::getRegion($this->regionId),
             'region_id' => $this->regionId,
         ];
 
@@ -48,22 +48,22 @@ class PilotsParams implements ParamsInterface
             $meta['nation_id'] = $this->nationId;
         }
 
-        $scoring = $this->scoring ?? Ranking::SCORING_OVERALL;
-        $meta['scoring'] = Ranking::getScoring($scoring);
+        $scoring = $this->scoring ?? Rank::SCORING_OVERALL;
+        $meta['scoring'] = Rank::getScoring($scoring);
 
         return $meta;
     }
 
     private function setRegionId(int $regionId)
     {
-        Ranking::getRegion($regionId);
+        Rank::getRegion($regionId);
         $this->regionId = $regionId;
     }
 
     private function setScoring(?int $scoring)
     {
         if (null !== $scoring) {
-            Ranking::getScoring($scoring);
+            Rank::getScoring($scoring);
         }
 
         $this->scoring = $scoring;

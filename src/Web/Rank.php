@@ -2,28 +2,30 @@
 
 namespace Wprs\Api\Web;
 
-class Ranking
+class Rank
 {
     public const URL_RANKING = 'https://civlcomps.org/ranking';
 
-    public const ACTIVITY_HG_CLASS_1 = 1;
-    public const ACTIVITY_HG_CLASS_2 = 2;
-    public const ACTIVITY_HG_CLASS_5 = 3;
-    public const ACTIVITY_HG_CLASS_1_SPORT = 4;
-    public const ACTIVITY_PG_XC = 5;
-    public const ACTIVITY_PG_ACCURACY = 6;
-    public const ACTIVITY_PG_ACRO_SOLO = 7;
-    public const ACTIVITY_PG_ACRO_SYNCRO = 8;
+    public const DISCIPLINE_HG_CLASS_1 = 2;
+    public const DISCIPLINE_HG_CLASS_1_SPORT = 10;
+    public const DISCIPLINE_HG_CLASS_2 = 8;
+    public const DISCIPLINE_HG_CLASS_5 = 3;
 
-    private const ACTIVITIES = [
-        self::ACTIVITY_HG_CLASS_1 => 'hang-gliding-class-1-xc',
-        self::ACTIVITY_HG_CLASS_2 => 'hang-gliding-class-2-xc',
-        self::ACTIVITY_HG_CLASS_5 => 'hang-gliding-class-5-xc',
-        self::ACTIVITY_HG_CLASS_1_SPORT => 'hang-gliding-class-1-sport-xc',
-        self::ACTIVITY_PG_XC => 'paragliding-xc',
-        self::ACTIVITY_PG_ACCURACY => 'paragliding-accuracy',
-        self::ACTIVITY_PG_ACRO_SOLO => 'paragliding-aerobatics',
-        self::ACTIVITY_PG_ACRO_SYNCRO => 'paragliding-acro-syncro',
+    public const DISCIPLINE_PG_XC = 1;
+    public const DISCIPLINE_PG_ACCURACY = 4;
+    public const DISCIPLINE_PG_ACRO_SOLO = 5;
+    public const DISCIPLINE_PG_ACRO_SYNCRO = 6;
+
+    private const DISCIPLINES = [
+        self::DISCIPLINE_HG_CLASS_1 => 'hang-gliding-class-1-xc',
+        self::DISCIPLINE_HG_CLASS_1_SPORT => 'hang-gliding-class-1-sport-xc',
+        self::DISCIPLINE_HG_CLASS_2 => 'hang-gliding-class-2-xc',
+        self::DISCIPLINE_HG_CLASS_5 => 'hang-gliding-class-5-xc',
+
+        self::DISCIPLINE_PG_XC => 'paragliding-xc',
+        self::DISCIPLINE_PG_ACCURACY => 'paragliding-accuracy',
+        self::DISCIPLINE_PG_ACRO_SOLO => 'paragliding-aerobatics',
+        self::DISCIPLINE_PG_ACRO_SYNCRO => 'paragliding-acro-syncro',
     ];
 
     public const ENDPOINT_PILOT = 101;
@@ -66,12 +68,12 @@ class Ranking
 
     private const API_VERSION = '1.0';
 
-    public static function getPath(int $activity, int $endPoint): string
+    public static function getPath(int $discipline, int $endPoint): string
     {
         return sprintf(
             '%s/%s/%s',
             self::URL_RANKING,
-            self::getActivity($activity),
+            self::getDiscipline($discipline),
             self::getEndpoint($endPoint)
         );
     }
@@ -81,12 +83,12 @@ class Ranking
         return self::API_VERSION;
     }
 
-    public static function getActivity(int $activity): string
+    public static function getDiscipline(int $discipline): string
     {
-        $result = self::ACTIVITIES[$activity] ?? null;
+        $result = self::DISCIPLINES[$discipline] ?? null;
 
         if (null === $result) {
-            throw new \RuntimeException('Activity not recognized: '.$activity);
+            throw new \RuntimeException('Discipline not recognized: '.$discipline);
         }
 
         return $result;
@@ -138,11 +140,11 @@ class Ranking
         return $result;
     }
 
-    public static function getMeta(int $activity, int $endpoint): array
+    public static function getMeta(int $discipline, int $endpoint): array
     {
         return [
             'endpoint' => self::getEndpoint($endpoint),
-            'activity' => self::getActivity($activity),
+            'discipline' => self::getDiscipline($discipline),
             'ranking_date' => null,
             'count' => 0,
             'version' => self::getVersion()

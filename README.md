@@ -7,18 +7,18 @@
 
 ## Usage
 
-**1.** Create an endpoint instance based on the type of data you want and the WPRS activity (discipline):
+**1.** Create an endpoint instance based on the type of data you want and the WPRS discipline (discipline):
 
  ```php
 require __DIR__.'/app/vendor/autoload.php';
 
-use Wprs\Api\Web\Ranking;
+use Wprs\Api\Web\Rank;
 use Wprs\Api\Web\Factory;
 
-$type = Ranking::ENDPOINT_PILOTS;
-$activity = Ranking::ACTIVITY_PG_XC;
+$type = Rank::ENDPOINT_PILOTS;
+$discipline = Rank::DISCIPLINE_PG_XC;
 
-$endpoint = Factory::createEndpoint($type, $activity);
+$endpoint = Factory::createEndpoint($type, $discipline);
 ```
 
 **2.** Use the `getData` method to return data for a specific ranking period.
@@ -38,7 +38,7 @@ are primarily intended for any additional curl options (identified by the `'curl
 be used for [filtering data](#filtering-data).
 
 ```php
-$endpoint = Factory::createEndpoint($type, $activity);
+$endpoint = Factory::createEndpoint($type, $discipline);
 
 $options['curl'] = [CURLOPT_PROXY => 'https://myproxy.com'];
 $endpoint->setOptions($options);
@@ -70,7 +70,7 @@ The data is returned as a PHP array, which can be encoded to JSON. This comprise
 ```jsonc
 "meta": {
     "endpoint": ""      // endpoint name
-    "activity": ""      // discipline
+    "discipline": ""    // discipline
     "ranking_date": ""  // ranking period
     "count": 0          // count of objects in data/items
     "version": "1.0"    // api version
@@ -100,22 +100,22 @@ floating-point values (`"355.9"`). Any missing string values are returned as an 
 
 This endpoint requires a `PilotsParams` instance, which takes the following parameters:
 
-**_$regionId_** (int) Required. One of the `Ranking::REGION_` constants.
+**_$regionId_** (int) Required. One of the following constants.
 ```
-REGION_WORLD
-REGION_EUROPE
-REGION_AFRICA
-REGION_ASIA_OCEANIA
-REGION_PAN_AMERICA
+Rank::REGION_WORLD
+Rank::REGION_EUROPE
+Rank::REGION_AFRICA
+Rank::REGION_ASIA_OCEANIA
+Rank::REGION_PAN_AMERICA
 ```
 
 **_$nationId_** (int) Optional. The nation id.
 
-**_$scoring_** (int) Optional. One of the `Ranking::SCORING_` constants.
+**_$scoring_** (int) Optional. One of the following constants.
 ```
-SCORING_OVERALL
-SCORING_FEMALE
-SCORING_JUNIOR
+Rank::SCORING_OVERALL
+Rank::SCORING_FEMALE
+Rank::SCORING_JUNIOR
 ```
 
 The current CIVL website only returns 20 pilots per page, so downloading the current World ranking
@@ -129,17 +129,17 @@ Gets the ranking of all UK pilots (nation id 223) in Europe for the current rank
  ```php
 require __DIR__.'/app/vendor/autoload.php';
 
-use Wprs\Api\Web\Ranking;
+use Wprs\Api\Web\Rank;
 use Wprs\Api\Web\Factory;
 
-$type = Ranking::ENDPOINT_PILOTS;
+$type = Rank::ENDPOINT_PILOTS;
 
-// set activity type and create the endpoint
-$activity = Ranking::ACTIVITY_PG_XC;
-$endpoint = Factory::createEndpoint($type, $activity);
+// set discipline and create the endpoint
+$discipline = Rank::DISCIPLINE_PG_XC;
+$endpoint = Factory::createEndpoint($type, $discipline);
 
 // set parameters and create params instance
-$regionId = Ranking::REGION_EUROPE;
+$regionId = Rank::REGION_EUROPE;
 $nationId = 223;
 $params = Factory::createParams($type, $regionId, $nationId);
 
@@ -154,7 +154,7 @@ $data = $endpoint->getData(null, $params);
 ```jsonc
 "meta": {
     "endpoint": "pilots",
-    "activity": "paragliding-xc",
+    "discipline": "paragliding-xc",
     "ranking_date": "2020-03-01",
     "count": 190,
     "version": "1.0"
@@ -210,17 +210,17 @@ Gets data about a specific competition at a specific ranking period.
 ```php
 require __DIR__.'/app/vendor/autoload.php';
 
-use Wprs\Api\Web\Ranking;
+use Wprs\Api\Web\Rank;
 use Wprs\Api\Web\Factory;
 
-$type = Ranking::ENDPOINT_COMPETITION;
+$type = Rank::ENDPOINT_COMPETITION;
 
-// set activity type, ranking period and competition id
-$activity = Ranking::ACTIVITY_PG_XC;
+// set discipline, ranking period and competition id
+$discipline = Rank::DISCIPLINE_PG_XC;
 $rankingDate = '2023-03-01';
 $compId = 6234;
 
-$endpoint = Factory::createEndpoint($type, $activity);
+$endpoint = Factory::createEndpoint($type, $discipline);
 $data = $endpoint->getData($rankingDate, $compId);
 ```
 
@@ -231,7 +231,7 @@ $data = $endpoint->getData($rankingDate, $compId);
 ```jsonc
 "meta": {
     "endpoint": "competition",
-    "activity": "paragliding-xc",
+    "discipline": "paragliding-xc",
     "ranking_date": "2023-03-01",
     "count": 90,
     "version": "1.0"
@@ -287,15 +287,15 @@ Gets all competitions used in the current ranking.
 ```php
 require __DIR__.'/app/vendor/autoload.php';
 
-use Wprs\Api\Web\Ranking;
+use Wprs\Api\Web\Rank;
 use Wprs\Api\Web\Factory;
 
-$type = Ranking::ENDPOINT_COMPETITIONS;
+$type = Rank::ENDPOINT_COMPETITIONS;
 
-// set activity type
-$activity = Ranking::ACTIVITY_PG_XC;
+// set discipline
+$discipline = Rank::DISCIPLINE_PG_XC;
 
-$endpoint = Factory::createEndpoint($type, $activity);
+$endpoint = Factory::createEndpoint($type, $discipline);
 $data = $endpoint->getData();
 ```
 
@@ -306,7 +306,7 @@ $data = $endpoint->getData();
 ```jsonc
 "meta": {
     "endpoint": "competitions",
-    "activity": "paragliding-xc",
+    "discipline": "paragliding-xc",
     "ranking_date": "2023-03-01",
     "count": 354,
     "version": "1.0"

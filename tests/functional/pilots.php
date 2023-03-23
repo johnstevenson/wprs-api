@@ -2,13 +2,13 @@
 
 require __DIR__.'/../../vendor/autoload.php';
 
-use Wprs\Api\Web\Ranking;
+use Wprs\Api\Web\Rank;
 use Wprs\Api\Web\Factory;
 
-$type = Ranking::ENDPOINT_PILOTS;
-$activity = Ranking::ACTIVITY_PG_XC;
+$type = Rank::ENDPOINT_PILOTS;
+$discipline = Rank::DISCIPLINE_PG_XC;
 
-$endpoint = Factory::createEndpoint($type, $activity);
+$endpoint = Factory::createEndpoint($type, $discipline);
 $endpoint->setRestricted();
 
 $params = Factory::createParams($type, 0);

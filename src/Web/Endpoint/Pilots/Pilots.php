@@ -9,13 +9,13 @@ use Wprs\Api\Web\FilterInterface;
 class Pilots extends Application
 {
     public function __construct(
-        int $activity,
+        int $discipline,
         ?FilterInterface $filter = null,
         ?DownloaderInterface $downloader = null
     ) {
         $parser = new PilotsParser();
 
-        parent::__construct($activity, $parser, $filter, $downloader);
+        parent::__construct($discipline, $parser, $filter, $downloader);
     }
 
     public function getData(?string $rankingDate, PilotsParams $params): array

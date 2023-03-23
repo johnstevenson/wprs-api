@@ -9,22 +9,22 @@ use Wprs\Api\Web\FilterInterface;
 class Competition extends Application
 {
     public function __construct(
-        int $activity,
+        int $discipline,
         ?FilterInterface $filter = null,
         ?DownloaderInterface $downloader = null
     ) {
         $parser = new CompetitionParser();
 
-        parent::__construct($activity, $parser, $filter, $downloader);
+        parent::__construct($discipline, $parser, $filter, $downloader);
     }
 
-    public function getData(string $rankingDate, $param): array
+    public function getData(string $rankingDate, $params): array
     {
-        if (!($param instanceof CompetitionParams)) {
-            if (!is_integer($param)) {
+        if (!($params instanceof CompetitionParams)) {
+            if (!is_integer($params)) {
                 throw new \RuntimeException('The competition id must be an integer.');
             }
-            $params = new CompetitionParams($param);
+            $params = new CompetitionParams($params);
         }
 
         $data = parent::run($rankingDate, $params);
