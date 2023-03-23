@@ -276,9 +276,9 @@ $data = $endpoint->getData($rankingDate, $compId);
 
 ### Competitions endpoint
 
-**_getData_** (?string _$rankingDate): array_
+**_getData_** (?string _$rankingDate = null): array_
 
-This endpoint only needs a `$rankingDate`, which can be null.
+This endpoint only needs a `$rankingDate`, which is optional.
 
 #### Example
 
@@ -296,7 +296,7 @@ $type = Ranking::ENDPOINT_COMPETITIONS;
 $activity = Ranking::ACTIVITY_PG_XC;
 
 $endpoint = Factory::createEndpoint($type, $activity);
-$data = $endpoint->getData(null);
+$data = $endpoint->getData();
 ```
 
 #### Response

@@ -21,7 +21,7 @@ class Competitions extends Application
         parent::__construct($activity, $parser, $filter, $downloader);
     }
 
-    public function getData(?string $rankingDate): array
+    public function getData(?string $rankingDate = null): array
     {
         $data = parent::run($rankingDate, $this->params);
         $meta = parent::getMeta();
