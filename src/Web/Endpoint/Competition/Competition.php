@@ -18,27 +18,14 @@ class Competition extends Application
         parent::__construct($discipline, $parser, $filter, $downloader);
     }
 
-    public function getData(string $rankingDate, $params): array
+    public function getData(string $rankingDate, int $id): array
     {
-        if (!($params instanceof CompetitionParams)) {
-            if (!is_integer($params)) {
-                throw new \RuntimeException('The competition id must be an integer.');
-            }
-            $params = new CompetitionParams($params);
-        }
-
+        $params = new CompetitionParams($id);
         $data = parent::run($rankingDate, $params);
-        $meta = parent::getMeta();
+
+        // Add competition id to details
         $details = array_merge($data->extras['details'], $params->getDetails());
 
-        $result = [
-            'meta' => $meta,
-            'data' => [
-                'details' => $details,
-                'items' => $data->items,
-            ],
-        ];
-
-        return $result;
+        return parent::formatOutput($details);
     }
 }

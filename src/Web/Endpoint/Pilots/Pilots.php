@@ -21,22 +21,14 @@ class Pilots extends Application
     public function getData(?string $rankingDate, PilotsParams $params): array
     {
         $data = parent::run($rankingDate, $params);
-        $meta = parent::getMeta();
         $details = $params->getDetails();
 
+        // Add nation name if nation id was requested
         if (isset($details['nation']) && isset($data->items[0]['nation'])) {
             $details['nation'] = $data->items[0]['nation'];
         }
 
-        $result = [
-            'meta' => $meta,
-            'data' => [
-                'details' => $details,
-                'items' => $data->items
-            ],
-        ];
-
-        return $result;
+        return parent::formatOutput($details);
     }
 
     public function getOverallCount(?string $rankingDate, PilotsParams $params): int

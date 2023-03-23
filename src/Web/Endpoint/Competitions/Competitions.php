@@ -8,14 +8,11 @@ use Wprs\Api\Web\FilterInterface;
 
 class Competitions extends Application
 {
-    private CompetitionsParams $params;
-
     public function __construct(
         int $discipline,
         ?FilterInterface $filter = null,
         ?DownloaderInterface $downloader = null
     ) {
-        $this->params = new CompetitionsParams();
         $parser = new CompetitionsParser();
 
         parent::__construct($discipline, $parser, $filter, $downloader);
@@ -23,17 +20,9 @@ class Competitions extends Application
 
     public function getData(?string $rankingDate = null): array
     {
-        $data = parent::run($rankingDate, $this->params);
-        $meta = parent::getMeta();
+        $params = new CompetitionsParams();
+        $data = parent::run($rankingDate, $params);
 
-        $result = [
-            'meta' => $meta,
-            'data' => [
-                'details' => null,
-                'items' => $data->items
-            ],
-        ];
-
-        return $result;
+        return parent::formatOutput(null);
     }
 }

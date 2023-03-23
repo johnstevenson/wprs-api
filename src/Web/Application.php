@@ -34,28 +34,6 @@ abstract class Application
         $this->meta = Rank::getMeta($discipline, $this->endpoint);
     }
 
-    public function run(?string $rankingDate, ParamsInterface $params): DataCollector
-    {
-        $this->dataCollector = null;
-        $rankingDate = $this->checkDateFormat($rankingDate);
-        $this->meta['ranking_date'] = $rankingDate;
-
-        $qs = $this->buildQuery($params, $rankingDate);
-        $url = $this->path.'?'.$qs;
-
-        $response = $this->downloader->get($url, $this->options);
-        $this->processResponses([$response]);
-
-        $urls = $this->getRemainingUrls($this->dataCollector, $url, $this->restricted);
-
-        if (!empty($urls)) {
-            $responses = $this->downloader->getBatch($urls, $this->options);
-            $this->processResponses($responses);
-        }
-
-        return $this->dataCollector;
-    }
-
     public function setOptions(array $options): self
     {
         $curlOptions = $options['curl'] ?? null;
@@ -79,15 +57,43 @@ abstract class Application
         return $this;
     }
 
-    protected function getMeta(): array
+    protected function run(?string $rankingDate, ParamsInterface $params): DataCollector
+    {
+        $this->dataCollector = null;
+        $rankingDate = $this->checkDateFormat($rankingDate);
+        $this->meta['ranking_date'] = $rankingDate;
+
+        $qs = $this->buildQuery($params, $rankingDate);
+        $url = $this->path.'?'.$qs;
+
+        $response = $this->downloader->get($url, $this->options);
+        $this->processResponses([$response]);
+
+        $urls = $this->getRemainingUrls($this->dataCollector, $url, $this->restricted);
+
+        if (!empty($urls)) {
+            $responses = $this->downloader->getBatch($urls, $this->options);
+            $this->processResponses($responses);
+        }
+
+        return $this->dataCollector;
+    }
+
+    protected function formatOutput(?array $details)
     {
         if (null === $this->dataCollector) {
-            throw new \RuntimeException('Meta data has not been generated');
+            throw new \RuntimeException('Data has not been generated');
         }
 
         $this->meta['count'] = $this->dataCollector->itemCount;
 
-        return $this->meta;
+        return [
+            'meta' => $this->meta,
+            'data' => [
+                'details' => $details,
+                'items' => $this->dataCollector->items,
+            ],
+        ];
     }
 
     private function checkDateFormat(?string $rankingDate): string

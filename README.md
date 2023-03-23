@@ -7,7 +7,7 @@
 
 ## Usage
 
-**1.** Create an endpoint instance based on the type of data you want and the WPRS discipline (discipline):
+**1.** Create an endpoint instance based on the type of data you want and the WPRS discipline:
 
  ```php
 require __DIR__.'/app/vendor/autoload.php';
@@ -28,7 +28,7 @@ $rankingDate = '2023-03-01';
 $data = $endpoint->getData($rankingDate, $params);
 ```
 
-The `$params` parameters are different for each endpoint and are described in [Endpoints](#endpoints).
+The `$params` value is different for each endpoint and is described in [Endpoints](#endpoints).
 
 ### Advanced usage
 
@@ -58,8 +58,8 @@ interface FilterInterface
 }
 ```
 
-The `filter` method can be used to modify each item before it is added to the `items` array. To
-prevent an item being added, return null.
+The `filter` method can be used to modify each item before it is added to the `data/items` array of
+the output data. To prevent an item being added, return null.
 
 The `setOptions` method will receive any non-curl [user options](#user-options) that have been set.
 
@@ -69,10 +69,10 @@ The data is returned as a PHP array, which can be encoded to JSON. This comprise
 
 ```jsonc
 "meta": {
-    "endpoint": ""      // endpoint name
-    "discipline": ""    // discipline
-    "ranking_date": ""  // ranking period
-    "count": 0          // count of objects in data/items
+    "endpoint": "",     // endpoint name
+    "discipline": "",   // discipline
+    "ranking_date": "", // ranking period
+    "count": 0,         // count of objects in data/items
     "version": "1.0"    // api version
 },
 "data" {
@@ -85,8 +85,8 @@ The data is returned as a PHP array, which can be encoded to JSON. This comprise
 }
 ```
 
-Numeric values are returned as JSON numbers if they are integers (`90`), or strings if they are
-floating-point values (`"355.9"`). Any missing string values are returned as an empty string (`""`).
+Numeric values are returned as JSON numbers if they are integers, or strings if they are
+floating-point values. Any missing string values are returned as an empty string.
 
 ## Endpoints
 
@@ -96,7 +96,7 @@ floating-point values (`"355.9"`). Any missing string values are returned as an 
 
 ### Pilots endpoint
 
-**_getData_** (?string _$rankingDate_, PilotsParams _$params_): array
+**_getData_**(?string _$rankingDate_, PilotsParams _$params_): array
 
 This endpoint requires a `PilotsParams` instance, which takes the following parameters:
 
@@ -148,14 +148,14 @@ $data = $endpoint->getData(null, $params);
 
 #### Response
 
-`data/details` are the name and id of the region (and nation, if specified) and the scoring category.
-`data/items` are the details, ranking and competition scores for each pilot.
+`data/details` is the name and id of the region (and nation, if specified) and the scoring category.
+`data/items` lists the details, ranking and competition scores for each pilot.
 
 ```jsonc
 "meta": {
     "endpoint": "pilots",
     "discipline": "paragliding-xc",
-    "ranking_date": "2020-03-01",
+    "ranking_date": "2023-03-01",
     "count": 190,
     "version": "1.0"
 }
@@ -199,9 +199,9 @@ $data = $endpoint->getData(null, $params);
 
 ### Competition endpoint
 
-**_getData_** (string _$rankingDate_, int _$id_): array
+**_getData_**(string _$rankingDate_, int _$id_): array
 
-`$id` is the competition id and `$rankingDate` is required and cannot be null.
+`$id` is the competition id. Note that `$rankingDate` is required and cannot be null.
 
 #### Example
 
@@ -226,7 +226,7 @@ $data = $endpoint->getData($rankingDate, $compId);
 
 #### Response
 
-`data/details` are the competition details. `data/items` are the results for each competitor.
+`data/details` is the competition details. `data/items` lists the results for each competitor.
 
 ```jsonc
 "meta": {
@@ -276,7 +276,7 @@ $data = $endpoint->getData($rankingDate, $compId);
 
 ### Competitions endpoint
 
-**_getData_** (?string _$rankingDate = null): array_
+**_getData_**(?string _$rankingDate = null): array_
 
 This endpoint only needs a `$rankingDate`, which is optional.
 
@@ -301,7 +301,7 @@ $data = $endpoint->getData();
 
 #### Response
 
-`data/details` is empty (null). `data/items` are the details of each competition.
+`data/details` is empty (null). `data/items` lists the details of each competition.
 
 ```jsonc
 "meta": {
