@@ -18,8 +18,9 @@ class Pilots extends Application
         parent::__construct($discipline, $parser, $filter, $downloader);
     }
 
-    public function getData(?string $rankingDate, PilotsParams $params): array
+    public function getData(?string $rankingDate, int $regionId, ?int $nationId = null, ?int $scoring = null): array
     {
+        $params = new PilotsParams($regionId, $nationId, $scoring);
         $data = parent::run($rankingDate, $params);
         $details = $params->getDetails();
 
@@ -31,9 +32,10 @@ class Pilots extends Application
         return parent::formatOutput($details);
     }
 
-    public function getOverallCount(?string $rankingDate, PilotsParams $params): int
+    public function getCount(?string $rankingDate, int $regionId, ?int $nationId = null, ?int $scoring = null): int
     {
         $this->setRestricted();
+        $params = new PilotsParams($regionId, $nationId, $scoring);
         $data = parent::run($rankingDate, $params);
 
         return $data->overallCount;

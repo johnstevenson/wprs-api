@@ -16,22 +16,11 @@ class Factory
         $class = self::getEndPointClass($name);
 
         if (!class_exists($class)) {
-            self::notifyNotImplemented($name);
+            $msg = sprintf('The %s endpoint has not been implemented.', $name);
+            throw new \RuntimeException($msg);
         }
 
         return new $class($discipline, $filter, $downloader);
-    }
-
-    public static function createParams(int $endpointType, ...$args): ParamsInterface
-    {
-        $name = self::getEndpointName($endpointType);
-        $class = self::getEndPointClass($name, 'Params');
-
-        if (!class_exists($class)) {
-            self::notifyNotImplemented($name);
-        }
-
-        return new $class(...$args);
     }
 
     private static function getEndpointName(int $endpoint): string
@@ -44,11 +33,5 @@ class Factory
         $format = '\\%s\\Endpoint\\%s\\%s'.$suffix;
 
         return sprintf($format, __NAMESPACE__, $name, $name);
-    }
-
-    private static function notifyNotImplemented($name)
-    {
-        $msg = sprintf('The %s endpoint has not been implemented.', $name);
-        throw new \RuntimeException($msg);
     }
 }

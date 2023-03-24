@@ -11,11 +11,9 @@ $discipline = Rank::DISCIPLINE_PG_XC;
 $endpoint = Factory::createEndpoint($type, $discipline);
 $endpoint->setRestricted();
 
-$params = Factory::createParams($type, 0);
-
 try {
     $start = microtime(true);
-    $count = $endpoint->getOverallCount(null, $params);
+    $count = $endpoint->getCount(null, Rank::REGION_WORLD);
 } catch (Exception $e) {
     printf(
         'Failed in %s, line %d, message: %s%s',

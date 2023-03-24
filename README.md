@@ -96,11 +96,11 @@ floating-point values. Any missing string values are returned as an empty string
 
 ### Pilots endpoint
 
-**_getData_**(?string _$rankingDate_, PilotsParams _$params_): array
+**_getData_**(?string _$rankingDate_, int _$regionId_, ?int _$nationId_ = null,
+?int _$scoring_ = null): array
 
-This endpoint requires a `PilotsParams` instance, which takes the following parameters:
 
-**_$regionId_** (int) Required. One of the following constants.
+`$regionId` is one of the following constants:
 ```
 Rank::REGION_WORLD
 Rank::REGION_EUROPE
@@ -109,19 +109,14 @@ Rank::REGION_ASIA_OCEANIA
 Rank::REGION_PAN_AMERICA
 ```
 
-**_$nationId_** (int) Optional. The nation id.
+`$nationId` is the nation id.
 
-**_$scoring_** (int) Optional. One of the following constants.
+`$scoring` is one of the following constants:
 ```
 Rank::SCORING_OVERALL
 Rank::SCORING_FEMALE
 Rank::SCORING_JUNIOR
 ```
-
-The current CIVL website only returns 20 pilots per page, so downloading the current World ranking
-data requires more than 300 requests. This takes some time and is prone to timeout errors when the
-server is busy. This endpoint also provides a `getOverallCount` method, with the same parameters
-as `getData`, which downloads a single page and returns the number of pilots in the ranking.
 
 #### Example
 Gets the ranking of all UK pilots (nation id 223) in Europe for the current ranking period.
@@ -138,12 +133,11 @@ $type = Rank::ENDPOINT_PILOTS;
 $discipline = Rank::DISCIPLINE_PG_XC;
 $endpoint = Factory::createEndpoint($type, $discipline);
 
-// set parameters and create params instance
+// set region id and other required params
 $regionId = Rank::REGION_EUROPE;
 $nationId = 223;
-$params = Factory::createParams($type, $regionId, $nationId);
 
-$data = $endpoint->getData(null, $params);
+$data = $endpoint->getData(null, $regionId, $nationId);
 ```
 
 #### Response
@@ -195,7 +189,12 @@ $data = $endpoint->getData(null, $params);
 }
 ```
 
-[back to Endpoints](#endpoints)
+The current CIVL website only returns 20 pilots per page, so downloading the World ranking data
+requires more than 300 requests. This takes some time and can be prone to timeout errors when the
+server is busy. This endpoint also provides a `getCount` method, with the same parameters as
+`getData`, which downloads a single page and returns the number of pilots in the ranking.
+
+[Back to Endpoints](#endpoints)
 
 ### Competition endpoint
 
@@ -272,7 +271,7 @@ $data = $endpoint->getData($rankingDate, $compId);
     ]
 }
 ```
-[back to Endpoints](#endpoints)
+[Back to Endpoints](#endpoints)
 
 ### Competitions endpoint
 
@@ -337,7 +336,7 @@ $data = $endpoint->getData();
 }
 ```
 
-[back to Endpoints](#endpoints)
+[Back to Endpoints](#endpoints)
 
 ## License
 This library is licensed under the MIT License, see the LICENSE file for details.
