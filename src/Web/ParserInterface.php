@@ -2,6 +2,8 @@
 
 namespace Wprs\Api\Web;
 
+use Wprs\Api\Web\Endpoint\DataCollector;
+
 interface ParserInterface
 {
     public function parse(string $html, ?FilterInterface $filter = null): DataCollector;

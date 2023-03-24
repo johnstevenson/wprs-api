@@ -4,12 +4,12 @@ namespace Wprs\Api\Web\Endpoint\Pilots;
 
 use \DOMElement;
 use \DOMNodeList;
-use Wprs\Api\Web\DataCollector;
-use Wprs\Api\Web\DomUtils;
+use Wprs\Api\Web\Endpoint\DataCollector;
+use Wprs\Api\Web\Endpoint\DomUtils;
+use Wprs\Api\Web\Endpoint\XPathDom;
 use Wprs\Api\Web\FilterInterface;
 use Wprs\Api\Web\Endpoint\EventParser;
 use Wprs\Api\Web\ParserInterface;
-use Wprs\Api\Web\XPathDom;
 
 class PilotsParser implements ParserInterface
 {

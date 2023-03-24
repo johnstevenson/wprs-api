@@ -5,9 +5,6 @@ namespace Wprs\Api\Web\Endpoint;
 use \DOMElement;
 use \DOMNodeList;
 
-use Wprs\Api\Web\DomUtils;
-use Wprs\Api\Web\XPathDom;
-
 class EventParser
 {
     private XPathDom $xpath;

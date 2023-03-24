@@ -5,6 +5,7 @@ namespace Wprs\Api\Web;
 use Wprs\Api\Http\DownloaderInterface;
 use Wprs\Api\Http\HttpDownloader;
 use Wprs\Api\Http\Response;
+use Wprs\Api\Web\Endpoint\DataCollector;
 
 abstract class Application
 {
