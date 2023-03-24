@@ -6,6 +6,9 @@ use Wprs\Api\Http\DownloaderInterface;
 use Wprs\Api\Http\HttpDownloader;
 use Wprs\Api\Http\Response;
 use Wprs\Api\Web\Endpoint\DataCollector;
+use Wprs\Api\Web\Endpoint\FilterInterface;
+use Wprs\Api\Web\Endpoint\ParamsInterface;
+use Wprs\Api\Web\Endpoint\ParserInterface;
 
 abstract class Application
 {

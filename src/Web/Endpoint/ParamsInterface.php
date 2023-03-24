@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Wprs\Api\Web;
+namespace Wprs\Api\Web\Endpoint;
 
 interface ParamsInterface
 {

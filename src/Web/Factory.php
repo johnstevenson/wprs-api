@@ -3,6 +3,7 @@
 namespace Wprs\Api\Web;
 
 use Wprs\Api\Http\DownloaderInterface;
+use Wprs\Api\Web\Endpoint\FilterInterface;
 
 class Factory
 {

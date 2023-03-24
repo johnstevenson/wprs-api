@@ -6,9 +6,9 @@ use \DOMElement;
 use \DOMNodeList;
 use Wprs\Api\Web\Endpoint\DataCollector;
 use Wprs\Api\Web\Endpoint\DomUtils;
+use Wprs\Api\Web\Endpoint\FilterInterface;
+use Wprs\Api\Web\Endpoint\ParserInterface;
 use Wprs\Api\Web\Endpoint\XPathDom;
-use Wprs\Api\Web\FilterInterface;
-use Wprs\Api\Web\ParserInterface;
 
 
 class CompetitionsParser implements ParserInterface

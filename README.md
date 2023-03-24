@@ -48,7 +48,7 @@ $endpoint->setOptions($options);
 The `Factory::createEndpoint` method accepts a `FilterInterface` instance as its last parameter.
 
 ```php
-namespace Wprs\Api\Web;
+namespace Wprs\Api\Web\Endpoint;
 
 interface FilterInterface
 {

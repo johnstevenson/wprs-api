@@ -2,7 +2,7 @@
 
 namespace Wprs\Api\Web\Endpoint\Pilots;
 
-use Wprs\Api\Web\ParamsInterface;
+use Wprs\Api\Web\Endpoint\ParamsInterface;
 use Wprs\Api\Web\Rank;
 
 class PilotsParams implements ParamsInterface

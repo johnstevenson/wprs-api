@@ -1,8 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Wprs\Api\Web;
-
-use Wprs\Api\Web\Endpoint\DataCollector;
+namespace Wprs\Api\Web\Endpoint;
 
 interface ParserInterface
 {

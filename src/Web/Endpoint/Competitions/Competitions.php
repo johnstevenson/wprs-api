@@ -4,7 +4,7 @@ namespace Wprs\Api\Web\Endpoint\Competitions;
 
 use Wprs\Api\Http\DownloaderInterface;
 use Wprs\Api\Web\Application;
-use Wprs\Api\Web\FilterInterface;
+use Wprs\Api\Web\Endpoint\FilterInterface;
 
 class Competitions extends Application
 {

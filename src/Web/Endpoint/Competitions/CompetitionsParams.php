@@ -2,7 +2,7 @@
 
 namespace Wprs\Api\Web\Endpoint\Competitions;
 
-use Wprs\Api\Web\ParamsInterface;
+use Wprs\Api\Web\Endpoint\ParamsInterface;
 
 class CompetitionsParams implements ParamsInterface
 {
