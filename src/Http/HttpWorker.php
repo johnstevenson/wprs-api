@@ -13,7 +13,7 @@ class HttpWorker
     private array $caOptions;
     private $multiHandle;
     private $shareHandle;
-    private bool $hasGzip;
+    private bool $gzip;
 
     public function __construct()
     {
@@ -50,7 +50,7 @@ class HttpWorker
         curl_setopt($ch, CURLOPT_TIMEOUT, 300);
 
         // User curl options next
-        if (!empty($options['curl'])) {
+        if (count($options['curl']) !== 0) {
             curl_setopt_array($ch, $options['curl']);
         }
 
@@ -81,9 +81,9 @@ class HttpWorker
 
             $curlHandle = $info['handle'];
 
-            /** @var Job */
+            /** @var Job|null */
             $job = $this->jobs[(int) $curlHandle] ?? null;
-            if (null === $job) {
+            if ($job === null) {
                 continue;
             }
 
@@ -171,7 +171,7 @@ class HttpWorker
 
     private function removeCurlHandle(Job $job): void
     {
-        if (null !== $job->curlHandle) {
+        if ($job->curlHandle !== null) {
             curl_multi_remove_handle($this->multiHandle, $job->curlHandle);
             curl_close($job->curlHandle);
             $job->curlHandle = null;

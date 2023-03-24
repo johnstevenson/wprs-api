@@ -44,12 +44,12 @@ abstract class Application
     {
         $curlOptions = $options['curl'] ?? null;
 
-        if (null !== $curlOptions) {
+        if ($curlOptions !== null) {
             $this->options['curl'] = $curlOptions;
             unset($options['curl']);
         }
 
-        if (!empty($options) && null !== $this->filter) {
+        if (count($options) !== 0 && $this->filter !==  null) {
             $this->filter->setOptions($options);
         }
 
@@ -77,7 +77,7 @@ abstract class Application
 
         $urls = $this->getRemainingUrls($this->dataCollector, $url, $this->restricted);
 
-        if (!empty($urls)) {
+        if (count($urls) !== 0) {
             $responses = $this->downloader->getBatch($urls, $this->options);
             $this->processResponses($responses);
         }

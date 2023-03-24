@@ -3,6 +3,7 @@
 namespace Wprs\Api\Web\Endpoint;
 
 use \DOMElement;
+use \DOMNode;
 use \DOMNodeList;
 
 class EventParser
@@ -35,11 +36,11 @@ class EventParser
         return $result;
     }
 
-    private function getPilotValues(DOMElement $element)
+    private function getPilotValues(DOMNode $contextNode)
     {
         $nodes = $this->xpath->start()
             ->with('//div[@class="wrapper-point"]')
-            ->query($element);
+            ->query($contextNode);
 
         $type = 'pilot event values';
         $value = DomUtils::getSingleNodeText($nodes, $type);
@@ -51,17 +52,19 @@ class EventParser
         return [$rank, $points];
     }
 
-    private function getEventValues(DOMElement $element)
+    private function getEventValues(DOMNode $contextNode)
     {
         $nodes = $this->xpath->start()
             ->with('//div[@class="title-event"]/a')
-            ->query($element);
+            ->query($contextNode);
 
         $name = DomUtils::getSingleNodeText($nodes, 'event values');
 
         // this needs more checking and should be a DomUtils method
         // note getAttribute seems to html decode values
-        $url = trim($nodes->item(0)->getAttribute('href'));
+
+        $url = DomUtils::getAttribute($nodes->item(0), 'href', 'event values');
+
         $query = parse_url(html_entity_decode($url), PHP_URL_QUERY);
         parse_str($query, $params);
 

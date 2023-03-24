@@ -3,6 +3,7 @@
 namespace Wprs\Api\Web\Endpoint\Competitions;
 
 use \DOMElement;
+use \DOMNode;
 use \DOMNodeList;
 use Wprs\Api\Web\Endpoint\DataCollector;
 use Wprs\Api\Web\Endpoint\DomUtils;
@@ -40,24 +41,24 @@ class CompetitionsParser implements ParserInterface
         return $dataCollector;
     }
 
-    private function getOverallCount(DOMElement $element): int
+    private function getOverallCount(DOMNode $contextNode): int
     {
         $nodes = $this->xpath->start()
             ->with('//div[@class="table-title-row"]/div')
             ->withClassContains('count-pilots')
             ->with('/span[@class="count"]')
-            ->query($element);
+            ->query($contextNode);
 
         $value = DomUtils::getSingleNodeText($nodes, 'competitions count');
 
         return (int) $value;
     }
 
-    private function checkColumnCount(DomElement $element, int $expected): void
+    private function checkColumnCount(DOMNode $contextNode, int $expected): void
     {
         $nodes = $this->xpath->start()
             ->with('//thead/tr/th')
-            ->query(($element));
+            ->query(($contextNode));
 
         if ($nodes->length !== $expected) {
             $format = 'expected %d competitions table columns, got %d';
@@ -65,11 +66,11 @@ class CompetitionsParser implements ParserInterface
         }
     }
 
-    private function getTablesRows(DomElement $element, int $expected): DOMNodeList
+    private function getTablesRows(DOMNode $contextNode, int $expected): DOMNodeList
     {
         $nodes = $this->xpath->start()
             ->with('//tbody/tr[@data-key]')
-            ->query(($element));
+            ->query(($contextNode));
 
         if ($nodes->length !== $expected) {
             $format = 'expected %d competitions rows, got %d';
@@ -79,9 +80,9 @@ class CompetitionsParser implements ParserInterface
         return $nodes;
     }
 
-    private function parseRow(DomElement $element): array
+    private function parseRow(DOMNode $contextNode): array
     {
-        $columns = $this->getColumns($element);
+        $columns = $this->getColumns($contextNode);
         list($start, $end) = $this->getPeriod($columns->item(0));
         list($name, $id) = $this->getEventValues($columns->item(1));
 
@@ -131,18 +132,18 @@ class CompetitionsParser implements ParserInterface
         return $result;
     }
 
-    private function getColumns(DomElement $element): DOMNodeList
+    private function getColumns(DOMNode $contextNode): DOMNodeList
     {
         $nodes = $this->xpath->start()
             ->with('/td')
-            ->query($element);
+            ->query($contextNode);
 
         return $nodes;
     }
 
-    private function getPeriod(DomElement $element): array
+    private function getPeriod(DOMNode $node): array
     {
-        $childNodes = $element->childNodes;
+        $childNodes = $node->childNodes;
 
         // expecting start <br/> end
         if ($childNodes->length !== 3) {
@@ -180,17 +181,23 @@ class CompetitionsParser implements ParserInterface
         return $date->format('Y-m-d');
     }
 
-    private function getEventValues(DOMElement $element)
+    private function getEventValues(DOMNode $contextNode)
     {
         $nodes = $this->xpath->start()
             ->with('/a[@class="competition-link"]')
-            ->query($element);
+            ->query($contextNode);
 
         $name = DomUtils::getSingleNodeText($nodes, 'event values');
 
         // this needs more checking and should be a DomUtils method
         // note getAttribute seems to html decode values
-        $url = trim($nodes->item(0)->getAttribute('href'));
+
+        $url = '';
+        // for phpstan
+        if ($nodes->item(0) instanceof DOMElement) {
+            $url = trim($nodes->item(0)->getAttribute('href'));
+        }
+
         $query = parse_url(html_entity_decode($url), PHP_URL_QUERY);
         parse_str($query, $params);
 
@@ -207,17 +214,19 @@ class CompetitionsParser implements ParserInterface
     {
         $value = trim($nodes->item($index)->nodeValue);
 
-        if (empty($value || !is_numeric($value))) {
+        if (strlen($value) === 0 || !is_numeric($value)) {
             $value = '0.0';
         }
 
         return $value;
     }
 
-    private function getUpdated(DOMElement $element): string
+    private function getUpdated(DOMNode $node): string
     {
         // updated values can be empty
-        if ($value = trim($element->nodeValue)) {
+        $value = trim($node->nodeValue);
+
+        if (strlen($value) !== 0) {
             return $this->formatDate($value, 'competitions updated');
         }
 

@@ -122,7 +122,7 @@ class HttpDownloader implements DownloaderInterface
             while (true) {
                 $activeJobs = $this->countActiveJobs();
 
-                if (!$activeJobs) {
+                if ($activeJobs === 0) {
                     break;
                 }
             }

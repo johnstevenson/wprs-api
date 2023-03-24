@@ -3,6 +3,7 @@
 namespace Wprs\Api\Web\Endpoint\Competition;
 
 use \DOMElement;
+use \DOMNode;
 use \DOMNodeList;
 use Wprs\Api\Web\Endpoint\DataCollector;
 use Wprs\Api\Web\Endpoint\DomUtils;
@@ -34,48 +35,48 @@ class CompetitionParser implements ParserInterface
         $this->checkColumnCount($pilotTable, 8);
 
         // details table
-        $row = $this->getTablesRows($detailsTable, 1);
-        $details = $this->parseDetailsRow($row->item(0), $compName);
+        $detailsRow = $this->getTablesRows($detailsTable, 1);
+        $details = $this->parseDetailsRow($detailsRow->item(0), $compName);
         $dataCollector->addExtra('details', $details);
 
         // pilot table
         $rows = $this->getTablesRows($pilotTable, $overallCount);
 
-        foreach ($rows as $row) {
-            $item = $this->parsePilotRow($row);
+        foreach ($rows as $pilotRow) {
+            $item = $this->parsePilotRow($pilotRow);
             $dataCollector->add($item, $filter);
         }
 
         return $dataCollector;
     }
 
-    private function getOverallCount(DOMElement $element): int
+    private function getOverallCount(DOMNode $context): int
     {
         $nodes = $this->xpath->start()
             ->with('//div[@class="table-title-row"]/div')
             ->withClassContains('count-pilots')
             ->with('//span[@class="count"]')
-            ->query($element);
+            ->query($context);
 
         $value = DomUtils::getSingleNodeText($nodes, 'pilots count');
 
         return (int) $value;
     }
 
-    private function getCompName(DOMElement $element): string
+    private function getCompName(DOMNode $context): string
     {
         $nodes = $this->xpath->start()
             ->with('/div[@class="header-rankings"]/h2')
-            ->query($element);
+            ->query($context);
 
         return DomUtils::getSingleNodeText($nodes, 'competition name');
     }
 
-    private function checkColumnCount(DomElement $element, int $expected): void
+    private function checkColumnCount(DOMNode $context, int $expected): void
     {
         $nodes = $this->xpath->start()
             ->with('//thead/tr/th')
-            ->query(($element));
+            ->query(($context));
 
         if ($nodes->length !== $expected) {
             $format = 'expected %d competition criteria table columns, got %d';
@@ -83,11 +84,11 @@ class CompetitionParser implements ParserInterface
         }
     }
 
-    private function getTablesRows(DomElement $element, int $expected): DOMNodeList
+    private function getTablesRows(DOMNode $context, int $expected): DOMNodeList
     {
         $nodes = $this->xpath->start()
             ->with('//tbody/tr')
-            ->query(($element));
+            ->query(($context));
 
         if ($nodes->length !== $expected) {
             $format = 'expected %d competitions rows, got %d';
@@ -97,9 +98,9 @@ class CompetitionParser implements ParserInterface
         return $nodes;
     }
 
-    private function parseDetailsRow(DomElement $element, string $compName): array
+    private function parseDetailsRow(DOMNode $context, string $compName): array
     {
-        $columns = $this->getColumns($element);
+        $columns = $this->getColumns($context);
         list($start, $end) = $this->getPeriod($columns->item(0));
 
         $result = [
@@ -157,9 +158,9 @@ class CompetitionParser implements ParserInterface
         return $result;
     }
 
-    private function parsePilotRow(DomElement $element): array
+    private function parsePilotRow(DOMNode $contextNode): array
     {
-        $columns = $this->getColumns($element);
+        $columns = $this->getColumns($contextNode);
         $result = [];
 
         $key = 'rank';
@@ -186,18 +187,18 @@ class CompetitionParser implements ParserInterface
         return $result;
     }
 
-    private function getColumns(DomElement $element): DOMNodeList
+    private function getColumns(DOMNode $context): DOMNodeList
     {
         $nodes = $this->xpath->start()
             ->with('/td')
-            ->query($element);
+            ->query($context);
 
         return $nodes;
     }
 
-    private function getPeriod(DomElement $element): array
+    private function getPeriod(DOMNode $context): array
     {
-        $childNodes = $element->childNodes;
+        $childNodes = $context->childNodes;
 
         // expecting start <br/> end
         if ($childNodes->length !== 3) {
@@ -239,17 +240,19 @@ class CompetitionParser implements ParserInterface
     {
         $value = trim($nodes->item($index)->nodeValue);
 
-        if (empty($value || !is_numeric($value))) {
+        if (strlen($value) === 0 || !is_numeric($value)) {
             throw new \RuntimeException('Missing value for '.$type);
         }
 
         return $value;
     }
 
-    private function getDateValue(DOMElement $element, string $type): string
+    private function getDateValue(DOMNode $node, string $type): string
     {
         // Pq Rank Date and Results Updated values can be empty
-        if ($value = trim($element->nodeValue)) {
+        $value = trim($node->nodeValue);
+
+        if (strlen($value) !== 0) {
             return $this->formatDate($value, $type);
         }
 

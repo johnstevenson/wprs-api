@@ -3,6 +3,7 @@
 namespace Wprs\Api\Web\Endpoint\Pilots;
 
 use \DOMElement;
+use \DOMNode;
 use \DOMNodeList;
 use Wprs\Api\Web\Endpoint\DataCollector;
 use Wprs\Api\Web\Endpoint\DomUtils;
@@ -37,25 +38,25 @@ class PilotsParser implements ParserInterface
         return $dataCollector;
     }
 
-    private function getOverallCount(DOMElement $element): int
+    private function getOverallCount(DOMNode $contextNode): int
     {
         $nodes = $this->xpath->start()
             ->with('//div[@class="table-title-row"]/div')
             ->withClassContains('count-pilots')
             ->with('/span[@class="count"]')
-            ->query($element);
+            ->query($contextNode);
 
         $value = DomUtils::getSingleNodeText($nodes, 'pilot count');
 
         return (int) $value;
     }
 
-    private function getPilotList(DOMElement $element): DOMNodeList
+    private function getPilotList(DOMNode $contextNode): DOMNodeList
     {
         $nodes = $this->xpath->start()
             ->with('//div')
             ->withClassContainsList(['cms__table__row', 'pilot-item'])
-            ->query($element);
+            ->query($contextNode);
 
         return $nodes;
     }
@@ -118,7 +119,7 @@ class PilotsParser implements ParserInterface
         return $nodes;
     }
 
-    private function getMainRanking(DOMElement $column): int
+    private function getMainRanking(DOMNode $column): int
     {
         $nodes = $this->xpath->start()
             ->with('//div[@class="main-ranking"]')
@@ -133,7 +134,7 @@ class PilotsParser implements ParserInterface
         return (int)$value;
     }
 
-    private function getOtherRankings(DOMElement $column): array
+    private function getOtherRankings(DOMNode $column): array
     {
         $result = [];
 
@@ -152,7 +153,7 @@ class PilotsParser implements ParserInterface
         return $result;
     }
 
-    private function getPilotName(DOMElement $column): string
+    private function getPilotName(DOMNode $column): string
     {
         $nodes = $this->xpath->start()
             ->with('//div[@class="pilot-id"]/../a')
@@ -167,14 +168,14 @@ class PilotsParser implements ParserInterface
         return $value;
     }
 
-    private function getPilotGender(DOMElement $column): string
+    private function getPilotGender(DOMNode $column): string
     {
         $value = DomUtils::getElementText($column, 'pilot gender');
 
         return $value;
     }
 
-    private function getNation(DOMElement $column): array
+    private function getNation(DOMNode $column): array
     {
         $nodes = $this->xpath->start()
             ->with('//a[@data-nation-id]')
@@ -182,20 +183,20 @@ class PilotsParser implements ParserInterface
 
         $nation = DomUtils::getSingleNodeText($nodes, 'nation details');
 
-        $value = trim($nodes->item(0)->getAttribute('data-nation-id'));
+        $value = DomUtils::getAttribute($nodes->item(0), 'data-nation-id', 'nation id');
         $nationId = (int) $value;
 
         return [$nation, $nationId];
     }
 
-    private function getPilotPoints(DOMElement $column): string
+    private function getPilotPoints(DOMNode $column): string
     {
         $value = DomUtils::getElementText($column, 'pilot points');
 
         return $value;
     }
 
-    private function getPilotEvents(DOMElement $column): DOMNodeList
+    private function getPilotEvents(DOMNode $column): DOMNodeList
     {
         $nodes = $this->xpath->start()
             ->with('//div[@class="event-wrapper"]')

@@ -30,7 +30,7 @@ class PilotsParams implements ParamsInterface
         }
 
         if (null !== $this->scoring && $this->scoring !== Rank::SCORING_OVERALL) {
-            $params['search[scoringCategory]'] = (string) Rank::getScoring($this->scoring) ;
+            $params['search[scoringCategory]'] = Rank::getScoring($this->scoring) ;
         }
 
         return $params;

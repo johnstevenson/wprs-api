@@ -28,7 +28,7 @@ class XPathDom
         return $this->dom;
     }
 
-    public function getElementById(string $id, ?DOMElement $context = null, bool $throwOnError = true): ?DOMElement
+    public function getElementById(string $id, ?DOMNode $context = null, bool $throwOnError = true): ?DOMNode
     {
         $expression = sprintf('//*[@id="%s"]', $id);
         $this->parts = [$expression];
@@ -79,16 +79,16 @@ class XPathDom
         return $this;
     }
 
-    public function query(?DOMElement $context = null): DOMNodeList
+    public function query(?DOMNode $context = null): DOMNodeList
     {
         $expression = implode('', $this->parts);
 
-        if (empty($expression)) {
+        if (strlen($expression) === 0) {
             throw new \RuntimeException('No expression set for xpath');
         }
 
         // Add initial root element if we have context
-        if (null !== $context && $expression[0] !==  '.') {
+        if ($context !== null && $expression[0] !==  '.') {
             $expression = '.'.$expression;
         }
 
