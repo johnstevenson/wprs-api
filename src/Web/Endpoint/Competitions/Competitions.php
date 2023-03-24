@@ -23,6 +23,6 @@ class Competitions extends Application
         $params = new CompetitionsParams();
         $data = parent::run($rankingDate, $params);
 
-        return parent::formatOutput(null);
+        return parent::getOutput(null);
     }
 }

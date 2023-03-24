@@ -5,6 +5,7 @@ namespace Wprs\Api\Web;
 use Wprs\Api\Http\DownloaderInterface;
 use Wprs\Api\Http\HttpDownloader;
 use Wprs\Api\Http\Response;
+use Wprs\Api\Web\Endpoint\ApiData;
 use Wprs\Api\Web\Endpoint\DataCollector;
 use Wprs\Api\Web\Endpoint\FilterInterface;
 use Wprs\Api\Web\Endpoint\ParamsInterface;
@@ -12,15 +13,16 @@ use Wprs\Api\Web\Endpoint\ParserInterface;
 
 abstract class Application
 {
+    private int $discipline;
     private int $endpoint;
     private string $path;
     private array $options = [];
     private bool $restricted = false;
-    private array $meta;
 
     private ParserInterface $parser;
     private ?FilterInterface $filter;
     private DownloaderInterface $downloader;
+    private ApiData $apiData;
     private ?DataCollector $dataCollector;
 
     public function __construct(
@@ -29,13 +31,13 @@ abstract class Application
         ?FilterInterface $filter = null,
         ?DownloaderInterface $downloader = null
     ) {
+        $this->discipline = $discipline;
         $this->parser = $parser;
         $this->filter = $filter;
         $this->downloader = $downloader ?? new HttpDownloader();
 
         $this->endpoint = $this->getEndpoint();
         $this->path = Rank::getPath($discipline, $this->endpoint);
-        $this->meta = Rank::getMeta($discipline, $this->endpoint);
     }
 
     public function setOptions(array $options): self
@@ -65,7 +67,7 @@ abstract class Application
     {
         $this->dataCollector = null;
         $rankingDate = $this->checkDateFormat($rankingDate);
-        $this->meta['ranking_date'] = $rankingDate;
+        $this->apiData = new ApiData($this->endpoint, $this->discipline, $rankingDate);
 
         $qs = $this->buildQuery($params, $rankingDate);
         $url = $this->path.'?'.$qs;
@@ -83,21 +85,13 @@ abstract class Application
         return $this->dataCollector;
     }
 
-    protected function formatOutput(?array $details)
+    protected function getOutput(?array $details)
     {
         if (null === $this->dataCollector) {
             throw new \RuntimeException('Data has not been generated');
         }
 
-        $this->meta['count'] = $this->dataCollector->itemCount;
-
-        return [
-            'meta' => $this->meta,
-            'data' => [
-                'details' => $details,
-                'items' => $this->dataCollector->items,
-            ],
-        ];
+        return $this->apiData->getOuput($this->dataCollector, $details);
     }
 
     private function checkDateFormat(?string $rankingDate): string

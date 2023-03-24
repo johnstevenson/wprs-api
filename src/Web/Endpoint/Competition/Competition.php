@@ -26,6 +26,6 @@ class Competition extends Application
         // Add competition id to details
         $details = array_merge($data->extras['details'], $params->getDetails());
 
-        return parent::formatOutput($details);
+        return parent::getOutput($details);
     }
 }

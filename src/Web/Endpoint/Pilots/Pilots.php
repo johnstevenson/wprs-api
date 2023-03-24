@@ -29,7 +29,7 @@ class Pilots extends Application
             $details['nation'] = $data->items[0]['nation'];
         }
 
-        return parent::formatOutput($details);
+        return parent::getOutput($details);
     }
 
     public function getCount(?string $rankingDate, int $regionId, ?int $nationId = null, ?int $scoring = null): int
