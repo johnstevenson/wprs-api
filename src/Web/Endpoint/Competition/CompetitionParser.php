@@ -231,7 +231,7 @@ class CompetitionParser implements ParserInterface
     {
         $error = sprintf('Unexpected %s date value: %s', $type, $date);
 
-        if (!preg_match('/^[A-Z]{1}[a-z]{2}\s\d{1,2},\s\d{4}$/', $date)) {
+        if (!(bool) preg_match('/^[A-Z]{1}[a-z]{2}\s\d{1,2},\s\d{4}$/', $date)) {
             throw new \RuntimeException($error);
         }
 

@@ -65,7 +65,7 @@ class PilotsParser implements ParserInterface
     }
 
     /**
-     * @return non-empty-array<string, string>
+     * @return non-empty-array<string, mixed>
      */
     private function parsePilotRow(DOMNode $contextNode): array
     {

@@ -173,7 +173,7 @@ class CompetitionsParser implements ParserInterface
     {
         $error = sprintf('Unexpected %s date value: %s', $type, $date);
 
-        if (!preg_match('/^[A-Z]{1}[a-z]{2}\s\d{1,2},\s\d{4}$/', $date)) {
+        if (!(bool) preg_match('/^[A-Z]{1}[a-z]{2}\s\d{1,2},\s\d{4}$/', $date)) {
             throw new \RuntimeException($error);
         }
 
@@ -201,13 +201,14 @@ class CompetitionsParser implements ParserInterface
         // this needs more checking and should be a DomUtils method
         // note getAttribute seems to html decode values
 
-        $url = '';
-        // for phpstan
-        if ($nodes->item(0) instanceof DOMElement) {
-            $url = trim($nodes->item(0)->getAttribute('href'));
-        }
+        $url = DomUtils::getAttribute($nodes->item(0), 'href', 'event values');
 
         $query = parse_url(html_entity_decode($url), PHP_URL_QUERY);
+
+        if (!is_string($query)) {
+            throw new \RuntimeException('Error getting event id');
+        }
+
         parse_str($query, $params);
 
         $id = $params['id'] ?? null;

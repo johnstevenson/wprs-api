@@ -40,11 +40,12 @@ class DomUtils
     }
 
     /**
+     * @phpstan-param non-empty-string $separator
      * @return array<int, string>
      */
-    public static function split(string $delimeter, string $value, int $expected, string $type): array
+    public static function split(string $separator, string $value, int $expected, string $type): array
     {
-        $result = array_map('trim', explode($delimeter, $value));
+        $result = array_map('trim', explode($separator, $value));
 
         if (count($result) !== $expected) {
             $msg = sprintf(

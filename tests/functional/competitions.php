@@ -3,7 +3,8 @@
 require __DIR__.'/../../vendor/autoload.php';
 
 use Wprs\Api\Web\Rank;
-use Wprs\Api\Web\Factory;
+use Wprs\Api\Web\Endpoint\Competition\Competition;
+use Wprs\Api\Web\Endpoint\Competitions\Competitions;
 
 function showError(Exception $e): void
 {
@@ -11,10 +12,8 @@ function showError(Exception $e): void
     printf($format, $e->getFile(), $e->getLine(), $e->getMessage(), PHP_EOL);
 }
 
-$type = Rank::ENDPOINT_COMPETITIONS;
 $discipline = Rank::DISCIPLINE_PG_XC;
-
-$endpoint = Factory::createEndpoint($type, $discipline);
+$endpoint = new Competitions($discipline);
 
 try {
     $data = $endpoint->getData(null);
@@ -41,8 +40,7 @@ foreach ($data['data']['items'] as $item) {
 
 printf('Competitions: %d, last update: %s, (%s)%s', $count, $lastDate, $name, PHP_EOL);
 
-$type = Rank::ENDPOINT_COMPETITION;
-$endpoint = Factory::createEndpoint($type, $discipline);
+$endpoint = new Competition($discipline);
 
 try {
     $data = $endpoint->getData($rankingDate, $compId);

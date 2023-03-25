@@ -178,7 +178,7 @@ abstract class Application
 
         // Check for gzip magic number
         if ("\x1f\x8b" === substr($result, 0, 2)) {
-            $result = gzdecode($result);
+            $result = (string) gzdecode($result);
         }
 
         return $result;

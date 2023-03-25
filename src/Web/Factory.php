@@ -11,7 +11,7 @@ use Wprs\Api\Web\Endpoint\Pilots\Pilots;
 class Factory
 {
     /**
-     * @return Competition|Competitions|Pilots
+     * @return object
      */
     public static function createEndpoint(
         int $endpointType,

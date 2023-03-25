@@ -13,10 +13,10 @@ class HttpWorker
     /** @var array<int, string> */
     private array $caOptions;
 
-    /** @var \CurlMultiHandle|Resource */
+    /** @var \CurlMultiHandle */
     private $multiHandle;
 
-     /** @var \CurlShareHandle|Resource */
+     /** @var \CurlShareHandle */
     private $shareHandle;
     private bool $gzip;
 
@@ -45,7 +45,13 @@ class HttpWorker
      */
     public function download(Job $job, array $options): void
     {
-        $job->curlHandle = $ch = curl_init($job->url);
+        $ch = curl_init($job->url);
+
+        if ($ch === false) {
+            throw new \RuntimeException('curl_init failed with: '.$job->url);
+        }
+
+        $job->curlHandle = $ch;
         $job->curlId = $id = (int) $ch;
 
         // Create body file handle
@@ -114,7 +120,8 @@ class HttpWorker
                 }
 
                 rewind($job->bodyHandle);
-                $contents = stream_get_contents($job->bodyHandle);
+                $contents = (string) stream_get_contents($job->bodyHandle);
+
                 $this->closeBodyHandle($job);
 
                 if ($statusCode !== 200) {

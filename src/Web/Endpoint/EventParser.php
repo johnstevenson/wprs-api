@@ -75,6 +75,11 @@ class EventParser
         $url = DomUtils::getAttribute($nodes->item(0), 'href', 'event values');
 
         $query = parse_url(html_entity_decode($url), PHP_URL_QUERY);
+
+        if (!is_string($query)) {
+            throw new \RuntimeException('Error getting event id');
+        }
+
         parse_str($query, $params);
 
         $id = $params['id'] ?? null;

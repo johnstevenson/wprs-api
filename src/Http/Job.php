@@ -13,7 +13,7 @@ class Job
     public array $options;
     public int $curlId;
     /**
-     * @var \CurlHandle|Resource|null
+     * @var \CurlHandle|null
      */
     public $curlHandle;
     /**
