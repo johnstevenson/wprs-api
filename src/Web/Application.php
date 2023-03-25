@@ -5,24 +5,31 @@ namespace Wprs\Api\Web;
 use Wprs\Api\Http\DownloaderInterface;
 use Wprs\Api\Http\HttpDownloader;
 use Wprs\Api\Http\Response;
-use Wprs\Api\Web\Endpoint\ApiData;
+use Wprs\Api\Web\Endpoint\ApiOutput;
 use Wprs\Api\Web\Endpoint\DataCollector;
 use Wprs\Api\Web\Endpoint\FilterInterface;
 use Wprs\Api\Web\Endpoint\ParamsInterface;
 use Wprs\Api\Web\Endpoint\ParserInterface;
 
+/**
+ * @phpstan-import-type apiDetails from \Wprs\Api\Web\Endpoint\ApiOutput
+ * @phpstan-import-type apiData from \Wprs\Api\Web\Endpoint\ApiOutput
+ */
 abstract class Application
 {
     private int $discipline;
     private int $endpoint;
     private string $path;
+    /**
+     * @var array<string, mixed>
+     */
     private array $options = [];
     private bool $restricted = false;
 
     private ParserInterface $parser;
     private ?FilterInterface $filter;
     private DownloaderInterface $downloader;
-    private ApiData $apiData;
+    private ApiOutput $output;
     private ?DataCollector $dataCollector;
 
     public function __construct(
@@ -40,6 +47,9 @@ abstract class Application
         $this->path = Rank::getPath($discipline, $this->endpoint);
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     public function setOptions(array $options): self
     {
         $curlOptions = $options['curl'] ?? null;
@@ -67,7 +77,7 @@ abstract class Application
     {
         $this->dataCollector = null;
         $rankingDate = $this->checkDateFormat($rankingDate);
-        $this->apiData = new ApiData($this->endpoint, $this->discipline, $rankingDate);
+        $this->output = new ApiOutput($this->endpoint, $this->discipline, $rankingDate);
 
         $qs = $this->buildQuery($params, $rankingDate);
         $url = $this->path.'?'.$qs;
@@ -85,13 +95,17 @@ abstract class Application
         return $this->dataCollector;
     }
 
-    protected function getOutput(?array $details)
+    /**
+     * @param apiDetails $details
+     * @return apiData
+     */
+    protected function getOutput(?array $details): array
     {
         if (null === $this->dataCollector) {
             throw new \RuntimeException('Data has not been generated');
         }
 
-        return $this->apiData->getOuput($this->dataCollector, $details);
+        return $this->output->getData($this->dataCollector, $details);
     }
 
     private function checkDateFormat(?string $rankingDate): string
@@ -111,6 +125,9 @@ abstract class Application
         return $date->format('Y-m-01');
     }
 
+    /**
+     * @param array<Response> $responses
+     */
     private function processResponses(array $responses): void
     {
         foreach ($responses as $response) {
@@ -128,6 +145,9 @@ abstract class Application
         }
     }
 
+    /**
+     * @return array<string>
+     */
     private function getRemainingUrls(DataCollector $collector, string $url, bool $restricted): array
     {
         $result = [];
@@ -172,7 +192,7 @@ abstract class Application
         return Rank::getEndpointFromName($name);
     }
 
-    private function isMultiPageEndpoint()
+    private function isMultiPageEndpoint(): bool
     {
         // Currently this is the only endpoint that needs multiple pages
         return $this->endpoint === Rank::ENDPOINT_PILOTS;

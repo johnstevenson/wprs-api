@@ -39,6 +39,9 @@ class DomUtils
         return self::getElementText($nodes->item(0), $type);
     }
 
+    /**
+     * @return array<int, string>
+     */
     public static function split(string $delimeter, string $value, int $expected, string $type): array
     {
         $result = array_map('trim', explode($delimeter, $value));

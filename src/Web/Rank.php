@@ -140,6 +140,9 @@ class Rank
         return $result;
     }
 
+    /**
+     * @return array<string, string|null|int>
+     */
     public static function getMeta(int $discipline, int $endpoint): array
     {
         return [

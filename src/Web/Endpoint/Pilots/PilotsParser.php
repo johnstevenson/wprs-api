@@ -51,6 +51,9 @@ class PilotsParser implements ParserInterface
         return (int) $value;
     }
 
+    /**
+     * @return DOMNodeList<DOMNode>
+     */
     private function getPilotList(DOMNode $contextNode): DOMNodeList
     {
         $nodes = $this->xpath->start()
@@ -61,10 +64,13 @@ class PilotsParser implements ParserInterface
         return $nodes;
     }
 
-    private function parsePilotRow($element): array
+    /**
+     * @return non-empty-array<string, string>
+     */
+    private function parsePilotRow(DOMNode $contextNode): array
     {
-        $civlId = $this->getCivlId($element);
-        $columns = $this->getColumns($element, 6);
+        $civlId = $this->getCivlId($contextNode);
+        $columns = $this->getColumns($contextNode, 6);
 
         $rank = $this->getMainRanking($columns->item(0));
         $xranks = $this->getOtherRankings($columns->item(0));
@@ -90,11 +96,11 @@ class PilotsParser implements ParserInterface
         return $item;
     }
 
-    private function getCivlId(DOMElement $element): int
+    private function getCivlId(DOMNode $contextNode): int
     {
         $nodes = $this->xpath->start()
             ->with('//@data-id')
-            ->query($element);
+            ->query($contextNode);
 
         if ($nodes->length !== 1) {
             throw new \RuntimeException('Cannot find pilot civl id');
@@ -105,11 +111,14 @@ class PilotsParser implements ParserInterface
         return (int)$value;
     }
 
-    private function getColumns(DOMElement $element, int $expected): DOMNodeList
+    /**
+     * @return DOMNodeList<DOMNode>
+     */
+    private function getColumns(DOMNode $contextNode, int $expected): DOMNodeList
     {
         $nodes = $this->xpath->start()
             ->with('//div[@class="row"]/div[starts-with(@class,"col-")]')
-            ->query($element);
+            ->query($contextNode);
 
         if ($nodes->length !== $expected) {
             $format = 'expected %d pilot row columns, got %d';
@@ -134,6 +143,9 @@ class PilotsParser implements ParserInterface
         return (int)$value;
     }
 
+    /**
+     * @return array<int, non-empty-array<string, string>>
+     */
     private function getOtherRankings(DOMNode $column): array
     {
         $result = [];
@@ -175,6 +187,9 @@ class PilotsParser implements ParserInterface
         return $value;
     }
 
+    /**
+     * @return array{0: string, 1: int}
+     */
     private function getNation(DOMNode $column): array
     {
         $nodes = $this->xpath->start()
@@ -196,6 +211,9 @@ class PilotsParser implements ParserInterface
         return $value;
     }
 
+    /**
+     * @return DOMNodeList<DOMNode>
+     */
     private function getPilotEvents(DOMNode $column): DOMNodeList
     {
         $nodes = $this->xpath->start()

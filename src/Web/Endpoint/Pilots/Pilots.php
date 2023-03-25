@@ -6,6 +6,9 @@ use Wprs\Api\Http\DownloaderInterface;
 use Wprs\Api\Web\Application;
 use Wprs\Api\Web\Endpoint\FilterInterface;
 
+/**
+ * @phpstan-import-type apiData from \Wprs\Api\Web\Endpoint\ApiOutput
+ */
 class Pilots extends Application
 {
     public function __construct(
@@ -18,6 +21,9 @@ class Pilots extends Application
         parent::__construct($discipline, $parser, $filter, $downloader);
     }
 
+    /**
+     * @phpstan-return apiData
+     */
     public function getData(?string $rankingDate, int $regionId, ?int $nationId = null, ?int $scoring = null): array
     {
         $params = new PilotsParams($regionId, $nationId, $scoring);

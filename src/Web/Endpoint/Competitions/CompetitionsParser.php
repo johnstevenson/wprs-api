@@ -80,6 +80,9 @@ class CompetitionsParser implements ParserInterface
         return $nodes;
     }
 
+    /**
+     * @return non-empty-array<string, string|int>
+     */
     private function parseRow(DOMNode $contextNode): array
     {
         $columns = $this->getColumns($contextNode);
@@ -141,6 +144,9 @@ class CompetitionsParser implements ParserInterface
         return $nodes;
     }
 
+    /**
+     * @return array{0: string, 1: string}
+     */
     private function getPeriod(DOMNode $node): array
     {
         $childNodes = $node->childNodes;
@@ -181,7 +187,10 @@ class CompetitionsParser implements ParserInterface
         return $date->format('Y-m-d');
     }
 
-    private function getEventValues(DOMNode $contextNode)
+    /**
+     * @return array{0: string, 1: int}
+     */
+    private function getEventValues(DOMNode $contextNode): array
     {
         $nodes = $this->xpath->start()
             ->with('/a[@class="competition-link"]')

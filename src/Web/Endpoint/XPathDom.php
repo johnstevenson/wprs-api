@@ -10,6 +10,7 @@ use \DOMXPath;
 
 class XPathDom
 {
+    /** @var string[] */
     private array $parts = [];
     private DOMDocument $dom;
     private DomXPath $xpath;
@@ -66,6 +67,9 @@ class XPathDom
         return $this;
     }
 
+    /**
+     * @param string[] $classNames
+     */
     public function withClassContainsList(array $classNames): self
     {
         $contains = [];
@@ -79,6 +83,9 @@ class XPathDom
         return $this;
     }
 
+    /**
+     * @return DOMNodeList<DOMNode>
+     */
     public function query(?DOMNode $context = null): DOMNodeList
     {
         $expression = implode('', $this->parts);
@@ -101,13 +108,13 @@ class XPathDom
         return $result;
     }
 
-    private function getClassContains(string $className)
+    private function getClassContains(string $className): string
     {
         $concat = 'concat(" ", normalize-space(@class), " ")';
         return sprintf('contains(%s, " %s ")', $concat, $className);
     }
 
-    private function load($html)
+    private function load(string $html): void
     {
         libxml_use_internal_errors(true);
 

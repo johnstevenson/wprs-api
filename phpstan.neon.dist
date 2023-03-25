@@ -2,7 +2,8 @@ includes:
     - vendor/phpstan/phpstan-strict-rules/rules.neon
 
 parameters:
-    level: 5
+    level: 6
+    checkGenericClassInNonGenericObjectType: false
     paths:
         - src
         - tests

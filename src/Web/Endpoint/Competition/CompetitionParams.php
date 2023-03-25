@@ -13,6 +13,9 @@ class CompetitionParams implements ParamsInterface
         $this->id = $id;
     }
 
+    /**
+     * @phpstan-return non-empty-array<string, string>
+     */
     public function getQueryParams(string $rankingDate): array
     {
         $params = [
@@ -23,6 +26,9 @@ class CompetitionParams implements ParamsInterface
         return $params;
     }
 
+    /**
+     * @phpstan-return non-empty-array<string, int>
+     */
     public function getDetails(): array
     {
         $meta = [

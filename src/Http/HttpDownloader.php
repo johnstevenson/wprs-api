@@ -14,6 +14,9 @@ class HttpDownloader implements DownloaderInterface
     private array $jobs = [];
     private int $runningJobs = 0;
     private int $maxJobs = 12;
+    /**
+     * @var array<string, mixed>
+     */
     private array $options;
 
     private ResponseCollector $responseCollector;
@@ -28,6 +31,9 @@ class HttpDownloader implements DownloaderInterface
         $this->httpWorker = new HttpWorker();
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     public function get(string $url, array $options = []): Response
     {
         $this->options = $this->formatOptions($options);
@@ -62,6 +68,9 @@ class HttpDownloader implements DownloaderInterface
         return $this->responseCollector->getAll();
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     private function queueJob(int $index, string $url, array $options): void
     {
         $job = new Job($index, $url, $options);
@@ -148,6 +157,10 @@ class HttpDownloader implements DownloaderInterface
         $this->responseCollector->getAll();
     }
 
+    /**
+     * @param array<string, mixed> $options
+     * @return array<string, mixed>
+     */
     private function formatOptions(array $options): array
     {
         // Curl user options

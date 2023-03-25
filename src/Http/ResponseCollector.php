@@ -7,12 +7,15 @@ class ResponseCollector
     /** @var array<Response> */
     private $items = [];
 
-    public function add(Response $response)
+    public function add(Response $response): void
     {
         $this->items[$response->id] = $response;
     }
 
-    public function getAll()
+    /**
+     * @return array<Response>
+     */
+    public function getAll(): array
     {
         $result = $this->items;
         $this->items = [];

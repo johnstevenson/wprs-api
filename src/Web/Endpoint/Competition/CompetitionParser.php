@@ -98,6 +98,9 @@ class CompetitionParser implements ParserInterface
         return $nodes;
     }
 
+    /**
+     * @return array<string, string|int>
+     */
     private function parseDetailsRow(DOMNode $context, string $compName): array
     {
         $columns = $this->getColumns($context);
@@ -158,6 +161,9 @@ class CompetitionParser implements ParserInterface
         return $result;
     }
 
+    /**
+     * @return non-empty-array<string, string|int>
+     */
     private function parsePilotRow(DOMNode $contextNode): array
     {
         $columns = $this->getColumns($contextNode);
@@ -196,6 +202,9 @@ class CompetitionParser implements ParserInterface
         return $nodes;
     }
 
+    /**
+     * @return array{0: string, 1: string}
+     */
     private function getPeriod(DOMNode $context): array
     {
         $childNodes = $context->childNodes;

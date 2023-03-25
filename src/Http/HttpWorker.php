@@ -10,8 +10,13 @@ class HttpWorker
     private array $jobs = [];
     private int $maxRetries = 3;
 
+    /** @var array<int, string> */
     private array $caOptions;
+
+    /** @var \CurlMultiHandle|Resource */
     private $multiHandle;
+
+     /** @var \CurlShareHandle|Resource */
     private $shareHandle;
     private bool $gzip;
 
@@ -35,6 +40,9 @@ class HttpWorker
         $this->gzip = (bool) ($version['libz_version'] ?? null);
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     public function download(Job $job, array $options): void
     {
         $job->curlHandle = $ch = curl_init($job->url);
@@ -160,6 +168,9 @@ class HttpWorker
         }
     }
 
+    /**
+     * @return Resource
+     */
     private function openBodyHandle(Job $job)
     {
         if (false === ($handle = @fopen('php://temp/maxmemory:524288', 'w+b'))) {
@@ -219,7 +230,7 @@ class HttpWorker
         return $result;
     }
 
-    private function retryFromStatusError(Job $job, $statusCode): bool
+    private function retryFromStatusError(Job $job, int $statusCode): bool
     {
         if ($job->retries >= $this->maxRetries) {
             return false;

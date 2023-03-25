@@ -15,6 +15,9 @@ class EventParser
         $this->xpath = $xpath;
     }
 
+    /**
+     * @return array<int, array{rank: int, points: string, name: string, id: int}>
+     */
     public function getData(DOMNodeList $events): array
     {
         $result = [];
@@ -36,7 +39,10 @@ class EventParser
         return $result;
     }
 
-    private function getPilotValues(DOMNode $contextNode)
+    /**
+     * @return array{0: int, 1: string}
+     */
+    private function getPilotValues(DOMNode $contextNode): array
     {
         $nodes = $this->xpath->start()
             ->with('//div[@class="wrapper-point"]')
@@ -52,7 +58,10 @@ class EventParser
         return [$rank, $points];
     }
 
-    private function getEventValues(DOMNode $contextNode)
+    /**
+     * @return array{0: string, 1: int}
+     */
+    private function getEventValues(DOMNode $contextNode): array
     {
         $nodes = $this->xpath->start()
             ->with('//div[@class="title-event"]/a')

@@ -18,6 +18,9 @@ class PilotsParams implements ParamsInterface
         $this->setScoring($scoring);
     }
 
+    /**
+     * @phpstan-return non-empty-array<string, string>
+     */
     public function getQueryParams(string $rankingDate): array
     {
         $params = [
@@ -36,6 +39,9 @@ class PilotsParams implements ParamsInterface
         return $params;
     }
 
+    /**
+     * @phpstan-return non-empty-array<string, string|int>
+     */
     public function getDetails(): array
     {
         $meta = [
@@ -54,13 +60,13 @@ class PilotsParams implements ParamsInterface
         return $meta;
     }
 
-    private function setRegionId(int $regionId)
+    private function setRegionId(int $regionId): void
     {
         Rank::getRegion($regionId);
         $this->regionId = $regionId;
     }
 
-    private function setScoring(?int $scoring)
+    private function setScoring(?int $scoring): void
     {
         if (null !== $scoring) {
             Rank::getScoring($scoring);

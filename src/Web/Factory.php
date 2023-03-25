@@ -3,10 +3,16 @@
 namespace Wprs\Api\Web;
 
 use Wprs\Api\Http\DownloaderInterface;
+use Wprs\Api\Web\Endpoint\Competition\Competition;
+use Wprs\Api\Web\Endpoint\Competitions\Competitions;
 use Wprs\Api\Web\Endpoint\FilterInterface;
+use Wprs\Api\Web\Endpoint\Pilots\Pilots;
 
 class Factory
 {
+    /**
+     * @return Competition|Competitions|Pilots
+     */
     public static function createEndpoint(
         int $endpointType,
         int $discipline,

@@ -6,6 +6,9 @@ use Wprs\Api\Http\DownloaderInterface;
 use Wprs\Api\Web\Application;
 use Wprs\Api\Web\Endpoint\FilterInterface;
 
+/**
+ * @phpstan-import-type apiData from \Wprs\Api\Web\Endpoint\ApiOutput
+ */
 class Competition extends Application
 {
     public function __construct(
@@ -18,6 +21,9 @@ class Competition extends Application
         parent::__construct($discipline, $parser, $filter, $downloader);
     }
 
+    /**
+     * @phpstan-return apiData
+     */
     public function getData(string $rankingDate, int $id): array
     {
         $params = new CompetitionParams($id);

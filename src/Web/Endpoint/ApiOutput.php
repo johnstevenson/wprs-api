@@ -4,7 +4,13 @@ namespace Wprs\Api\Web\Endpoint;
 
 use Wprs\Api\Web\Rank;
 
-class ApiData
+/**
+ * @phpstan-type apiMeta array{endpoint: string, discipline: string, ranking_date: string, count: int, version: string}
+ * @phpstan-type apiDetails array<string, string|int>|null
+ * @phpstan-type apiItem non-empty-array<mixed, mixed>
+ * @phpstan-type apiData array{meta: apiMeta, data: array{details: apiDetails, items: array<apiItem>}}
+ */
+class ApiOutput
 {
     private string $endpoint;
     private string $discipline;
@@ -19,7 +25,11 @@ class ApiData
         $this->version = Rank::getVersion();
     }
 
-    public function getOuput(DataCollector $dataCollector, ?array $details)
+    /**
+     * @phpstan-param apiDetails $details
+     * @phpstan-return apiData
+     */
+    public function getData(DataCollector $dataCollector, ?array $details): array
     {
         $meta = $this->getMeta($dataCollector);
 
@@ -32,7 +42,10 @@ class ApiData
         ];
     }
 
-    private function getMeta(DataCollector $dataCollector)
+    /**
+     * @phpstan-return apiMeta
+     */
+    private function getMeta(DataCollector $dataCollector): array
     {
         return [
             'endpoint' => $this->endpoint,
