@@ -8,7 +8,7 @@ class Job
     public int $status;
     public string $url;
     /**
-     * @var array<string, mixed>
+     * @var array<int, mixed>
      */
     public array $options;
     public int $curlId;
@@ -17,14 +17,14 @@ class Job
      */
     public $curlHandle;
     /**
-     * @var Resource|null
+     * @var Resource
      */
     public $bodyHandle;
     public int $retries;
     public Response $response;
 
     /**
-     * @param array<string, mixed> $options
+     * @param array<int, mixed> $options
      */
     public function __construct(int $id, string $url, array $options)
     {

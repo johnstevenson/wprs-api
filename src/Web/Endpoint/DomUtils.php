@@ -16,27 +16,34 @@ class DomUtils
             throw new \RuntimeException('Error getting '.$type);
         }
 
-        return trim($node->nodeValue);
+        return trim($node->textContent);
     }
 
-    public static function getAttribute(DOMNode $node, string $attr, string $type): string
+    public static function getAttribute(?DOMNode $node, string $attr, string $type): string
     {
+        $error = sprintf('Error getting %s attribute for %s.', $attr, $type);
+
+        if ($node === null) {
+            throw new \RuntimeException($error);
+        }
         // for phpstan
         if ($node instanceof DOMElement) {
             return trim($node->getAttribute($attr));
         }
 
-        $msg = sprintf('Error getting %s attribute for %s.', $attr, $type);
-        throw new \RuntimeException($msg);
+        throw new \RuntimeException($error);
     }
 
+    /**
+     * @param DOMNodeList<DOMNode> $nodes
+     */
     public static function getSingleNodeText(DOMNodeList $nodes, string $type): string
     {
-        if ($nodes->length !== 1) {
-            throw new \RuntimeException('Error getting '.$type);
+        if ($nodes->length === 1 && $nodes->item(0) !== null) {
+            return self::getElementText($nodes->item(0), $type);
         }
 
-        return self::getElementText($nodes->item(0), $type);
+        throw new \RuntimeException('Error getting '.$type);
     }
 
     /**

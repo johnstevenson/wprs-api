@@ -50,7 +50,7 @@ try {
 }
 
 $count = $data['meta']['count'];
-$name = $data['data']['details']['name'];
+$name = $data['data']['details']['name'] ?? '';
 
 printf('Competition id: %d, name: %s, pilots: %d%s', $compId, $name, $count, PHP_EOL);
 

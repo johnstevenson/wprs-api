@@ -21,7 +21,7 @@ abstract class Application
     private int $endpoint;
     private string $path;
     /**
-     * @var array<string, mixed>
+     * @var array<int, mixed>
      */
     private array $options = [];
     private bool $restricted = false;
@@ -30,7 +30,7 @@ abstract class Application
     private ?FilterInterface $filter;
     private DownloaderInterface $downloader;
     private ApiOutput $output;
-    private ?DataCollector $dataCollector;
+    private DataCollector $dataCollector;
 
     public function __construct(
         int $discipline,
@@ -54,8 +54,8 @@ abstract class Application
     {
         $curlOptions = $options['curl'] ?? null;
 
-        if ($curlOptions !== null) {
-            $this->options['curl'] = $curlOptions;
+        if (is_array($curlOptions)) {
+            $this->options = $curlOptions;
             unset($options['curl']);
         }
 
@@ -75,7 +75,7 @@ abstract class Application
 
     protected function run(?string $rankingDate, ParamsInterface $params): DataCollector
     {
-        $this->dataCollector = null;
+        $this->dataCollector = new DataCollector(DataCollector::PLACE_HOLDER);
         $rankingDate = $this->checkDateFormat($rankingDate);
         $this->output = new ApiOutput($this->endpoint, $this->discipline, $rankingDate);
 
@@ -101,7 +101,7 @@ abstract class Application
      */
     protected function getOutput(?array $details): array
     {
-        if (null === $this->dataCollector) {
+        if ($this->dataCollector->isPlaceholder()) {
             throw new \RuntimeException('Data has not been generated');
         }
 
@@ -134,7 +134,7 @@ abstract class Application
             $contents = $this->getHtmlFromResponse($response);
             $data = $this->parser->parse($contents, $this->filter);
 
-            if (null === $this->dataCollector) {
+            if ($this->dataCollector->isPlaceholder()) {
                 $this->dataCollector = $data;
                 return;
             }

@@ -16,6 +16,7 @@ class EventParser
     }
 
     /**
+     * @param DOMNodeList<DOMNode> $events
      * @return array<int, array{rank: int, points: string, name: string, id: int}>
      */
     public function getData(DOMNodeList $events): array

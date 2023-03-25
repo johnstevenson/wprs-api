@@ -15,7 +15,7 @@ class HttpDownloader implements DownloaderInterface
     private int $runningJobs = 0;
     private int $maxJobs = 12;
     /**
-     * @var array<string, mixed>
+     * @var array<int, mixed>
      */
     private array $options;
 
@@ -32,7 +32,7 @@ class HttpDownloader implements DownloaderInterface
     }
 
     /**
-     * @param array<string, mixed> $options
+     * @param array<int, mixed> $options
      */
     public function get(string $url, array $options = []): Response
     {
@@ -44,6 +44,10 @@ class HttpDownloader implements DownloaderInterface
 
     }
 
+    /**
+     * @param array<string> $urls
+     * @param array<int, mixed> $options
+     */
     public function getBatch(array $urls, array $options = []): array
     {
         $this->options = $this->formatOptions($options);
@@ -69,7 +73,7 @@ class HttpDownloader implements DownloaderInterface
     }
 
     /**
-     * @param array<string, mixed> $options
+     * @param array<int, mixed> $options
      */
     private function queueJob(int $index, string $url, array $options): void
     {
@@ -158,18 +162,15 @@ class HttpDownloader implements DownloaderInterface
     }
 
     /**
-     * @param array<string, mixed> $options
-     * @return array<string, mixed>
+     * @param array<int, mixed> $options
+     * @return array<int, mixed>
      */
     private function formatOptions(array $options): array
     {
-        // Curl user options
-        $curlOptions = $options['curl'] ?? [];
-
-        if (!array_key_exists(CURLOPT_USERAGENT, $curlOptions)) {
-            $curlOptions[CURLOPT_USERAGENT] = 'Needs-An-API/1.0';
+        if (!array_key_exists(CURLOPT_USERAGENT, $options)) {
+            $options[CURLOPT_USERAGENT] = 'Needs-An-API/1.0';
         }
 
-        return ['curl' => $curlOptions];
+        return $options;
     }
 }

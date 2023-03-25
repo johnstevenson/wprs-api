@@ -21,6 +21,11 @@ class CompetitionParser implements ParserInterface
 
         // Containing wrapper div
         $wrapper = $this->xpath->getElementById('rankingTableWrapper');
+
+        if ($wrapper === null) {
+            throw new \RuntimeException('Error getting competition rankingTableWrapper.');
+        }
+
         $overallCount = $this->getOverallCount($wrapper);
         $dataCollector = new DataCollector($overallCount);
 
@@ -28,15 +33,29 @@ class CompetitionParser implements ParserInterface
         $compName = $this->getCompName($wrapper);
 
         $detailsTable = $this->xpath->getElementById('tableMain', $wrapper);
+
+        if ($detailsTable === null) {
+            throw new \RuntimeException('Error getting competitions tableMain.');
+        }
+
         $pilotTable = $this->xpath->getElementById('w1', $wrapper);
+
+        if ($pilotTable === null) {
+            throw new \RuntimeException('Error getting competitions w1.');
+        }
 
         // Check columns for both tables
         $this->checkColumnCount($detailsTable, 17);
         $this->checkColumnCount($pilotTable, 8);
 
         // details table
-        $detailsRow = $this->getTablesRows($detailsTable, 1);
-        $details = $this->parseDetailsRow($detailsRow->item(0), $compName);
+        $detailsRows = $this->getTablesRows($detailsTable, 1);
+
+        if ($detailsRows->item(0) === null) {
+            throw new \RuntimeException('Error getting tableMain row');
+        }
+
+        $details = $this->parseDetailsRow($detailsRows->item(0), $compName);
         $dataCollector->addExtra('details', $details);
 
         // pilot table
@@ -84,6 +103,9 @@ class CompetitionParser implements ParserInterface
         }
     }
 
+    /**
+     * @return DOMNodeList<DOMNode>
+     */
     private function getTablesRows(DOMNode $context, int $expected): DOMNodeList
     {
         $nodes = $this->xpath->start()
@@ -185,7 +207,7 @@ class CompetitionParser implements ParserInterface
         $result[$key] = $this->getNumericValue($columns, 4, $key);
 
         $key = 'pilot';
-        $result[$key] = trim($columns->item(5)->nodeValue);
+        $result[$key] = $this->getTextValue($columns->item(5), $key);
 
         $key = 'civil_id';
         $result[$key] = (int) $this->getNumericValue($columns, 7, $key);
@@ -193,6 +215,9 @@ class CompetitionParser implements ParserInterface
         return $result;
     }
 
+    /**
+     * @return DOMNodeList<DOMNode>
+     */
     private function getColumns(DOMNode $context): DOMNodeList
     {
         $nodes = $this->xpath->start()
@@ -205,13 +230,19 @@ class CompetitionParser implements ParserInterface
     /**
      * @return array{0: string, 1: string}
      */
-    private function getPeriod(DOMNode $context): array
+    private function getPeriod(?DOMNode $context): array
     {
+        $error = 'Error getting competition period';
+
+        if ($context === null) {
+            throw new \RuntimeException($error);
+        }
+
         $childNodes = $context->childNodes;
 
         // expecting start <br/> end
         if ($childNodes->length !== 3) {
-            throw new \RuntimeException('Error getting competitions period');
+            throw new \RuntimeException($error);
         }
 
         $start = $this->getPeriodDate($childNodes, 0,  'competions start');
@@ -220,9 +251,16 @@ class CompetitionParser implements ParserInterface
         return [$start, $end];
     }
 
+    /**
+     * @param DOMNodeList<DOMNode> $nodes
+     */
     private function getPeriodDate(DOMNodeList $nodes, int $index, string $type): string
     {
-        $date = trim($nodes->item($index)->nodeValue);
+        if ($nodes->item($index) === null) {
+            throw new \RuntimeException('Error getting '.$type);
+        }
+
+        $date = trim($nodes->item($index)->textContent);
 
         return $this->formatDate($date, $type);
     }
@@ -245,9 +283,16 @@ class CompetitionParser implements ParserInterface
         return $date->format('Y-m-d');
     }
 
+    /**
+     * @param DOMNodeList<DOMNode> $nodes
+     */
     private function getNumericValue(DOMNodeList $nodes, int $index, string $type): string
     {
-        $value = trim($nodes->item($index)->nodeValue);
+        if ($nodes->item($index) === null) {
+            throw new \RuntimeException('Error getting '.$type);
+        }
+
+        $value = trim($nodes->item($index)->textContent);
 
         if (strlen($value) === 0 || !is_numeric($value)) {
             throw new \RuntimeException('Missing value for '.$type);
@@ -256,14 +301,29 @@ class CompetitionParser implements ParserInterface
         return $value;
     }
 
-    private function getDateValue(DOMNode $node, string $type): string
+    private function getDateValue(?DOMNode $node, string $type): string
     {
+        if ($node === null) {
+            throw new \RuntimeException('Error getting '.$type);
+        }
+
         // Pq Rank Date and Results Updated values can be empty
-        $value = trim($node->nodeValue);
+        $value = trim($node->textContent);
 
         if (strlen($value) !== 0) {
             return $this->formatDate($value, $type);
         }
+
+        return $value;
+    }
+
+    private function getTextValue(?DOMNode $node, string $type): string
+    {
+        if ($node === null) {
+            throw new \RuntimeException('Error getting '.$type);
+        }
+
+        $value = trim($node->textContent);
 
         return $value;
     }

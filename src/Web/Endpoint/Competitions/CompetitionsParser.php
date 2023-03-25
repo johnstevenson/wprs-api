@@ -22,6 +22,11 @@ class CompetitionsParser implements ParserInterface
 
         // Containing wrapper div
         $wrapper = $this->xpath->getElementById('rankingTableWrapper');
+
+        if ($wrapper === null) {
+            throw new \RuntimeException('Error getting competitions rankingTableWrapper.');
+        }
+
         $overallCount = $this->getOverallCount($wrapper);
         $dataCollector = new DataCollector($overallCount);
 
@@ -30,6 +35,11 @@ class CompetitionsParser implements ParserInterface
         }
 
         $table = $this->xpath->getElementById('tableMain', $wrapper);
+
+        if ($table === null) {
+            throw new \RuntimeException('Error getting competitions tableMain.');
+        }
+
         $this->checkColumnCount($table, 15);
         $rows = $this->getTablesRows($table, $overallCount);
 
@@ -66,6 +76,9 @@ class CompetitionsParser implements ParserInterface
         }
     }
 
+    /**
+     * @return DOMNodeList<DOMNode>
+     */
     private function getTablesRows(DOMNode $contextNode, int $expected): DOMNodeList
     {
         $nodes = $this->xpath->start()
@@ -97,44 +110,47 @@ class CompetitionsParser implements ParserInterface
         ];
 
         $key = 'ta';
-        $result[$key] = $this->getNumericValue($columns, 3);
+        $result[$key] = $this->getNumericValue($columns, 3, $key);
 
         $key = 'pn';
-        $result[$key] = $this->getNumericValue($columns, 4);
+        $result[$key] = $this->getNumericValue($columns, 4, $key);
 
         $key = 'pq';
-        $result[$key] = $this->getNumericValue($columns, 5);
+        $result[$key] = $this->getNumericValue($columns, 5, $key);
 
         $key = 'td';
-        $result[$key] = $this->getNumericValue($columns, 6);
+        $result[$key] = $this->getNumericValue($columns, 6, $key);
 
         $key = 'tasks';
-        $result[$key] = (int) $this->getNumericValue($columns, 7);
+        $result[$key] = (int) $this->getNumericValue($columns, 7, $key);
 
         $key = 'pilots';
-        $result[$key] = (int) $this->getNumericValue($columns, 8);
+        $result[$key] = (int) $this->getNumericValue($columns, 8, $key);
 
         $key = 'pilots_last_12_months';
-        $result[$key] = (int) $this->getNumericValue($columns, 9);
+        $result[$key] = (int) $this->getNumericValue($columns, 9, $key);
 
         $key = 'comps_last_12_months';
-        $result[$key] = (int) $this->getNumericValue($columns, 10);
+        $result[$key] = (int) $this->getNumericValue($columns, 10, $key);
 
         $key = 'days_since_end';
-        $result[$key] = (int) $this->getNumericValue($columns, 11);
+        $result[$key] = (int) $this->getNumericValue($columns, 11, $key);
 
         $key = 'last_score';
-        $result[$key] = $this->getNumericValue($columns, 12);
+        $result[$key] = $this->getNumericValue($columns, 12, $key);
 
         $key = 'winner_score';
-        $result[$key] = $this->getNumericValue($columns, 13);
+        $result[$key] = $this->getNumericValue($columns, 13, $key);
 
         $key = 'updated';
-        $result[$key] = $this->getUpdated($columns->item(14));
+        $result[$key] = $this->getUpdated($columns->item(14), $key);
 
         return $result;
     }
 
+    /**
+     * @return DOMNodeList<DOMNode>
+     */
     private function getColumns(DOMNode $contextNode): DOMNodeList
     {
         $nodes = $this->xpath->start()
@@ -147,24 +163,37 @@ class CompetitionsParser implements ParserInterface
     /**
      * @return array{0: string, 1: string}
      */
-    private function getPeriod(DOMNode $node): array
+    private function getPeriod(?DOMNode $node): array
     {
+        $error = 'Error getting competitions period';
+
+        if ($node === null) {
+            throw new \RuntimeException($error);
+        }
+
         $childNodes = $node->childNodes;
 
         // expecting start <br/> end
         if ($childNodes->length !== 3) {
-            throw new \RuntimeException('Error getting competitions period');
+            throw new \RuntimeException($error);
         }
 
-        $start = $this->getPeriodDate($childNodes, 0,  'competions start');
-        $end = $this->getPeriodDate($childNodes, 2, 'competions end ');
+        $start = $this->getPeriodDate($childNodes, 0,  'competitions start');
+        $end = $this->getPeriodDate($childNodes, 2, 'competitions end ');
 
         return [$start, $end];
     }
 
+    /**
+     * @param DOMNodeList<DOMNode> $nodes
+     */
     private function getPeriodDate(DOMNodeList $nodes, int $index, string $type): string
     {
-        $date = trim($nodes->item($index)->nodeValue);
+        if ($nodes->item($index) === null) {
+            throw new \RuntimeException('Error getting '.$type);
+        }
+
+        $date = trim($nodes->item($index)->textContent);
 
         return $this->formatDate($date, $type);
     }
@@ -190,7 +219,7 @@ class CompetitionsParser implements ParserInterface
     /**
      * @return array{0: string, 1: int}
      */
-    private function getEventValues(DOMNode $contextNode): array
+    private function getEventValues(?DOMNode $contextNode): array
     {
         $nodes = $this->xpath->start()
             ->with('/a[@class="competition-link"]')
@@ -220,9 +249,16 @@ class CompetitionsParser implements ParserInterface
         return [$name, (int) $id];
     }
 
-    private function getNumericValue(DOMNodeList $nodes, int $index): string
+    /**
+     * @param DOMNodeList<DOMNode> $nodes
+     */
+    private function getNumericValue(DOMNodeList $nodes, int $index, string $type): string
     {
-        $value = trim($nodes->item($index)->nodeValue);
+        if ($nodes->item($index) === null) {
+            throw new \RuntimeException('Error getting '.$type);
+        }
+
+        $value = trim($nodes->item($index)->textContent);
 
         if (strlen($value) === 0 || !is_numeric($value)) {
             $value = '0.0';
@@ -231,10 +267,14 @@ class CompetitionsParser implements ParserInterface
         return $value;
     }
 
-    private function getUpdated(DOMNode $node): string
+    private function getUpdated(?DOMNode $node, string $type): string
     {
+        if ($node === null) {
+            throw new \RuntimeException('Error getting '.$type);
+        }
+
         // updated values can be empty
-        $value = trim($node->nodeValue);
+        $value = trim($node->textContent);
 
         if (strlen($value) !== 0) {
             return $this->formatDate($value, 'competitions updated');

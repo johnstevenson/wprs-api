@@ -41,7 +41,7 @@ class HttpWorker
     }
 
     /**
-     * @param array<string, mixed> $options
+     * @param array<int, mixed> $options
      */
     public function download(Job $job, array $options): void
     {
@@ -64,8 +64,8 @@ class HttpWorker
         curl_setopt($ch, CURLOPT_TIMEOUT, 300);
 
         // User curl options next
-        if (count($options['curl']) !== 0) {
-            curl_setopt_array($ch, $options['curl']);
+        if (count($options) !== 0) {
+            curl_setopt_array($ch, $options);
         }
 
         curl_setopt($ch, CURLOPT_SHARE, $this->shareHandle);
@@ -169,9 +169,9 @@ class HttpWorker
 
     private function closeBodyHandle(Job $job): void
     {
+        /* @phpstan-ignore-next-line */
         if (is_resource($job->bodyHandle)) {
             fclose($job->bodyHandle);
-            $job->bodyHandle = null;
         }
     }
 
