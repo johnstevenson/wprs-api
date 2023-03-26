@@ -2,10 +2,13 @@
 
 require __DIR__.'/../../vendor/autoload.php';
 
+use Wprs\Api\Web\Factory;
 use Wprs\Api\Web\Rank;
-use Wprs\Api\Web\Endpoint\Pilots\Pilots;
 
-$endpoint = new Pilots(Rank::DISCIPLINE_PG_XC);
+$type = Rank::ENDPOINT_PILOTS;
+$discipline = Rank::DISCIPLINE_PG_XC;
+
+$endpoint = Factory::createEndpoint($type, $discipline);
 $endpoint->setRestricted();
 
 try {

@@ -18,7 +18,7 @@ use Wprs\Api\Web\Endpoint\ParserInterface;
 abstract class Application
 {
     private int $discipline;
-    private int $endpoint;
+    private string $endpoint;
     private string $path;
     /**
      * @var array<int, mixed>
@@ -43,7 +43,7 @@ abstract class Application
         $this->filter = $filter;
         $this->downloader = $downloader ?? new HttpDownloader();
 
-        $this->endpoint = $this->getEndpoint();
+        $this->endpoint = get_class($this);
         $this->path = Rank::getPath($discipline, $this->endpoint);
     }
 
@@ -182,14 +182,6 @@ abstract class Application
         }
 
         return $result;
-    }
-
-    private function getEndpoint(): int
-    {
-        $class = strtr(get_class($this), '\\', '/');
-        $name = basename($class);
-
-        return Rank::getEndpointFromName($name);
     }
 
     private function isMultiPageEndpoint(): bool

@@ -18,7 +18,7 @@ class ApiOutput
     private string $rankingDate;
     private string $version;
 
-    public function __construct(int $endpoint, int $discipline, string $rankingDate)
+    public function __construct(string $endpoint, int $discipline, string $rankingDate)
     {
         $this->endpoint = Rank::getEndpoint($endpoint);
         $this->discipline = Rank::getDiscipline($discipline);

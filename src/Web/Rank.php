@@ -28,11 +28,11 @@ class Rank
         self::DISCIPLINE_PG_ACRO_SYNCRO => 'paragliding-acro-syncro',
     ];
 
-    public const ENDPOINT_PILOT = 101;
-    public const ENDPOINT_PILOTS = 102;
-    public const ENDPOINT_NATIONS = 103;
-    public const ENDPOINT_COMPETITION = 104;
-    public const ENDPOINT_COMPETITIONS = 105;
+    public const ENDPOINT_PILOT = __NAMESPACE__.'\\Endpoint\\Pilot\\Pilot';
+    public const ENDPOINT_PILOTS = __NAMESPACE__.'\\Endpoint\\Pilots\\Pilots';
+    public const ENDPOINT_NATIONS = __NAMESPACE__.'\\Endpoint\\Nations\\Nations';
+    public const ENDPOINT_COMPETITION = __NAMESPACE__.'\\Endpoint\\Competition\\Competition';
+    public const ENDPOINT_COMPETITIONS = __NAMESPACE__.'\\Endpoint\\Competitions\\Competitions';
 
     private const ENDPOINTS = [
         self::ENDPOINT_PILOT => 'pilot',
@@ -68,7 +68,7 @@ class Rank
 
     private const API_VERSION = '1.0';
 
-    public static function getPath(int $discipline, int $endPoint): string
+    public static function getPath(int $discipline, string $endPoint): string
     {
         return sprintf(
             '%s/%s/%s',
@@ -94,7 +94,7 @@ class Rank
         return $result;
     }
 
-    public static function getEndpoint(int $endpoint): string
+    public static function getEndpoint(string $endpoint): string
     {
         $result = self::ENDPOINTS[$endpoint] ?? null;
 
@@ -105,7 +105,7 @@ class Rank
         return $result;
     }
 
-    public static function getEndpointFromName(string $name): int
+    public static function getEndpointFromName(string $name): string
     {
         $name = strtolower($name);
 
@@ -138,19 +138,5 @@ class Rank
         }
 
         return $result;
-    }
-
-    /**
-     * @return array<string, string|null|int>
-     */
-    public static function getMeta(int $discipline, int $endpoint): array
-    {
-        return [
-            'endpoint' => self::getEndpoint($endpoint),
-            'discipline' => self::getDiscipline($discipline),
-            'ranking_date' => null,
-            'count' => 0,
-            'version' => self::getVersion()
-        ];
     }
 }

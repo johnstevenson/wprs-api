@@ -26,10 +26,10 @@ class DataCollector
      */
     public function add(array $item, ?FilterInterface $filter = null): void
     {
-        if (null !== $filter) {
+        if ($filter !== null) {
             $item = $filter->filter($item);
 
-            if (null === $item) {
+            if ($item === null) {
                 ++$this->filteredCount;
                 return;
             }
