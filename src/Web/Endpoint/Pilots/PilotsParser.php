@@ -12,6 +12,9 @@ use Wprs\Api\Web\Endpoint\FilterInterface;
 use Wprs\Api\Web\Endpoint\ParserInterface;
 use Wprs\Api\Web\Endpoint\XPathDom;
 
+/**
+ * @phpstan-import-type apiItem from \Wprs\Api\Web\Endpoint\ApiOutput
+ */
 class PilotsParser implements ParserInterface
 {
     private XPathDom $xpath;
@@ -75,7 +78,7 @@ class PilotsParser implements ParserInterface
     }
 
     /**
-     * @return non-empty-array<string, mixed>
+     * @phpstan-return apiItem
      */
     private function parsePilotRow(DOMNode $contextNode): array
     {

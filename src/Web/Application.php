@@ -96,7 +96,7 @@ abstract class Application
     }
 
     /**
-     * @param apiDetails $details
+     * @param apiDetails|null $details
      * @return apiData
      */
     protected function getOutput(?array $details): array

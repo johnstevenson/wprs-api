@@ -2,6 +2,9 @@
 
 namespace Wprs\Api\Web\Endpoint;
 
+/**
+ * @phpstan-import-type apiDetails from \Wprs\Api\Web\Endpoint\ApiOutput
+ */
 interface ParamsInterface
 {
     /**
@@ -10,7 +13,7 @@ interface ParamsInterface
     public function getQueryParams(string $rankingDate): array;
 
     /**
-     * @phpstan-return array<string, mixed>
+     * @phpstan-return apiDetails
      */
     public function getDetails(): array;
 }

@@ -6,9 +6,10 @@ use Wprs\Api\Web\Rank;
 
 /**
  * @phpstan-type apiMeta array{endpoint: string, discipline: string, ranking_date: string, count: int, version: string}
- * @phpstan-type apiDetails array<string, string|int>|null
- * @phpstan-type apiItem non-empty-array<mixed, mixed>
- * @phpstan-type apiData array{meta: apiMeta, data: array{details: apiDetails, items: array<apiItem>}}
+ * @phpstan-type apiDetails array<string, string|int>
+ * @phpstan-type apiObject array<non-empty-array<string, string|int>>
+ * @phpstan-type apiItem non-empty-array<string, string|int|apiObject>
+ * @phpstan-type apiData array{meta: apiMeta, data: array{details: apiDetails|null, items: array<apiItem>}}
  */
 class ApiOutput
 {

@@ -38,11 +38,13 @@ foreach ($data['data']['items'] as $item) {
     }
 }
 
+// @phpstan-ignore-next-line
 printf('Competitions: %d, last update: %s, (%s)%s', $count, $lastDate, $name, PHP_EOL);
 
 $endpoint = new Competition($discipline);
 
 try {
+    // @phpstan-ignore-next-line
     $data = $endpoint->getData($rankingDate, $compId);
 } catch (Exception $e) {
     showError($e);
@@ -52,6 +54,7 @@ try {
 $count = $data['meta']['count'];
 $name = $data['data']['details']['name'] ?? '';
 
+// @phpstan-ignore-next-line
 printf('Competition id: %d, name: %s, pilots: %d%s', $compId, $name, $count, PHP_EOL);
 
 exit(0);

@@ -11,9 +11,9 @@ class DataCollector
     public int $overallCount = 0;
     public int $itemCount = 0;
     public int $filteredCount = 0;
-    /** @phpstan-var apiItem|array{} */
+    /** @phpstan-var array<apiItem> */
     public array $items = [];
-    /** @var array<string, mixed> */
+    /** @var array<string, array<string, string|int>> */
     public array $extras = [];
 
     public function __construct(int $overallCount)
@@ -40,9 +40,9 @@ class DataCollector
     }
 
     /**
-     * @param mixed $item
+     * @param array<string, string|int> $item
      */
-    public function addExtra(string $key, $item): void
+    public function addExtra(string $key, array $item): void
     {
         $this->extras[$key] = $item;
     }

@@ -32,7 +32,10 @@ class Pilots extends Application
 
         // Add nation name if nation id was requested
         if (isset($details['nation']) && isset($data->items[0]['nation'])) {
-            $details['nation'] = $data->items[0]['nation'];
+            // for phpstan
+            if (is_scalar($data->items[0]['nation'])) {
+                $details['nation'] = (string) $data->items[0]['nation'];
+            }
         }
 
         return parent::getOutput($details);
