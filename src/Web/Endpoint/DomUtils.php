@@ -46,6 +46,29 @@ class DomUtils
         throw new \RuntimeException('Error getting '.$type);
     }
 
+    public static function getElementText2(DOMNode $node, string $type): ?string
+    {
+        $childNodes = $node->childNodes;
+
+        if ($childNodes->length !== 1 || !($childNodes->item(0) instanceof \DOMText)) {
+            return null;
+        }
+
+        return trim($node->textContent);
+    }
+
+    /**
+     * @param DOMNodeList<DOMNode> $nodes
+     */
+    public static function getMultiNodeIndexText(DOMNodeList $nodes, int $index, string $type): ?string
+    {
+        if ($nodes->item($index) !== null) {
+            return self::getElementText2($nodes->item($index), $type);
+        }
+
+        return null;
+    }
+
     /**
      * @phpstan-param non-empty-string $separator
      * @return array<int, string>

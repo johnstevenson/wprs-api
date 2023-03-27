@@ -81,6 +81,9 @@ The data is returned as a PHP array, which can be encoded to JSON. This comprise
     },
     "items": [
         // array of endpoint specific objects
+    ],
+    "errors": [
+        // array of value errors, or null
     ]
 }
 ```

@@ -5,6 +5,7 @@ namespace Wprs\Api\Web\Endpoint;
 use \DOMElement;
 use \DOMNode;
 use \DOMNodeList;
+use Wprs\Api\Web\Endpoint\Utils;
 
 class EventParser
 {
@@ -49,11 +50,28 @@ class EventParser
             ->with('//div[@class="wrapper-point"]')
             ->query($contextNode);
 
-        $type = 'pilot event values';
-        $value = DomUtils::getSingleNodeText($nodes, $type);
-        $parts = DomUtils::split('-', $value, 2, $type);
+        $error = 'pilot event values';
+
+        $value = Utils::getTextFromNodeList($nodes);
+        if ($value === null) {
+            throw new \RuntimeException($error);
+        }
+
+        $parts = Utils::split('-', $value, 2);
+        if ($parts === null) {
+            throw new \RuntimeException($error);
+        }
+
+        if (!Utils::isNumericText($parts[0])) {
+            throw new \RuntimeException('event rank');
+        }
 
         $rank = (int) $parts[0];
+
+        if (!Utils::isNumericText($parts[1])) {
+            throw new \RuntimeException('event points');
+        }
+
         $points = $parts[1];
 
         return [$rank, $points];
@@ -68,25 +86,20 @@ class EventParser
             ->with('//div[@class="title-event"]/a')
             ->query($contextNode);
 
-        $name = DomUtils::getSingleNodeText($nodes, 'event values');
 
-        // this needs more checking and should be a DomUtils method
-        // note getAttribute seems to html decode values
-
-        $url = DomUtils::getAttribute($nodes->item(0), 'href', 'event values');
-
-        $query = parse_url(html_entity_decode($url), PHP_URL_QUERY);
-
-        if (!is_string($query)) {
-            throw new \RuntimeException('Error getting event id');
+        $name = Utils::getTextFromNodeList($nodes);
+        if ($name === null) {
+            throw new \RuntimeException('event name');
         }
 
-        parse_str($query, $params);
+        $params = Utils::getLinkQueryParams($nodes->item(0));
+        if ($params === null) {
+            throw new \RuntimeException('event href');
+        }
 
         $id = $params['id'] ?? null;
-
-        if (null === $id) {
-            throw new \RuntimeException('Error getting event id');
+        if (!is_string($id)) {
+            throw new \RuntimeException('event id');
         }
 
         return [$name, (int) $id];

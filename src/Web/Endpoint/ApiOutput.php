@@ -9,7 +9,8 @@ use Wprs\Api\Web\Rank;
  * @phpstan-type apiDetails array<string, string|int>
  * @phpstan-type apiObject array<non-empty-array<string, string|int>>
  * @phpstan-type apiItem non-empty-array<string, string|int|apiObject>
- * @phpstan-type apiData array{meta: apiMeta, data: array{details: apiDetails|null, items: array<apiItem>}}
+ * @phpstan-type apiErrors array<string>
+ * @phpstan-type apiData array{meta: apiMeta, data: array{details: apiDetails|null, items: array<apiItem>, errors: apiErrors|null}}
  */
 class ApiOutput
 {
@@ -34,11 +35,14 @@ class ApiOutput
     {
         $meta = $this->getMeta($dataCollector);
 
+        $errors = count($dataCollector->errors) > 0 ? $dataCollector->errors : null;
+
         return [
             'meta' => $meta,
             'data' => [
                 'details' => $details,
                 'items' => $dataCollector->items,
+                'errors' => $errors,
             ],
         ];
     }

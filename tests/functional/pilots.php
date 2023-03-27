@@ -15,13 +15,7 @@ try {
     $start = microtime(true);
     $count = $endpoint->getCount(null, Rank::REGION_WORLD);
 } catch (Exception $e) {
-    printf(
-        'Failed in %s, line %d, message: %s%s',
-        $e->getFile(),
-        $e->getLine(),
-        $e->getMessage(),
-        PHP_EOL
-    );
+    echo Rank::getExceptionMessage($e);
     exit(1);
 }
 

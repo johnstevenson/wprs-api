@@ -29,20 +29,13 @@ class XPathDom
         return $this->dom;
     }
 
-    public function getElementById(string $id, ?DOMNode $context = null, bool $throwOnError = true): ?DOMNode
+    public function getElementById(string $id, ?DOMNode $context = null): ?DOMNode
     {
         $expression = sprintf('//*[@id="%s"]', $id);
         $this->parts = [$expression];
         $nodeList = $this->query($context);
 
-        if ($nodeList->length !== 1) {
-            if ($throwOnError) {
-                throw new \RuntimeException('Element not found from id='.$id);
-            }
-            return null;
-        }
-
-        return $nodeList->item(0);
+        return $nodeList->length === 1 ? $nodeList->item(0) : null;
     }
 
     public function start(): self

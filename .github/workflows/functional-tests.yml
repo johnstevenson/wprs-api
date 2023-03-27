@@ -6,7 +6,7 @@ on:
   pull_request:
     paths-ignore: ["**.md"]
   schedule:
-    - cron:  "0 6 * * *"
+    - cron:  "40 6 * * *"
 
 permissions:
   contents: read
@@ -54,4 +54,5 @@ jobs:
         run: php tests/functional/pilots.php
 
       - name: Run competitions test
+        if: success() || failure()
         run: php tests/functional/competitions.php

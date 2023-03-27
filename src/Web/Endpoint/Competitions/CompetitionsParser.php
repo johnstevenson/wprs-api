@@ -6,25 +6,22 @@ use \DOMElement;
 use \DOMNode;
 use \DOMNodeList;
 use Wprs\Api\Web\Endpoint\DataCollector;
-use Wprs\Api\Web\Endpoint\DomUtils;
 use Wprs\Api\Web\Endpoint\FilterInterface;
-use Wprs\Api\Web\Endpoint\ParserInterface;
+use Wprs\Api\Web\Endpoint\ParserManager;
+use Wprs\Api\Web\Endpoint\Utils;
 use Wprs\Api\Web\Endpoint\XPathDom;
 
-
-class CompetitionsParser implements ParserInterface
+/**
+ * @phpstan-import-type apiItem from \Wprs\Api\Web\Endpoint\ApiOutput
+ */
+class CompetitionsParser extends ParserManager
 {
-    private XPathDom $xpath;
-
-    public function parse(string $html, ?FilterInterface $filter = null): DataCollector
+    protected function run(): DataCollector
     {
-        $this->xpath = new XPathDom($html);
-
         // Containing wrapper div
         $wrapper = $this->xpath->getElementById('rankingTableWrapper');
-
         if ($wrapper === null) {
-            throw new \RuntimeException('Error getting competitions rankingTableWrapper.');
+            throw new \RuntimeException('id=rankingTableWrapper.');
         }
 
         $overallCount = $this->getOverallCount($wrapper);
@@ -35,17 +32,17 @@ class CompetitionsParser implements ParserInterface
         }
 
         $table = $this->xpath->getElementById('tableMain', $wrapper);
-
         if ($table === null) {
-            throw new \RuntimeException('Error getting competitions tableMain.');
+            throw new \RuntimeException('id=tableMain.');
         }
 
-        $this->checkColumnCount($table, 15);
-        $rows = $this->getTablesRows($table, $overallCount);
+        $this->checkColumnCount($table, 15, 'main table');
+        $rows = $this->getTableRows($table, $overallCount, 'main table');
 
-        foreach ($rows as $row) {
-            $item = $this->parseRow($row);
-            $dataCollector->add($item, $filter);
+        foreach ($rows as $index => $row) {
+            $rawItem = $this->parseRow($row);
+            $item = $this->formatItem($rawItem, $index, $dataCollector);
+            $dataCollector->add($item, $this->filter);
         }
 
         return $dataCollector;
@@ -59,47 +56,51 @@ class CompetitionsParser implements ParserInterface
             ->with('/span[@class="count"]')
             ->query($contextNode);
 
-        $value = DomUtils::getSingleNodeText($nodes, 'competitions count');
+        $value = Utils::getNumberFromNodeList($nodes);
+
+        if ($value === null) {
+            throw new \RuntimeException('competitions count');
+        }
 
         return (int) $value;
     }
 
-    private function checkColumnCount(DOMNode $contextNode, int $expected): void
+    private function checkColumnCount(DOMNode $contextNode, int $expected, string $name): void
     {
         $nodes = $this->xpath->start()
             ->with('//thead/tr/th')
             ->query(($contextNode));
 
         if ($nodes->length !== $expected) {
-            $format = 'expected %d competitions table columns, got %d';
-            throw new \RuntimeException(sprintf($format, $expected, $nodes->length));
+            $message = Utils::getCountMessage($expected, $name, 'columns', $nodes->length);
+            throw new \RuntimeException($message);
         }
     }
 
     /**
      * @return DOMNodeList<DOMNode>
      */
-    private function getTablesRows(DOMNode $contextNode, int $expected): DOMNodeList
+    private function getTableRows(DOMNode $contextNode, int $expected, string $name): DOMNodeList
     {
         $nodes = $this->xpath->start()
             ->with('//tbody/tr[@data-key]')
             ->query(($contextNode));
 
         if ($nodes->length !== $expected) {
-            $format = 'expected %d competitions rows, got %d';
-            throw new \RuntimeException(sprintf($format, $expected, $nodes->length));
+            $message = Utils::getCountMessage($expected, $name, 'rows', $nodes->length);
+            throw new \RuntimeException($message);
         }
 
         return $nodes;
     }
 
     /**
-     * @return non-empty-array<string, string|int>
+     * @return non-empty-array<string, string>
      */
     private function parseRow(DOMNode $contextNode): array
     {
         $columns = $this->getColumns($contextNode);
-        list($start, $end) = $this->getPeriod($columns->item(0));
+        list($start, $end) = $this->getCompPeriod($columns->item(0));
         list($name, $id) = $this->getEventValues($columns->item(1));
 
         $result = [
@@ -122,19 +123,19 @@ class CompetitionsParser implements ParserInterface
         $result[$key] = $this->getNumericValue($columns, 6, $key);
 
         $key = 'tasks';
-        $result[$key] = (int) $this->getNumericValue($columns, 7, $key);
+        $result[$key] = $this->getNumericValue($columns, 7, $key);
 
         $key = 'pilots';
-        $result[$key] = (int) $this->getNumericValue($columns, 8, $key);
+        $result[$key] = $this->getNumericValue($columns, 8, $key);
 
         $key = 'pilots_last_12_months';
-        $result[$key] = (int) $this->getNumericValue($columns, 9, $key);
+        $result[$key] = $this->getNumericValue($columns, 9, $key);
 
         $key = 'comps_last_12_months';
-        $result[$key] = (int) $this->getNumericValue($columns, 10, $key);
+        $result[$key] = $this->getNumericValue($columns, 10, $key);
 
         $key = 'days_since_end';
-        $result[$key] = (int) $this->getNumericValue($columns, 11, $key);
+        $result[$key] = $this->getNumericValue($columns, 11, $key);
 
         $key = 'last_score';
         $result[$key] = $this->getNumericValue($columns, 12, $key);
@@ -143,7 +144,54 @@ class CompetitionsParser implements ParserInterface
         $result[$key] = $this->getNumericValue($columns, 13, $key);
 
         $key = 'updated';
-        $result[$key] = $this->getUpdated($columns->item(14), $key);
+        $result[$key] = $this->getDateValue($columns->item(14), $key);
+
+        return $result;
+    }
+
+    /**
+     * @param array<string, string> $item
+     * @phpstan-return apiItem
+     */
+    private function formatItem(array $item, int $index, DataCollector $dataCollector): array
+    {
+        // we ignore updated date as this value is missing on some pre 2022 comps
+        $result = $item;
+        $result['id'] = (int) $item['id'];
+
+        $hasResults = !(Utils::isEmptyString($item['tasks']) || Utils::isEmptyString('pilots'));
+
+        $numerics = ['ta', 'pn', 'pq', 'td', 'last_score', 'winner_score'];
+
+        foreach ($numerics as $key) {
+            $value = $item[$key];
+
+            if (Utils::isEmptyString($value)) {
+                $error = Utils::makeItemError($key, $index);
+
+                if ($hasResults) {
+                    $dataCollector->addError($error);
+                }
+                $result[$key] = '0.0';
+            }
+        }
+
+        $ints = ['tasks', 'pilots', 'pilots_last_12_months', 'comps_last_12_months', 'days_since_end'];
+
+        foreach ($ints as $key) {
+            $value = $item[$key];
+
+            if (Utils::isEmptyString($value)) {
+                $error = Utils::makeItemError($key, $index);
+
+                if ($hasResults) {
+                    $dataCollector->addError($error);
+                }
+                $result[$key] = '0';
+            }
+
+            $result[$key] = (int) $value;
+        }
 
         return $result;
     }
@@ -163,61 +211,38 @@ class CompetitionsParser implements ParserInterface
     /**
      * @return array{0: string, 1: string}
      */
-    private function getPeriod(?DOMNode $node): array
+    private function getCompPeriod(?DOMNode $contextNode): array
     {
-        $error = 'Error getting competitions period';
+        $error = 'period';
 
-        if ($node === null) {
+        if ($contextNode === null) {
             throw new \RuntimeException($error);
         }
 
-        $childNodes = $node->childNodes;
+        $childNodes = $contextNode->childNodes;
 
         // expecting start <br/> end
         if ($childNodes->length !== 3) {
             throw new \RuntimeException($error);
         }
 
-        $start = $this->getPeriodDate($childNodes, 0,  'competitions start');
-        $end = $this->getPeriodDate($childNodes, 2, 'competitions end ');
+        $format = 'M j, Y';
+
+        $start = Utils::getDateFromNodeList($childNodes, 0, $format );
+        if ($start === null) {
+            throw new \RuntimeException('start date');
+        }
+
+        $end = Utils::getDateFromNodeList($childNodes, 2, $format );
+        if ($end === null) {
+            throw new \RuntimeException('end date');
+        }
 
         return [$start, $end];
     }
 
     /**
-     * @param DOMNodeList<DOMNode> $nodes
-     */
-    private function getPeriodDate(DOMNodeList $nodes, int $index, string $type): string
-    {
-        if ($nodes->item($index) === null) {
-            throw new \RuntimeException('Error getting '.$type);
-        }
-
-        $date = trim($nodes->item($index)->textContent);
-
-        return $this->formatDate($date, $type);
-    }
-
-    private function formatDate(string $date, string $type): string
-    {
-        $error = sprintf('Unexpected %s date value: %s', $type, $date);
-
-        if (!(bool) preg_match('/^[A-Z]{1}[a-z]{2}\s\d{1,2},\s\d{4}$/', $date)) {
-            throw new \RuntimeException($error);
-        }
-
-        $tz = new \DateTimeZone('UTC');
-        $date = \DateTimeImmutable::createFromFormat('M j, Y', $date, $tz);
-
-        if (false === $date) {
-            throw new \RuntimeException($error);
-        }
-
-        return $date->format('Y-m-d');
-    }
-
-    /**
-     * @return array{0: string, 1: int}
+     * @return array{0: string, 1: string}
      */
     private function getEventValues(?DOMNode $contextNode): array
     {
@@ -225,59 +250,69 @@ class CompetitionsParser implements ParserInterface
             ->with('/a[@class="competition-link"]')
             ->query($contextNode);
 
-        $name = DomUtils::getSingleNodeText($nodes, 'event values');
 
-        // this needs more checking and should be a DomUtils method
-        // note getAttribute seems to html decode values
-
-        $url = DomUtils::getAttribute($nodes->item(0), 'href', 'event values');
-
-        $query = parse_url(html_entity_decode($url), PHP_URL_QUERY);
-
-        if (!is_string($query)) {
-            throw new \RuntimeException('Error getting event id');
+        $name = Utils::getTextFromNodeList($nodes);
+        if ($name === null) {
+            throw new \RuntimeException('name');
         }
 
-        parse_str($query, $params);
+        $params = Utils::getLinkQueryParams($nodes->item(0));
+        if ($params === null) {
+            throw new \RuntimeException('href');
+        }
 
         $id = $params['id'] ?? null;
-
-        if (null === $id) {
-            throw new \RuntimeException('Error getting event id');
+        if (!is_string($id)) {
+            throw new \RuntimeException('id');
         }
 
-        return [$name, (int) $id];
+        return [$name, $id];
     }
 
     /**
      * @param DOMNodeList<DOMNode> $nodes
      */
-    private function getNumericValue(DOMNodeList $nodes, int $index, string $type): string
+    private function getNumericValue(DOMNodeList $nodes, int $index, string $name): string
     {
-        if ($nodes->item($index) === null) {
-            throw new \RuntimeException('Error getting '.$type);
+        // these values are '(not </br> set)' for comps without results
+        $allowNames = ['last_score', 'winner_score'];
+        $emptyString = '';
+
+        $value = Utils::getNumberFromNodeListLax($nodes, $index);
+
+        if ($value === null) {
+            if (!in_array($name, $allowNames, true)) {
+                throw new \RuntimeException($name);
+            }
+            $value = $emptyString;
         }
 
-        $value = trim($nodes->item($index)->textContent);
-
-        if (strlen($value) === 0 || !is_numeric($value)) {
-            $value = '0.0';
+        // in case the '(not </br> set)' notation changes
+        if (!Utils::isEmptyString($value) && !Utils::isNumericText($value)) {
+            if (!in_array($name, $allowNames, true)) {
+                throw new \RuntimeException($name);
+            }
+            $value = $emptyString;
         }
 
         return $value;
     }
 
-    private function getUpdated(?DOMNode $node, string $type): string
+    private function getDateValue(?DOMNode $node, string $name): string
     {
-        if ($node === null) {
-            throw new \RuntimeException('Error getting '.$type);
+        $value = Utils::getNodeText($node);
+        if ($value === null) {
+            throw new \RuntimeException($name);
         }
 
-        // updated values can be empty
-        $value = trim($node->textContent);
+        // Updated value can be empty
+        if (Utils::isEmptyString($value)) {
+            return $value;
+        }
 
-        if (strlen($value) !== 0) {
-            return $this->formatDate($value, 'competitions updated');
+        $value = Utils::formatDate($value, 'M j, Y');
+        if ($value === null) {
+            throw new \RuntimeException($name);
         }
 
         return $value;

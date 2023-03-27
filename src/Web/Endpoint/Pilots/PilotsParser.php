@@ -6,46 +6,42 @@ use \DOMElement;
 use \DOMNode;
 use \DOMNodeList;
 use Wprs\Api\Web\Endpoint\DataCollector;
-use Wprs\Api\Web\Endpoint\DomUtils;
 use Wprs\Api\Web\Endpoint\EventParser;
 use Wprs\Api\Web\Endpoint\FilterInterface;
-use Wprs\Api\Web\Endpoint\ParserInterface;
+use Wprs\Api\Web\Endpoint\ParserManager;
+use Wprs\Api\Web\Endpoint\Utils;
 use Wprs\Api\Web\Endpoint\XPathDom;
 
 /**
  * @phpstan-import-type apiItem from \Wprs\Api\Web\Endpoint\ApiOutput
  */
-class PilotsParser implements ParserInterface
+class PilotsParser extends ParserManager
 {
-    private XPathDom $xpath;
     private EventParser $eventParser;
 
-    public function parse(string $html, ?FilterInterface $filter = null): DataCollector
+    protected function run(): DataCollector
     {
-        $this->xpath = new XPathDom($html);
         $this->eventParser = new EventParser($this->xpath);
 
         // Containing wrapper div
         $wrapper = $this->xpath->getElementById('rankingTableWrapper');
-
         if ($wrapper === null) {
-            throw new \RuntimeException('Error getting pilots rankingTableWrapper.');
+            throw new \RuntimeException('id=rankingTableWrapper');
         }
 
         $overallCount = $this->getOverallCount($wrapper);
         $dataCollector = new DataCollector($overallCount);
 
         $list = $this->xpath->getElementById('w0', $wrapper);
-
         if ($list === null) {
-            throw new \RuntimeException('Error getting pilots w0.');
+            throw new \RuntimeException('id=w0');
         }
 
         $pilotNodes = $this->getPilotList($list);
 
         foreach ($pilotNodes as $node) {
             $item = $this->parsePilotRow($node);
-            $dataCollector->add($item, $filter);
+            $dataCollector->add($item, $this->filter);
         }
 
         return $dataCollector;
@@ -59,7 +55,10 @@ class PilotsParser implements ParserInterface
             ->with('/span[@class="count"]')
             ->query($contextNode);
 
-        $value = DomUtils::getSingleNodeText($nodes, 'pilot count');
+        $value = Utils::getNumberFromNodeList($nodes);
+        if ($value === null) {
+            throw new \RuntimeException('competitions count');
+        }
 
         return (int) $value;
     }
@@ -83,11 +82,7 @@ class PilotsParser implements ParserInterface
     private function parsePilotRow(DOMNode $contextNode): array
     {
         $civlId = $this->getCivlId($contextNode);
-        $columns = $this->getColumns($contextNode, 6);
-
-        if ($columns->count() !== 6) {
-            throw new \RuntimeException('error.');
-        }
+        $columns = $this->getColumns($contextNode, 6, 'pilot row');
 
         $rank = $this->getMainRanking($columns->item(0));
         $xranks = $this->getOtherRankings($columns->item(0));
@@ -119,7 +114,10 @@ class PilotsParser implements ParserInterface
             ->with('//@data-id')
             ->query($contextNode);
 
-        $value = DomUtils::getSingleNodeText($nodes, 'Cannot find pilot civl id');
+        $value = Utils::getNumberFromNodeList($nodes);
+        if ($value === null) {
+            throw new \RuntimeException('civl_id');
+        }
 
         return (int)$value;
     }
@@ -127,15 +125,15 @@ class PilotsParser implements ParserInterface
     /**
      * @return DOMNodeList<DOMNode>
      */
-    private function getColumns(DOMNode $contextNode, int $expected): DOMNodeList
+    private function getColumns(DOMNode $contextNode, int $expected, string $name): DOMNodeList
     {
         $nodes = $this->xpath->start()
             ->with('//div[@class="row"]/div[starts-with(@class,"col-")]')
             ->query($contextNode);
 
         if ($nodes->length !== $expected) {
-            $format = 'expected %d pilot row columns, got %d';
-            throw new \RuntimeException(sprintf($format, $expected, $nodes->length));
+            $message = Utils::getCountMessage($expected, $name, 'columns', $nodes->length);
+            throw new \RuntimeException($message);
         }
 
         return $nodes;
@@ -143,17 +141,18 @@ class PilotsParser implements ParserInterface
 
     private function getMainRanking(?DOMNode $contextNode): int
     {
-        $error = 'Cannot find pilot main ranking';
-
         if ($contextNode === null) {
-            throw new \RuntimeException($error);
+            throw new \RuntimeException('main ranking div');
         }
 
         $nodes = $this->xpath->start()
             ->with('//div[@class="main-ranking"]')
             ->query($contextNode);
 
-        $value = DomUtils::getSingleNodeText($nodes, $error);
+        $value = Utils::getNumberFromNodeList($nodes);
+        if ($value === null) {
+            throw new \RuntimeException('rank');
+        }
 
         return (int)$value;
     }
@@ -163,10 +162,8 @@ class PilotsParser implements ParserInterface
      */
     private function getOtherRankings(?DOMNode $contextNode): array
     {
-        $error = 'Cannot find pilot other rankings';
-
         if ($contextNode === null) {
-            throw new \RuntimeException($error);
+            throw new \RuntimeException('other rankings div');
         }
 
         $nodes = $this->xpath->start()
@@ -174,11 +171,19 @@ class PilotsParser implements ParserInterface
             ->query($contextNode);
 
         $result = [];
-        $type = 'pilot other rankings';
+        $error= 'xrank item';
 
         foreach ($nodes as $node) {
-            $value = DomUtils::getElementText($node, $type);
-            $parts = DomUtils::split(':', $value, 2, $type);
+            $value = Utils::getNodeText($node);
+            if ($value === null) {
+                throw new \RuntimeException($error);
+            }
+
+            $parts = Utils::split(':', $value, 2);
+            if ($parts === null) {
+                throw new \RuntimeException($error);
+            }
+
             $result[] = [$parts[0] => $parts[1]];
         }
 
@@ -187,7 +192,7 @@ class PilotsParser implements ParserInterface
 
     private function getPilotName(?DOMNode $contextNode): string
     {
-        $error = 'Cannot find pilot pilot main name';
+        $error = 'pilot name';
 
         if ($contextNode === null) {
             throw new \RuntimeException($error);
@@ -197,18 +202,20 @@ class PilotsParser implements ParserInterface
             ->with('//div[@class="pilot-id"]/../a')
             ->query($contextNode);
 
-        $value = DomUtils::getSingleNodeText($nodes, $error);
+        $value = Utils::getTextFromNodeList($nodes);
+        if ($value === null) {
+            throw new \RuntimeException($error);
+        }
 
         return $value;
     }
 
     private function getPilotGender(?DOMNode $contextNode): string
     {
-        if ($contextNode === null) {
-            throw new \RuntimeException('Cannot find pilot gender.');
+        $value = Utils::getNodeText($contextNode);
+        if ($value === null) {
+            throw new \RuntimeException('gender');
         }
-
-        $value = DomUtils::getElementText($contextNode, 'pilot gender');
 
         return $value;
     }
@@ -218,17 +225,34 @@ class PilotsParser implements ParserInterface
      */
     private function getNation(?DOMNode $contextNode): array
     {
+        $error = 'nation details';
+
         if ($contextNode === null) {
-            throw new \RuntimeException('Cannot find pilot nation.');
+            throw new \RuntimeException($error);
         }
 
         $nodes = $this->xpath->start()
             ->with('//a[@data-nation-id]')
             ->query($contextNode);
 
-        $nation = DomUtils::getSingleNodeText($nodes, 'nation details');
+        // get nation name
+        $value = Utils::getTextFromNodeList($nodes);
+        if ($value === null) {
+            throw new \RuntimeException($error);
+        }
 
-        $value = DomUtils::getAttribute($nodes->item(0), 'data-nation-id', 'nation id');
+        $nation = $value;
+
+        // get nation id
+        $value = Utils::getAttribute($nodes->item(0), 'data-nation-id');
+        if ($value === null) {
+            throw new \RuntimeException($error);
+        }
+
+        if (!Utils::isNumericText($value)) {
+            throw new \RuntimeException('nation_id');
+        }
+
         $nationId = (int) $value;
 
         return [$nation, $nationId];
@@ -236,11 +260,16 @@ class PilotsParser implements ParserInterface
 
     private function getPilotPoints(?DOMNode $contextNode): string
     {
-        if ($contextNode === null) {
-            throw new \RuntimeException('Cannot find pilot points.');
+        $error = 'points';
+
+        $value = Utils::getNodeText($contextNode);
+        if ($value === null) {
+            throw new \RuntimeException($error);
         }
 
-        $value = DomUtils::getElementText($contextNode, 'pilot points');
+        if (!Utils::isNumericText($value)) {
+            throw new \RuntimeException($error);
+        }
 
         return $value;
     }
@@ -250,7 +279,7 @@ class PilotsParser implements ParserInterface
      */
     private function getPilotEvents(?DOMNode $contextNode): DOMNodeList
     {
-        $error = 'Cannot find pilot events.';
+        $error = 'pilot events.';
 
         if ($contextNode === null) {
             throw new \RuntimeException($error);

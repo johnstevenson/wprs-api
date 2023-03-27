@@ -139,4 +139,20 @@ class Rank
 
         return $result;
     }
+
+    public static function formatMessage(string $className, string $error): string
+    {
+        $name = basename(strtr($className, '\\', '/'));
+
+        return sprintf('%s: %s', $name, $error);
+    }
+
+    public static function getExceptionMessage(\Exception $e): string
+    {
+        if ($e instanceof WprsException) {
+            return $e->getMessage();
+        }
+
+        return WprsException::formatMessage($e);
+    }
 }

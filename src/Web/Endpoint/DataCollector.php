@@ -16,6 +16,9 @@ class DataCollector
     /** @var array<string, array<string, string|int>> */
     public array $extras = [];
 
+    /** @var array<string> */
+    public array $errors = [];
+
     public function __construct(int $overallCount)
     {
         $this->overallCount = $overallCount;
@@ -45,6 +48,11 @@ class DataCollector
     public function addExtra(string $key, array $item): void
     {
         $this->extras[$key] = $item;
+    }
+
+    public function addError(string $error): void
+    {
+        $this->errors[] = $error;
     }
 
     public function isPlaceholder(): bool
