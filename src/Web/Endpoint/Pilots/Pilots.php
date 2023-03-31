@@ -34,6 +34,7 @@ class Pilots extends Application
         $results = parent::run([$job->getUrl()]);
         $data = $results[0];
 
+        // details are the params values
         $details = $job->getDetails();
 
         // Add nation name if nation id was requested

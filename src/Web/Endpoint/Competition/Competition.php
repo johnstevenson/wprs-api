@@ -26,17 +26,63 @@ class Competition extends Application
      */
     public function getData(string $rankingDate, int $id): array
     {
-        $params = new CompetitionParams($id);
-        $job = $this->getJob($rankingDate, $params);
+        $results = $this->getBatch($rankingDate, [$id]);
 
-        $results = parent::run([$job->getUrl()]);
-        $data = $results[0];
+        return $results[0];
+    }
 
-        $details = $job->getDetails();
+    /**
+     * @param array<int> $ids
+     * @phpstan-return non-empty-array<apiData>
+     */
+    public function getBatch(string $rankingDate, array $ids): array
+    {
+        $results = [];
+        $urls = [];
+        $jobs = [];
 
-        // Add competition id to details
-        $details = array_merge($data->extras['details'], $params->getDetails());
+        $this->checkValues($ids);
 
-        return $job->getData($data, $details);
+        foreach ($ids as $id) {
+            $params = new CompetitionParams($id);
+            $job = $this->getJob($rankingDate, $params);
+            $urls[] = $job->getUrl();
+            $jobs[] = $job;
+        }
+
+        $dataSets = parent::run($urls);
+
+        foreach ($dataSets as $index => $data) {
+            $job = $jobs[$index];
+            // Add competition id to details
+            $details = array_merge($data->extras['details'], $job->getDetails());
+            $results[] = $job->getData($data, $details);
+        }
+
+        return $results;
+    }
+
+    /**
+     * @param array<mixed> $ids
+     */
+    private function checkValues(array $ids): void
+    {
+        $idCount = count($ids);
+
+        if ($idCount === 0) {
+            throw new \RuntimeException('Missing ids');
+        }
+
+        foreach ($ids as $id) {
+            if (!is_int($id)) {
+                throw new \RuntimeException('id must be an int, got '.gettype($id));
+            }
+        }
+
+        $unique = array_unique($ids);
+
+        if (count($unique) !== $idCount) {
+            throw new \RuntimeException('Duplicate ids');
+        }
     }
 }

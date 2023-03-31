@@ -73,7 +73,7 @@ class Task
     }
 
     /**
-     * @return array<DataCollector>
+     * @return non-empty-array<DataCollector>
      */
     public function getResults(): array
     {
@@ -81,9 +81,15 @@ class Task
 
         foreach ($this->items as $item) {
             if ($item === null) {
-                throw new \RuntimeException('Results are incomplete');
+                break;
             }
             $results[] = $item;
+        }
+
+        $count = count($results);
+
+        if ($count === 0 || $count !== count($this->items)) {
+            throw new \RuntimeException('Results are incomplete');
         }
 
         return $results;

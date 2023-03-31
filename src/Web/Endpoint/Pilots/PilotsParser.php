@@ -32,6 +32,10 @@ class PilotsParser extends ParserManager
         $overallCount = $this->getOverallCount($wrapper);
         $dataCollector = new DataCollector($overallCount);
 
+        if ($overallCount === 0) {
+            return $dataCollector;
+        }
+
         $list = $this->xpath->getElementById('w0', $wrapper);
         if ($list === null) {
             throw new \RuntimeException('id=w0');

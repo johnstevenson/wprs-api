@@ -33,19 +33,20 @@ The `$params` value is different for each endpoint and is described in [Endpoint
 ### Advanced usage
 
 #### User options
-All endpoints have a `setOptions` method that accepts an associative array of user options. These
-are primarily intended for any additional curl options (identified by the `'curl'` key), but can also
-be used for [filtering data](#filtering-data).
+All endpoints have a `setOptions` method that accepts an array of user options. These are primarily
+intended for any additional curl options (identified by the `'curl'` key), but can also be used for
+[filtering data](#filtering-data).
 
 ```php
 $endpoint = Factory::createEndpoint($type, $discipline);
 
+/** @var array<string, mixed> */
 $options['curl'] = [CURLOPT_PROXY => 'https://myproxy.com'];
 $endpoint->setOptions($options);
 ```
 
 #### Filtering data
-The `Factory::createEndpoint` method accepts a `FilterInterface` instance as its last parameter.
+The `Factory::createEndpoint` method accepts a `FilterInterface` instance as its 3rd parameter.
 
 ```php
 namespace Wprs\Api\Web\Endpoint;
@@ -53,7 +54,6 @@ namespace Wprs\Api\Web\Endpoint;
 interface FilterInterface
 {
     public function filter(array $item): ?array;
-
     public function setOptions(array $options): void;
 }
 ```
@@ -61,7 +61,7 @@ interface FilterInterface
 The `filter` method can be used to modify each item before it is added to the `data/items` array of
 the output data. To prevent an item being added, return null.
 
-The `setOptions` method will receive any non-curl [user options](#user-options) that have been set.
+The `setOptions` method receives any non-curl [user options](#user-options) that have been set.
 
 ## Output data
 The data is returned as a PHP array, which can be encoded to JSON. This comprises a `meta` and a
@@ -99,27 +99,24 @@ floating-point values. Any missing string values are returned as an empty string
 
 ### Pilots endpoint
 
-**_getData_**(?string _$rankingDate_, int _$regionId_, ?int _$nationId_ = null,
-?int _$scoring_ = null): array
+#### Methods
 
+* **_getData_**(?string _$rankingDate_, int _$regionId_, ?int _$nationId_ = null, ?int _$scoring_ = null): array
+* **_getCount_**(?string _$rankingDate_, int _$regionId_, ?int _$nationId_ = null, ?int _$scoring_ = null): int
 
-`$regionId` is one of the following constants:
+`$regionId` is one of the following System:: constants:
 ```
-System::REGION_WORLD
-System::REGION_EUROPE
-System::REGION_AFRICA
-System::REGION_ASIA_OCEANIA
-System::REGION_PAN_AMERICA
+REGION_WORLD, REGION_EUROPE, REGION_AFRICA, REGION_ASIA_OCEANIA, REGION_PAN_AMERICA
 ```
 
 `$nationId` is the nation id.
 
-`$scoring` is one of the following constants:
+`$scoring` is one of the following System:: constants:
 ```
-System::SCORING_OVERALL
-System::SCORING_FEMALE
-System::SCORING_JUNIOR
+SCORING_OVERALL, SCORING_FEMALE, SCORING_JUNIOR
 ```
+
+The `getCount` method downloads a single page and returns the number of pilots in the ranking.
 
 #### Example
 Gets the ranking of all UK pilots (nation id 223) in Europe for the current ranking period.
@@ -136,7 +133,7 @@ $type = System::ENDPOINT_PILOTS;
 $discipline = System::DISCIPLINE_PG_XC;
 $endpoint = Factory::createEndpoint($type, $discipline);
 
-// set region id and other required params
+// set region id and other params, if needed
 $regionId = System::REGION_EUROPE;
 $nationId = 223;
 
@@ -192,18 +189,17 @@ $data = $endpoint->getData(null, $regionId, $nationId);
 }
 ```
 
-The current CIVL website only returns 20 pilots per page, so downloading the World ranking data
-requires more than 300 requests. This takes some time and can be prone to timeout errors when the
-server is busy. This endpoint also provides a `getCount` method, with the same parameters as
-`getData`, which downloads a single page and returns the number of pilots in the ranking.
-
 [Back to Endpoints](#endpoints)
 
 ### Competition endpoint
 
-**_getData_**(string _$rankingDate_, int _$id_): array
+#### Methods
 
-`$id` is the competition id. Note that `$rankingDate` is required and cannot be null.
+* **_getData_**(string _$rankingDate_, int _$id_): array
+* **_getBatch_**(string _$rankingDate_, array _$ids_): array
+
+`$rankingDate` is required and cannot be null. `$id` is the competition id. The `getBatch` method
+requires an array of integer ids and returns an array of output data arrays.
 
 #### Example
 
@@ -278,7 +274,9 @@ $data = $endpoint->getData($rankingDate, $compId);
 
 ### Competitions endpoint
 
-**_getData_**(?string _$rankingDate = null): array_
+#### Methods
+
+* **_getData_**(?string _$rankingDate = null): array_
 
 This endpoint only needs a `$rankingDate`, which is optional.
 

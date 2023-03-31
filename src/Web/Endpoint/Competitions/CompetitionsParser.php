@@ -27,7 +27,7 @@ class CompetitionsParser extends ParserManager
         $overallCount = $this->getOverallCount($wrapper);
         $dataCollector = new DataCollector($overallCount);
 
-        if (0 === $overallCount) {
+        if ($overallCount === 0) {
             return $dataCollector;
         }
 

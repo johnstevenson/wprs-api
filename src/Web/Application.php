@@ -74,11 +74,16 @@ abstract class Application
     }
 
     /**
-     * @param non-empty-array<string> $urls
-     * @return array<DataCollector>
+     * @param array<string> $urls
+     * @return non-empty-array<DataCollector>
      */
     protected function run(array $urls): array
     {
+        if (count($urls) === 0) {
+            $message = System::formatMessage(static::class, 'error, no urls');
+            throw new WprsException($message);
+        }
+
         $task = new Task($urls);
         $this->runTask($task);
 

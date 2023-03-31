@@ -56,6 +56,10 @@ class CompetitionParser extends ParserManager
         $details = $this->formatDetails($rawDetails, $dataCollector);
         $dataCollector->addExtra('details', $details);
 
+        if ($overallCount === 0) {
+            return $dataCollector;
+        }
+
         // pilot table
         $rows = $this->getTableRows($pilotTable, $overallCount, 'pilots table');
 
