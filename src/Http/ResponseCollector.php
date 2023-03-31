@@ -18,6 +18,7 @@ class ResponseCollector
     public function getAll(): array
     {
         $result = $this->items;
+        ksort($result);
         $this->items = [];
 
         return $result;

@@ -12,11 +12,11 @@
  ```php
 require __DIR__.'/app/vendor/autoload.php';
 
-use Wprs\Api\Web\Rank;
+use Wprs\Api\Web\System;
 use Wprs\Api\Web\Factory;
 
-$type = Rank::ENDPOINT_PILOTS;
-$discipline = Rank::DISCIPLINE_PG_XC;
+$type = System::ENDPOINT_PILOTS;
+$discipline = System::DISCIPLINE_PG_XC;
 
 $endpoint = Factory::createEndpoint($type, $discipline);
 ```
@@ -105,20 +105,20 @@ floating-point values. Any missing string values are returned as an empty string
 
 `$regionId` is one of the following constants:
 ```
-Rank::REGION_WORLD
-Rank::REGION_EUROPE
-Rank::REGION_AFRICA
-Rank::REGION_ASIA_OCEANIA
-Rank::REGION_PAN_AMERICA
+System::REGION_WORLD
+System::REGION_EUROPE
+System::REGION_AFRICA
+System::REGION_ASIA_OCEANIA
+System::REGION_PAN_AMERICA
 ```
 
 `$nationId` is the nation id.
 
 `$scoring` is one of the following constants:
 ```
-Rank::SCORING_OVERALL
-Rank::SCORING_FEMALE
-Rank::SCORING_JUNIOR
+System::SCORING_OVERALL
+System::SCORING_FEMALE
+System::SCORING_JUNIOR
 ```
 
 #### Example
@@ -127,17 +127,17 @@ Gets the ranking of all UK pilots (nation id 223) in Europe for the current rank
  ```php
 require __DIR__.'/app/vendor/autoload.php';
 
-use Wprs\Api\Web\Rank;
+use Wprs\Api\Web\System;
 use Wprs\Api\Web\Factory;
 
-$type = Rank::ENDPOINT_PILOTS;
+$type = System::ENDPOINT_PILOTS;
 
 // set discipline and create the endpoint
-$discipline = Rank::DISCIPLINE_PG_XC;
+$discipline = System::DISCIPLINE_PG_XC;
 $endpoint = Factory::createEndpoint($type, $discipline);
 
 // set region id and other required params
-$regionId = Rank::REGION_EUROPE;
+$regionId = System::REGION_EUROPE;
 $nationId = 223;
 
 $data = $endpoint->getData(null, $regionId, $nationId);
@@ -212,13 +212,13 @@ Gets data about a specific competition at a specific ranking period.
 ```php
 require __DIR__.'/app/vendor/autoload.php';
 
-use Wprs\Api\Web\Rank;
+use Wprs\Api\Web\System;
 use Wprs\Api\Web\Factory;
 
-$type = Rank::ENDPOINT_COMPETITION;
+$type = System::ENDPOINT_COMPETITION;
 
 // set discipline, ranking period and competition id
-$discipline = Rank::DISCIPLINE_PG_XC;
+$discipline = System::DISCIPLINE_PG_XC;
 $rankingDate = '2023-03-01';
 $compId = 6234;
 
@@ -289,13 +289,13 @@ Gets all competitions used in the current ranking.
 ```php
 require __DIR__.'/app/vendor/autoload.php';
 
-use Wprs\Api\Web\Rank;
+use Wprs\Api\Web\System;
 use Wprs\Api\Web\Factory;
 
-$type = Rank::ENDPOINT_COMPETITIONS;
+$type = System::ENDPOINT_COMPETITIONS;
 
 // set discipline
-$discipline = Rank::DISCIPLINE_PG_XC;
+$discipline = System::DISCIPLINE_PG_XC;
 
 $endpoint = Factory::createEndpoint($type, $discipline);
 $data = $endpoint->getData();

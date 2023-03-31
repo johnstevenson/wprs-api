@@ -5,6 +5,8 @@ namespace Wprs\Api\Web\Endpoint\Pilots;
 use Wprs\Api\Http\DownloaderInterface;
 use Wprs\Api\Web\Application;
 use Wprs\Api\Web\Endpoint\FilterInterface;
+use Wprs\Api\Web\Endpoint\Job;
+use Wprs\Api\Web\System;
 
 /**
  * @phpstan-import-type apiData from \Wprs\Api\Web\Endpoint\ApiOutput
@@ -27,8 +29,12 @@ class Pilots extends Application
     public function getData(?string $rankingDate, int $regionId, ?int $nationId = null, ?int $scoring = null): array
     {
         $params = new PilotsParams($regionId, $nationId, $scoring);
-        $data = parent::run($rankingDate, $params);
-        $details = $params->getDetails();
+        $job = $this->getJob($rankingDate, $params);
+
+        $results = parent::run([$job->getUrl()]);
+        $data = $results[0];
+
+        $details = $job->getDetails();
 
         // Add nation name if nation id was requested
         if (isset($details['nation']) && isset($data->items[0]['nation'])) {
@@ -38,14 +44,16 @@ class Pilots extends Application
             }
         }
 
-        return parent::getOutput($details);
+        return $job->getData($data, $details);
     }
 
     public function getCount(?string $rankingDate, int $regionId, ?int $nationId = null, ?int $scoring = null): int
     {
-        $this->setRestricted();
         $params = new PilotsParams($regionId, $nationId, $scoring);
-        $data = parent::run($rankingDate, $params);
+        $job = $this->getJob($rankingDate, $params);
+
+        $results = parent::run([$job->getUrl()]);
+        $data = $results[0];
 
         return $data->overallCount;
     }

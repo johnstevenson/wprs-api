@@ -2,7 +2,7 @@
 
 namespace Wprs\Api\Web;
 
-class Rank
+class System
 {
     public const URL_RANKING = 'https://civlcomps.org/ranking';
 
@@ -105,19 +105,6 @@ class Rank
         return $result;
     }
 
-    public static function getEndpointFromName(string $name): string
-    {
-        $name = strtolower($name);
-
-        foreach (self::ENDPOINTS as $endpoint => $value) {
-            if ($name === $value) {
-                return $endpoint;
-            }
-        }
-
-        throw new \RuntimeException('Endpoint not found '.$name);
-    }
-
     public static function getRegion(int $region): string
     {
         $result = self::REGIONS[$region] ?? null;
@@ -127,6 +114,23 @@ class Rank
         }
 
         return $result;
+    }
+
+    public static function getRankingDate(?string $rankingDate): string
+    {
+        $tz = new \DateTimeZone('UTC');
+
+        if (null === $rankingDate) {
+            $date = new \DateTime('now', $tz);
+        } else {
+            $date = \DateTime::createFromFormat('Y-m-d', $rankingDate, $tz);
+        }
+
+        if (false === $date) {
+            throw new \RuntimeException('Invalid rankingDate: '.$rankingDate);
+        }
+
+        return $date->format('Y-m-01');
     }
 
     public static function getScoring(int $scoring): string

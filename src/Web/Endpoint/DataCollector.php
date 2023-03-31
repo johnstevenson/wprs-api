@@ -7,7 +7,6 @@ namespace Wprs\Api\Web\Endpoint;
  */
 class DataCollector
 {
-    public const PLACE_HOLDER = -1;
     public int $overallCount = 0;
     public int $itemCount = 0;
     public int $filteredCount = 0;
@@ -53,10 +52,5 @@ class DataCollector
     public function addError(string $error): void
     {
         $this->errors[] = $error;
-    }
-
-    public function isPlaceholder(): bool
-    {
-        return $this->overallCount === self::PLACE_HOLDER;
     }
 }

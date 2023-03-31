@@ -8,8 +8,10 @@ use Wprs\Api\Http\Response;
 use Wprs\Api\Web\Endpoint\ApiOutput;
 use Wprs\Api\Web\Endpoint\DataCollector;
 use Wprs\Api\Web\Endpoint\FilterInterface;
+use Wprs\Api\Web\Endpoint\Job;
 use Wprs\Api\Web\Endpoint\ParamsInterface;
 use Wprs\Api\Web\Endpoint\ParserInterface;
+use Wprs\Api\Web\Endpoint\Task;
 
 /**
  * @phpstan-import-type apiDetails from \Wprs\Api\Web\Endpoint\ApiOutput
@@ -29,8 +31,6 @@ abstract class Application
     private ParserInterface $parser;
     private ?FilterInterface $filter;
     private DownloaderInterface $downloader;
-    private ApiOutput $output;
-    private DataCollector $dataCollector;
 
     public function __construct(
         int $discipline,
@@ -44,7 +44,7 @@ abstract class Application
         $this->downloader = $downloader ?? new HttpDownloader();
 
         $this->endpoint = get_class($this);
-        $this->path = Rank::getPath($discipline, $this->endpoint);
+        $this->path = System::getPath($discipline, $this->endpoint);
     }
 
     /**
@@ -73,74 +73,71 @@ abstract class Application
         return $this;
     }
 
-    protected function run(?string $rankingDate, ParamsInterface $params): DataCollector
-    {
-        $this->dataCollector = new DataCollector(DataCollector::PLACE_HOLDER);
-        $rankingDate = $this->checkDateFormat($rankingDate);
-        $this->output = new ApiOutput($this->endpoint, $this->discipline, $rankingDate);
-
-        $qs = $this->buildQuery($params, $rankingDate);
-        $url = $this->path.'?'.$qs;
-
-        $response = $this->downloader->get($url, $this->options);
-        $this->processResponses([$response]);
-
-        $urls = $this->getRemainingUrls($this->dataCollector, $url, $this->restricted);
-
-        if (count($urls) !== 0) {
-            $responses = $this->downloader->getBatch($urls, $this->options);
-            $this->processResponses($responses);
-        }
-
-        return $this->dataCollector;
-    }
-
     /**
-     * @param apiDetails|null $details
-     * @return apiData
+     * @param non-empty-array<string> $urls
+     * @return array<DataCollector>
      */
-    protected function getOutput(?array $details): array
+    protected function run(array $urls): array
     {
-        if ($this->dataCollector->isPlaceholder()) {
-            throw new \RuntimeException('Data has not been generated');
+        $task = new Task($urls);
+        $this->runTask($task);
+
+        if ($task->hasExtraUrls()) {
+            $this->runTask($task);
         }
 
-        return $this->output->getData($this->dataCollector, $details);
+        return $task->getResults();
     }
 
-    private function checkDateFormat(?string $rankingDate): string
+    protected function getJob(?string $rankingDate, ParamsInterface $params, ?string $path = null): Job
     {
-        $tz = new \DateTimeZone('UTC');
+        $rankingDate = System::getRankingDate($rankingDate);
+        $query = $params->getQueryParams($rankingDate);
+        $url = $this->buildUrl($query, $path);
 
-        if (null === $rankingDate) {
-            $date = new \DateTime('now', $tz);
-        } else {
-            $date = \DateTime::createFromFormat('Y-m-d', $rankingDate, $tz);
+        $output = new ApiOutput($this->endpoint, $this->discipline, $rankingDate);
+
+        return new Job($url, $params->getDetails(), $output);
+    }
+
+    private function runTask(Task $task): void
+    {
+        try {
+            $responses = $this->downloader->getBatch($task->getUrls(), $this->options);
+        } catch (\RuntimeException $e) {
+            throw new WprsException('Download error:', $e);
         }
 
-        if (false === $date) {
-            throw new \RuntimeException('Invalid rankingDate: '.$rankingDate);
+        try {
+            $this->handleResponses($task, $responses);
+        } catch (\RuntimeException $e) {
+            throw new WprsException('Response error:', $e);
         }
-
-        return $date->format('Y-m-01');
     }
 
     /**
      * @param array<Response> $responses
      */
-    private function processResponses(array $responses): void
+    private function handleResponses(Task $task, array $responses): void
     {
-        foreach ($responses as $response) {
+        foreach ($responses as $index => $response) {
             $contents = $this->getHtmlFromResponse($response);
             $data = $this->parser->parse($contents, $this->filter);
 
-            if ($this->dataCollector->isPlaceholder()) {
-                $this->dataCollector = $data;
-                return;
+            $dataCollector = $task->getDataCollector($index);
+
+            if ($dataCollector === null) {
+                $task->setDataCollector($data, $index);
+                $urls = $this->getRemainingUrls($data, $response->url, $this->restricted);
+
+                if (count($urls) !== 0) {
+                    $task->addExtraUrls($urls, $index);
+                }
+                continue;
             }
 
             foreach ($data->items as $item) {
-                $this->dataCollector->add($item);
+                $dataCollector->add($item);
             }
         }
     }
@@ -187,21 +184,27 @@ abstract class Application
     private function isMultiPageEndpoint(): bool
     {
         // Currently this is the only endpoint that needs multiple pages
-        return $this->endpoint === Rank::ENDPOINT_PILOTS;
+        return $this->endpoint === System::ENDPOINT_PILOTS;
     }
 
-    private function buildQuery(ParamsInterface $params, string $rankingDate): string
+
+    /**
+     * @param non-empty-array<string, string> $params
+     */
+    private function buildUrl(array $params, ?string $path): string
     {
-        $items = $params->getQueryParams($rankingDate);
+        $path = $path ?? $this->path;
         $pairs = [];
 
-        foreach ($items as $name => $value) {
+        foreach ($params as $name => $value) {
             $name = $this->queryStringEncode($name);
             $value = $this->queryStringEncode($value);
             $pairs[] = $name.'='.$value;
         }
 
-        return implode('&', $pairs);
+        $query = implode('&', $pairs);
+
+        return $path.'?'.$query;
     }
 
     /**

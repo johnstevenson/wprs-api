@@ -4,7 +4,7 @@ namespace Wprs\Api\Web\Endpoint;
 
 use \DOMNode;
 use \DOMNodeList;
-use Wprs\Api\Web\Rank;
+use Wprs\Api\Web\System;
 use Wprs\Api\Web\WprsException;
 
 abstract class ParserManager implements ParserInterface
@@ -22,7 +22,7 @@ abstract class ParserManager implements ParserInterface
         try {
             $dataCollector = $this->run();
         } catch (\RuntimeException $e) {
-            $message = Rank::formatMessage(static::class, 'error getting');
+            $message = System::formatMessage(static::class, 'error getting');
             throw new WprsException($message, $e);
         }
 

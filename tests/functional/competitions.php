@@ -3,17 +3,17 @@
 require __DIR__.'/../../vendor/autoload.php';
 
 use Wprs\Api\Web\Factory;
-use Wprs\Api\Web\Rank;
+use Wprs\Api\Web\System;
 
-$type = Rank::ENDPOINT_COMPETITIONS;
-$discipline = Rank::DISCIPLINE_PG_XC;
+$type = System::ENDPOINT_COMPETITIONS;
+$discipline = System::DISCIPLINE_PG_XC;
 
 $endpoint = Factory::createEndpoint($type, $discipline);
 
 try {
     $data = $endpoint->getData(null);
 } catch (Exception $e) {
-    echo Rank::getExceptionMessage($e);
+    echo System::getExceptionMessage($e);
     exit(1);
 }
 
@@ -36,14 +36,14 @@ foreach ($data['data']['items'] as $item) {
 // @phpstan-ignore-next-line
 printf('Competitions: %d, last update: %s, (%s)%s', $count, $lastDate, $name, PHP_EOL);
 
-$type = Rank::ENDPOINT_COMPETITION;
+$type = System::ENDPOINT_COMPETITION;
 $endpoint = Factory::createEndpoint($type, $discipline);
 
 try {
     // @phpstan-ignore-next-line
     $data = $endpoint->getData($rankingDate, $compId);
 } catch (Exception $e) {
-    echo Rank::getExceptionMessage($e);
+    echo System::getExceptionMessage($e);
     exit(1);
 }
 

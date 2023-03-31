@@ -27,8 +27,11 @@ class Competitions extends Application
     public function getData(?string $rankingDate = null): array
     {
         $params = new CompetitionsParams();
-        $data = parent::run($rankingDate, $params);
+        $job = $this->getJob($rankingDate, $params);
 
-        return parent::getOutput(null);
+        $results = parent::run([$job->getUrl()]);
+        $data = $results[0];
+
+        return $job->getData($data);
     }
 }

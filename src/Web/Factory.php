@@ -18,7 +18,7 @@ class Factory
         ?FilterInterface $filter = null,
         ?DownloaderInterface $downloader = null
     ): object {
-        $name = Rank::getEndpoint($endpoint);
+        $name = System::getEndpoint($endpoint);
 
         if (!class_exists($endpoint)) {
             $msg = sprintf('The %s endpoint has not been implemented.', $name);

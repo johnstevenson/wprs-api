@@ -3,19 +3,19 @@
 require __DIR__.'/../../vendor/autoload.php';
 
 use Wprs\Api\Web\Factory;
-use Wprs\Api\Web\Rank;
+use Wprs\Api\Web\System;
 
-$type = Rank::ENDPOINT_PILOTS;
-$discipline = Rank::DISCIPLINE_PG_XC;
+$type = System::ENDPOINT_PILOTS;
+$discipline = System::DISCIPLINE_PG_XC;
 
 $endpoint = Factory::createEndpoint($type, $discipline);
 $endpoint->setRestricted();
 
 try {
     $start = microtime(true);
-    $count = $endpoint->getCount(null, Rank::REGION_WORLD);
+    $count = $endpoint->getCount(null, System::REGION_WORLD);
 } catch (Exception $e) {
-    echo Rank::getExceptionMessage($e);
+    echo System::getExceptionMessage($e);
     exit(1);
 }
 

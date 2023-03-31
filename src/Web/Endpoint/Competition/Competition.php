@@ -27,11 +27,16 @@ class Competition extends Application
     public function getData(string $rankingDate, int $id): array
     {
         $params = new CompetitionParams($id);
-        $data = parent::run($rankingDate, $params);
+        $job = $this->getJob($rankingDate, $params);
+
+        $results = parent::run([$job->getUrl()]);
+        $data = $results[0];
+
+        $details = $job->getDetails();
 
         // Add competition id to details
         $details = array_merge($data->extras['details'], $params->getDetails());
 
-        return parent::getOutput($details);
+        return $job->getData($data, $details);
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Wprs\Api\Web\Endpoint;
 
-use Wprs\Api\Web\Rank;
+use Wprs\Api\Web\System;
 
 /**
  * @phpstan-type apiMeta array{endpoint: string, discipline: string, ranking_date: string, count: int, version: string}
@@ -21,10 +21,10 @@ class ApiOutput
 
     public function __construct(string $endpoint, int $discipline, string $rankingDate)
     {
-        $this->endpoint = Rank::getEndpoint($endpoint);
-        $this->discipline = Rank::getDiscipline($discipline);
+        $this->endpoint = System::getEndpoint($endpoint);
+        $this->discipline = System::getDiscipline($discipline);
         $this->rankingDate = $rankingDate;
-        $this->version = Rank::getVersion();
+        $this->version = System::getVersion();
     }
 
     /**
