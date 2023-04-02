@@ -1,5 +1,5 @@
-composer.lock
-phpcs.xml
-phpunit.xml
-.phpunit.result.cache
 vendor/
+*.lock
+*phpunit.xml
+!phpunit.xml.dist
+.phpunit.result.cache

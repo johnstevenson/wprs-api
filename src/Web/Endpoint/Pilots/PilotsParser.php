@@ -162,7 +162,7 @@ class PilotsParser extends ParserManager
     }
 
     /**
-     * @return array<int, non-empty-array<string, string>>
+     * @return array<int, non-empty-array<string, int>>
      */
     private function getOtherRankings(?DOMNode $contextNode): array
     {
@@ -188,7 +188,13 @@ class PilotsParser extends ParserManager
                 throw new \RuntimeException($error);
             }
 
-            $result[] = [$parts[0] => $parts[1]];
+            list($rankType, $rank) = $parts;
+
+            if (!Utils::isNumericText($rank)) {
+                throw new \RuntimeException($error);
+            }
+
+            $result[] = [$rankType => (int) $rank];
         }
 
         return $result;
