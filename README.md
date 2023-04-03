@@ -249,7 +249,7 @@ $data = $endpoint->getData($rankingDate, $compId);
         "pq_srtp": "15527.4",
         "pilots": 90,
         "pq_rank_date": "",
-        "pilots_last_12-months": 11819,
+        "pilots_last_12_months": 11819,
         "comps_last_12_months": 155,
         "days_since_end": 32,
         "last_score": "0.1",
@@ -262,9 +262,9 @@ $data = $endpoint->getData($rankingDate, $compId);
             "pp": "1.000",
             "points": "44.400",
             "td_points": "44.4",
-            "score": "3602",
+            "score": 3602,
             "pilot": "Gareth Carter",
-            "civil_id": 17421
+            "civl_id": 17421
         }
         // more pilot result items
     ]

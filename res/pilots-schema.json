@@ -1,0 +1,178 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "Pilots endpoint",
+    "type": "object",
+    "required": [
+        "meta",
+        "data"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "meta": {
+            "$ref": "#/definitions/meta"
+        },
+        "data": {
+            "type": "object",
+            "required": [
+                "details",
+                "items"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "details": {
+                    "$ref": "#/definitions/details"
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/pilot"
+                    }
+                },
+                "errors": {
+                    "type": ["array", "null"],
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "meta": {
+            "type": "object",
+            "required": [
+                "endpoint",
+                "discipline",
+                "ranking_date",
+                "count",
+                "version"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "endpoint": {
+                    "type": "string"
+                },
+                "discipline": {
+                    "type": "string"
+                },
+                "ranking_date": {
+                    "type": "string"
+                },
+                "count": {
+                    "type": "integer"
+                },
+                "version": {
+                    "type": "string"
+                }
+            }
+        },
+        "details": {
+            "type": "object",
+            "required": [
+                "region",
+                "region_id"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "region": {
+                    "type": "string"
+                },
+                "region_id": {
+                    "type": "integer"
+                },
+                "nation": {
+                    "type": "string"
+                },
+                "nation_id": {
+                    "type": "integer"
+                },
+                "scoring": {
+                    "type": "string"
+                }
+            }
+        },
+        "pilot": {
+            "type": "object",
+            "required": [
+                "civl_id",
+                "name",
+                "gender",
+                "nation",
+                "nation_id",
+                "rank",
+                "xranks",
+                "points",
+                "comps"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "civl_id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "gender": {
+                    "type": "string"
+                },
+                "nation": {
+                    "type": "string"
+                },
+                "nation_id": {
+                    "type": "number"
+                },
+                "rank": {
+                    "type": "number"
+                },
+                "xranks": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/xrank"
+                    }
+                },
+                "points": {
+                    "type": "string"
+                },
+                "comps": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/comp"
+                    }
+                }
+            }
+        },
+        "comp": {
+            "type": "object",
+            "required": [
+                "rank",
+                "points",
+                "name",
+                "id"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "rank": {
+                    "type": "integer"
+                },
+                "points": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "xrank": {
+            "type": "object",
+            "additionalProperties": false,
+            "patternProperties": {
+                "^wo|wf|wj|co|cf|cj|no$": {
+                    "type": "integer"
+                }
+            }
+        }
+    }
+}
