@@ -47,12 +47,12 @@ class Utils
 
     public static function makeDetailsError(string $key): string
     {
-        return sprintf('details-%s', $key);
+        return sprintf('details/%s', $key);
     }
 
     public static function makeItemError(string $key, int $index): string
     {
-        return sprintf('item-%s at row %d', $key, $index);
+        return sprintf('items/%d/%s', $index, $key);
     }
 
     /**

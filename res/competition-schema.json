@@ -9,7 +9,7 @@
     "additionalProperties": false,
     "properties": {
         "meta": {
-            "$ref": "#/definitions/meta"
+            "$ref": "#/$defs/meta"
         },
         "data": {
             "type": "object",
@@ -20,12 +20,12 @@
             "additionalProperties": false,
             "properties": {
                 "details": {
-                    "$ref": "#/definitions/details"
+                    "$ref": "#/$defs/details"
                 },
                 "items": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/result"
+                        "$ref": "#/$defs/result"
                     }
                 },
                 "errors": {
@@ -37,7 +37,7 @@
             }
         }
     },
-    "definitions": {
+    "$defs": {
         "meta": {
             "type": "object",
             "required": [

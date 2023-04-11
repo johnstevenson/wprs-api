@@ -9,7 +9,7 @@
     "additionalProperties": false,
     "properties": {
         "meta": {
-            "$ref": "#/definitions/meta"
+            "$ref": "#/$defs/meta"
         },
         "data": {
             "type": "object",
@@ -25,7 +25,7 @@
                 "items": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/competition"
+                        "$ref": "#/$defs/competition"
                     }
                 },
                 "errors": {
@@ -37,7 +37,7 @@
             }
         }
     },
-    "definitions": {
+    "$defs": {
         "meta": {
             "type": "object",
             "required": [

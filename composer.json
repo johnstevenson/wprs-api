@@ -22,7 +22,7 @@
         "phpunit/phpunit": "^9.6 || ^10.0",
         "phpstan/phpstan": "^1.0",
         "phpstan/phpstan-strict-rules": "^1.1",
-        "johnstevenson/json-works": "1.2.x-dev"
+        "johnstevenson/json-works": "2.1.x-dev"
     },
     "autoload": {
         "psr-4": {

@@ -9,7 +9,7 @@
     "additionalProperties": false,
     "properties": {
         "meta": {
-            "$ref": "#/definitions/meta"
+            "$ref": "#/$defs/meta"
         },
         "data": {
             "type": "object",
@@ -20,12 +20,12 @@
             "additionalProperties": false,
             "properties": {
                 "details": {
-                    "$ref": "#/definitions/details"
+                    "$ref": "#/$defs/details"
                 },
                 "items": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/pilot"
+                        "$ref": "#/$defs/pilot"
                     }
                 },
                 "errors": {
@@ -37,7 +37,7 @@
             }
         }
     },
-    "definitions": {
+    "$defs": {
         "meta": {
             "type": "object",
             "required": [
@@ -127,7 +127,7 @@
                 "xranks": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/xrank"
+                        "$ref": "#/$defs/xrank"
                     }
                 },
                 "points": {
@@ -135,8 +135,10 @@
                 },
                 "comps": {
                     "type": "array",
+                    "minItems": 1,
+                    "maxItems": 4,
                     "items": {
-                        "$ref": "#/definitions/comp"
+                        "$ref": "#/$defs/comp"
                     }
                 }
             }
