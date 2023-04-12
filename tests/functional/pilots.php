@@ -9,10 +9,8 @@ $type = System::ENDPOINT_PILOTS;
 $discipline = System::DISCIPLINE_PG_XC;
 
 $endpoint = Factory::createEndpoint($type, $discipline);
-$endpoint->setRestricted();
 
 try {
-    $start = microtime(true);
     $count = $endpoint->getCount(null, System::REGION_WORLD);
 } catch (Exception $e) {
     echo System::getExceptionMessage($e);

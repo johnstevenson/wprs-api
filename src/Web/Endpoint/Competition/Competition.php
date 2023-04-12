@@ -55,7 +55,7 @@ class Competition extends Application
         foreach ($dataSets as $index => $data) {
             $job = $jobs[$index];
             // Add competition id to details
-            $details = array_merge($data->extras['details'], $job->getDetails());
+            $details = array_merge($data->getExtrasItem('details'), $job->getDetails());
             $results[] = $job->getData($data, $details);
         }
 

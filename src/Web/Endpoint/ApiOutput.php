@@ -34,15 +34,14 @@ class ApiOutput
     public function getData(DataCollector $dataCollector, ?array $details): array
     {
         $meta = $this->getMeta($dataCollector);
-
-        $errors = count($dataCollector->errors) > 0 ? $dataCollector->errors : null;
+        $errors = $dataCollector->getErrors();
 
         return [
             'meta' => $meta,
             'data' => [
                 'details' => $details,
-                'items' => $dataCollector->items,
-                'errors' => $errors,
+                'items' => $dataCollector->getItems(),
+                'errors' => count($errors) !== 0 ? $errors : null,
             ],
         ];
     }
@@ -56,7 +55,7 @@ class ApiOutput
             'endpoint' => $this->endpoint,
             'discipline' => $this->discipline,
             'ranking_date' => $this->rankingDate,
-            'count' => $dataCollector->itemCount,
+            'count' => $dataCollector->getItemCount(),
             'version' => $this->version,
         ];
     }

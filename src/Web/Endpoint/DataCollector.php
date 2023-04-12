@@ -3,20 +3,21 @@
 namespace Wprs\Api\Web\Endpoint;
 
 /**
+ * @phpstan-type dataExtra array<string, string|int>
  * @phpstan-import-type apiItem from ApiOutput
+ * @phpstan-import-type apiErrors from ApiOutput
  */
 class DataCollector
 {
-    public int $overallCount = 0;
-    public int $itemCount = 0;
-    public int $filteredCount = 0;
+    private int $overallCount = 0;
+    private int $itemCount = 0;
+    private int $filteredCount = 0;
     /** @phpstan-var array<apiItem> */
-    public array $items = [];
-    /** @var array<string, array<string, string|int>> */
-    public array $extras = [];
-
-    /** @var array<string> */
-    public array $errors = [];
+    private array $items = [];
+    /** @phpstan-var array<string, dataExtra> */
+    private array $extras = [];
+    /** @phpstan-var apiErrors */
+    private array $errors = [];
 
     public function __construct(int $overallCount)
     {
@@ -25,11 +26,12 @@ class DataCollector
 
     /**
      * @phpstan-param apiItem $item
+     * @phpstan-param apiErrors $errors
      */
-    public function add(array $item, ?FilterInterface $filter = null): void
+    public function addItem(array $item, ?array $errors, ?FilterInterface $filter = null): void
     {
         if ($filter !== null) {
-            $item = $filter->filter($item);
+            $item = $filter->filter($item, $errors);
 
             if ($item === null) {
                 ++$this->filteredCount;
@@ -39,18 +41,90 @@ class DataCollector
 
         $this->items[] = $item;
         ++$this->itemCount;
+
+        if ($errors !== null) {
+            $index = $this->itemCount - 1;
+
+            foreach ($errors as $error) {
+                $this->errors[] = Utils::makeItemError($error, $index);
+            }
+        }
     }
 
     /**
-     * @param array<string, string|int> $item
+     * Merges data from additional pages
      */
-    public function addExtra(string $key, array $item): void
+    public function addData(DataCollector $data): void
     {
-        $this->extras[$key] = $item;
+        foreach ($data->getItems() as $item) {
+            $this->items[] = $item;
+            ++$this->itemCount;
+        }
+
+        foreach ($data->getErrors() as $error) {
+            $this->errors[] = $error;
+        }
     }
 
-    public function addError(string $error): void
+    /**
+     * @phpstan-param dataExtra $item
+     * @phpstan-param apiErrors $errors
+     */
+    public function addExtra(string $key, array $item, ?array $errors = null): void
     {
-        $this->errors[] = $error;
+        $this->extras[$key] = $item;
+
+        if ($errors !== null) {
+            foreach ($errors as $error) {
+                $this->errors[] = $error;
+            }
+        }
+    }
+
+    /**
+     * @phpstan-return apiErrors
+     */
+    public function getErrors(): array
+    {
+        return $this->errors;
+    }
+
+    /**
+     * @phpstan-return array<string, dataExtra>
+     */
+    public function getExtras(): array
+    {
+        return $this->extras;
+    }
+
+    /**
+     * @phpstan-return dataExtra
+     */
+    public function getExtrasItem(string $key): array
+    {
+        return $this->extras[$key] ?? [];
+    }
+
+    public function getItemCount(): int
+    {
+        return $this->itemCount;
+    }
+
+    /**
+     * @phpstan-return array<apiItem>
+     */
+    public function getItems(): array
+    {
+        return $this->items;
+    }
+
+    public function getOverallCount(): int
+    {
+        return $this->overallCount;
+    }
+
+    public function getProcessedCount(): int
+    {
+        return $this->itemCount + $this->filteredCount;
     }
 }

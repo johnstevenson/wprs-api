@@ -41,8 +41,8 @@ class CompetitionsParser extends ParserManager
 
         foreach ($rows as $index => $row) {
             $rawItem = $this->parseRow($row);
-            $item = $this->formatItem($rawItem, $index, $dataCollector);
-            $dataCollector->add($item, $this->filter);
+            list($item, $errors) = $this->formatItem($rawItem);
+            $dataCollector->addItem($item, $errors, $this->filter);
         }
 
         return $dataCollector;
@@ -151,49 +151,31 @@ class CompetitionsParser extends ParserManager
 
     /**
      * @param array<string, string> $item
-     * @phpstan-return apiItem
+     * @return array{0: apiItem, 1: array<string>|null}
      */
-    private function formatItem(array $item, int $index, DataCollector $dataCollector): array
+    private function formatItem(array $item): array
     {
-        // we ignore updated date as this value is missing on some pre 2022 comps
         $result = $item;
         $result['id'] = (int) $item['id'];
+        $errors = [];
 
-        $hasResults = !(Utils::isEmptyString($item['tasks']) || Utils::isEmptyString('pilots'));
+        //$hasResults = !(Utils::isEmptyString($item['tasks']) || Utils::isEmptyString('pilots'));
 
-        $numerics = ['ta', 'pn', 'pq', 'td', 'last_score', 'winner_score'];
-
-        foreach ($numerics as $key) {
+        foreach ($this->getMissingItemTypes() as $key => $type) {
             $value = $item[$key];
+            $isInteger = $type === 'int';
 
             if (Utils::isEmptyString($value)) {
-                $error = Utils::makeItemError($key, $index);
+                $errors[] = $key;
+                $result[$key] =  $isInteger ? '0' : '0.0';
+            }
 
-                if ($hasResults) {
-                    $dataCollector->addError($error);
-                }
-                $result[$key] = '0.0';
+            if ($isInteger) {
+                $result[$key] = (int) $result[$key];
             }
         }
 
-        $ints = ['tasks', 'pilots', 'pilots_last_12_months', 'comps_last_12_months', 'days_since_end'];
-
-        foreach ($ints as $key) {
-            $value = $item[$key];
-
-            if (Utils::isEmptyString($value)) {
-                $error = Utils::makeItemError($key, $index);
-
-                if ($hasResults) {
-                    $dataCollector->addError($error);
-                }
-                $result[$key] = '0';
-            }
-
-            $result[$key] = (int) $value;
-        }
-
-        return $result;
+        return [$result, count($errors) !== 0 ? $errors : null];
     }
 
     /**
@@ -316,5 +298,30 @@ class CompetitionsParser extends ParserManager
         }
 
         return $value;
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function getMissingItemTypes(): array
+    {
+        // we ignore updated date as this value is missing on some pre 2022 comps
+
+        $float = 'float';
+        $int = 'int';
+
+        return [
+            'ta' => $float,
+            'pn' => $float,
+            'pq' => $float,
+            'td' => $float,
+            'tasks' => $int,
+            'pilots' => $int,
+            'pilots_last_12_months' => $int,
+            'comps_last_12_months' => $int,
+            'days_since_end' => $int,
+            'last_score' => $float,
+            'winner_score' => $float,
+        ];
     }
 }

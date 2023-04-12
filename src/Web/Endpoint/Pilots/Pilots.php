@@ -32,16 +32,19 @@ class Pilots extends Application
         $job = $this->getJob($rankingDate, $params);
 
         $results = parent::run([$job->getUrl()]);
+
+        /** @var \Wprs\Api\Web\Endpoint\DataCollector */
         $data = $results[0];
 
         // details are the params values
         $details = $job->getDetails();
+        $items = $data->getItems();
 
         // Add nation name if nation id was requested
-        if (isset($details['nation']) && isset($data->items[0]['nation'])) {
+        if ($nationId !== null && isset($items[0]['nation'])) {
             // for phpstan
-            if (is_scalar($data->items[0]['nation'])) {
-                $details['nation'] = (string) $data->items[0]['nation'];
+            if (is_string($items[0]['nation'])) {
+                $details['nation'] = $items[0]['nation'];
             }
         }
 
@@ -52,10 +55,12 @@ class Pilots extends Application
     {
         $params = new PilotsParams($regionId, $nationId, $scoring);
         $job = $this->getJob($rankingDate, $params);
+        $this->setRestricted();
 
         $results = parent::run([$job->getUrl()]);
-        $data = $results[0];
 
-        return $data->overallCount;
+        /** @var \Wprs\Api\Web\Endpoint\DataCollector */
+        $data = $results[0];
+        return $data->getOverallCount();
     }
 }

@@ -56,7 +56,7 @@
                     "type": "string"
                 },
                 "ranking_date": {
-                    "type": "string"
+                    "$ref": "#/$defs/dateString"
                 },
                 "count": {
                     "type": "integer"
@@ -98,31 +98,31 @@
                     "type": "integer"
                 },
                 "start_date": {
-                    "type": "string"
+                    "$ref": "#/$defs/dateString"
                 },
                 "end_date": {
-                    "type": "string"
+                    "$ref": "#/$defs/dateString"
                 },
                 "ta": {
-                    "type": "string"
+                    "$ref": "#/$defs/floatString"
                 },
                 "pn": {
-                    "type": "string"
+                    "$ref": "#/$defs/floatString"
                 },
                 "pq": {
-                    "type": "string"
+                    "$ref": "#/$defs/floatString"
                 },
                 "td": {
-                    "type": "string"
+                    "$ref": "#/$defs/floatString"
                 },
                 "tasks": {
                     "type": "integer"
                 },
                 "pq_srp": {
-                    "type": "string"
+                    "$ref": "#/$defs/floatString"
                 },
                 "pq_srtp": {
-                    "type": "string"
+                    "$ref": "#/$defs/floatString"
                 },
                 "pilots": {
                     "type": "integer"
@@ -140,10 +140,10 @@
                     "type": "integer"
                 },
                 "last_score": {
-                    "type": "string"
+                    "$ref": "#/$defs/floatString"
                 },
                 "winner_score": {
-                    "type": "string"
+                    "$ref": "#/$defs/floatString"
                 },
                 "updated": {
                     "type": "string"
@@ -167,13 +167,13 @@
                     "type": "integer"
                 },
                 "pp": {
-                    "type": "string"
+                    "$ref": "#/$defs/floatString"
                 },
                 "points": {
-                    "type": "string"
+                    "$ref": "#/$defs/floatString"
                 },
                 "td_points": {
-                    "type": "string"
+                    "$ref": "#/$defs/floatString"
                 },
                 "score": {
                     "type": "integer"
@@ -185,6 +185,14 @@
                     "type": "integer"
                 }
             }
+        },
+        "dateString": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "floatString": {
+            "type": "string",
+            "pattern": "^\\d+\\.\\d+$"
         }
     }
 }

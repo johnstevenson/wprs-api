@@ -45,7 +45,7 @@ class PilotsParser extends ParserManager
 
         foreach ($pilotNodes as $node) {
             $item = $this->parsePilotRow($node);
-            $dataCollector->add($item, $this->filter);
+            $dataCollector->addItem($item, null, $this->filter);
         }
 
         return $dataCollector;

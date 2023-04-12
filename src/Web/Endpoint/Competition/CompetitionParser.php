@@ -53,8 +53,8 @@ class CompetitionParser extends ParserManager
         }
 
         $rawDetails = $this->parseDetailsRow($detailsRows->item(0), $compName);
-        $details = $this->formatDetails($rawDetails, $dataCollector);
-        $dataCollector->addExtra('details', $details);
+        list($details, $errors) = $this->formatDetails($rawDetails);
+        $dataCollector->addExtra('details', $details, $errors);
 
         if ($overallCount === 0) {
             return $dataCollector;
@@ -65,8 +65,8 @@ class CompetitionParser extends ParserManager
 
         foreach ($rows as $index => $pilotRow) {
             $rawItem = $this->parsePilotRow($pilotRow);
-            $item = $this->formatItem($rawItem, $index, $dataCollector);
-            $dataCollector->add($item, $this->filter);
+            list($item, $errors) = $this->formatItem($rawItem);
+            $dataCollector->addItem($item, $errors, $this->filter);
         }
 
         return $dataCollector;
@@ -134,7 +134,7 @@ class CompetitionParser extends ParserManager
     }
 
     /**
-     * @return array<string, string>
+     * @return non-empty-array<string, string>
      */
     private function parseDetailsRow(DOMNode $contextNode, string $compName): array
     {
@@ -197,43 +197,30 @@ class CompetitionParser extends ParserManager
     }
 
     /**
-     * @param array<string, string> $details
-     * @return array<string, string|int>
+     * @param non-empty-array<string, string> $details
+     * @return array{0: non-empty-array<string, string|int>, 1: array<string>|null}
      */
-    private function formatDetails(array $details, DataCollector $dataCollector): array
+    private function formatDetails(array $details): array
     {
-        // we ignore pq_rank_date and updated dates as these are already missing
-
         $result = $details;
         $result['id'] = 0;
+        $errors = [];
 
-        $numerics = ['ta', 'pn', 'pq', 'td', 'pq_srp', 'pq_srtp', 'last_score', 'winner_score'];
-
-        foreach ($numerics as $key) {
+        foreach ($this->getMissingDetailsTypes() as $key => $type) {
             $value = $details[$key];
+            $isInteger = $type === 'int';
 
             if (Utils::isEmptyString($value)) {
-                $error = Utils::makeDetailsError($key);
-                $dataCollector->addError($error);
-                $result[$key] = '0.0';
+                $errors[] = Utils::makeDetailsError($key);
+                $result[$key] = $isInteger ? '0' : '0.0';
+            }
+
+            if ($isInteger) {
+                $result[$key] = (int) $result[$key];
             }
         }
 
-        $ints = ['tasks', 'pilots', 'pilots_last_12_months', 'comps_last_12_months', 'days_since_end'];
-
-        foreach ($ints as $key) {
-            $value = $details[$key];
-
-            if (Utils::isEmptyString($value)) {
-                $error = Utils::makeDetailsError($key);
-                $dataCollector->addError($error);
-                $result[$key] = '0';
-            }
-
-            $result[$key] = (int) $value;
-        }
-
-        return $result;
+        return [$result, count($errors) !== 0 ? $errors : null];
     }
 
 
@@ -270,51 +257,30 @@ class CompetitionParser extends ParserManager
     }
 
     /**
-     * @param array<string, string> $item
-     * @phpstan-return apiItem
+     * @param non-empty-array<string, string> $item
+     * @return array{0: apiItem, 1: array<string>|null}
      */
-    private function formatItem(array $item, int $index, DataCollector $dataCollector): array
+    private function formatItem(array $item): array
     {
         $result = $item;
+        $errors = [];
 
-        $numerics = ['pp', 'points', 'td_points'];
-
-        foreach ($numerics as $key) {
+        foreach ($this->getMissingItemTypes() as $key => $type) {
             $value = $item[$key];
+            $isInteger = $type === 'int';
 
             if (Utils::isEmptyString($value)) {
-                $error = Utils::makeItemError($key, $index);
-                $dataCollector->addError($error);
-                $result[$key] = '0.0';
+                $errors[] = $key;
+                $isFloat = $type === 'float';
+                $result[$key] = $isInteger ? '0' : ($isFloat ? '0.0' : '');
+            }
+
+            if ($isInteger) {
+                $result[$key] = (int) $result[$key];
             }
         }
 
-        $ints = ['rank', 'score', 'civl_id'];
-
-        foreach ($ints as $key) {
-            $value = $item[$key];
-
-            if (Utils::isEmptyString($value)) {
-                $error = Utils::makeItemError($key, $index);
-                $dataCollector->addError($error);
-                $result[$key] = '0';
-            }
-
-            $result[$key] = (int) $value;
-        }
-
-        $texts = ['pilot'];
-
-        foreach ($texts as $key) {
-            $value = $item[$key];
-
-            if (Utils::isEmptyString($value)) {
-                $error = Utils::makeItemError($key, $index);
-                $dataCollector->addError($error);
-            }
-        }
-
-        return $result;
+        return [$result, count($errors) !== 0 ? $errors : null];
     }
 
     /**
@@ -412,5 +378,52 @@ class CompetitionParser extends ParserManager
         }
 
         return $value;
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function getMissingDetailsTypes(): array
+    {
+        // we ignore pq_rank_date and updated dates as these are already missing
+
+        $float = 'float';
+        $int = 'int';
+
+        return [
+            'ta' => $float,
+            'pn' => $float,
+            'pq' => $float,
+            'td' => $float,
+            'pq_srp' => $float,
+            'pq_srtp' => $float,
+            'tasks' => $int,
+            'pilots' => $int,
+            'pilots_last_12_months' => $int,
+            'comps_last_12_months' => $int,
+            'days_since_end' => $int,
+            'last_score' => $float,
+            'winner_score' => $float,
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function getMissingItemTypes(): array
+    {
+        $float = 'float';
+        $int = 'int';
+        $string = 'string';
+
+        return [
+            'rank' => $int,
+            'pp' => $float,
+            'points' => $float,
+            'td_points' => $float,
+            'score' => $int,
+            'pilot' => $string,
+            'civl_id' => $int,
+        ];
     }
 }

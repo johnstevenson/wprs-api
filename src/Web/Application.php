@@ -141,9 +141,7 @@ abstract class Application
                 continue;
             }
 
-            foreach ($data->items as $item) {
-                $dataCollector->add($item);
-            }
+            $dataCollector->addData($data);
         }
     }
 
@@ -158,13 +156,13 @@ abstract class Application
             return $result;
         }
 
-        $itemCount = $collector->itemCount + $collector->filteredCount;
+        $itemCount = $collector->getProcessedCount();
 
-        if ($itemCount === $collector->overallCount) {
+        if ($itemCount === $collector->getOverallCount()) {
             return $result;
         }
 
-        $more = (int) (ceil($collector->overallCount / $itemCount) - 1);
+        $more = (int) (ceil($collector->getOverallCount() / $itemCount) - 1);
 
         for ($i = 0; $i < $more; ++$i) {
             $page = $i + 2;

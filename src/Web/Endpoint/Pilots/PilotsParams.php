@@ -49,10 +49,10 @@ class PilotsParams implements ParamsInterface
             'region_id' => $this->regionId,
         ];
 
-        if (null !== $this->nationId) {
+        //if (null !== $this->nationId) {
             $meta['nation'] = '';
-            $meta['nation_id'] = $this->nationId;
-        }
+            $meta['nation_id'] = $this->nationId ?? 0;
+        //}
 
         $scoring = $this->scoring ?? System::SCORING_OVERALL;
         $meta['scoring'] = System::getScoring($scoring);
