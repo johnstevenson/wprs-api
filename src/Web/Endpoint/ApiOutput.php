@@ -22,7 +22,7 @@ class ApiOutput
     public function __construct(string $endpoint, int $discipline, string $rankingDate)
     {
         $this->endpoint = System::getEndpoint($endpoint);
-        $this->discipline = System::getDiscipline($discipline);
+        $this->discipline = System::getDisciplineForDisplay($discipline);
         $this->rankingDate = $rankingDate;
         $this->version = System::getVersion();
     }

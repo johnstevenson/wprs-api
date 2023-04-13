@@ -94,6 +94,17 @@ class System
         return $result;
     }
 
+    public static function getDisciplineForDisplay(int $discipline): string
+    {
+        $result = self::getDiscipline($discipline);
+
+        if ($result === 'paragliding-aerobatics') {
+            $result = 'paragliding-acro-solo';
+        }
+
+        return $result;
+    }
+
     public static function getEndpoint(string $endpoint): string
     {
         $result = self::ENDPOINTS[$endpoint] ?? null;

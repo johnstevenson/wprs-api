@@ -305,7 +305,7 @@ class CompetitionsParser extends ParserManager
      */
     private function getMissingItemTypes(): array
     {
-        // we ignore updated date as this value is missing on some pre 2022 comps
+        // we ignore updated date as this value is missing on some pre mid-2022 comps
 
         $float = 'float';
         $int = 'int';

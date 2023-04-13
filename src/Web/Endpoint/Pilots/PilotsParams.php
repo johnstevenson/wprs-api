@@ -9,9 +9,9 @@ class PilotsParams implements ParamsInterface
 {
     public int $regionId;
     public ?int $nationId;
-    public ?int $scoring;
+    public int $scoring;
 
-    public function __construct(int $regionId, ?int $nationId = null, ?int $scoring = null)
+    public function __construct(?int $regionId, ?int $nationId = null, ?int $scoring = null)
     {
         $this->setRegionId($regionId);
         $this->nationId = $nationId;
@@ -32,7 +32,7 @@ class PilotsParams implements ParamsInterface
             $params['search[nation_id]'] = (string) $this->nationId;
         }
 
-        if (null !== $this->scoring && $this->scoring !== System::SCORING_OVERALL) {
+        if ($this->scoring !== System::SCORING_OVERALL) {
             $params['search[scoringCategory]'] = System::getScoring($this->scoring) ;
         }
 
@@ -60,18 +60,27 @@ class PilotsParams implements ParamsInterface
         return $meta;
     }
 
-    private function setRegionId(int $regionId): void
+    private function setRegionId(?int $regionId): void
     {
+        if ($regionId === null) {
+            $this->regionId = System::REGION_WORLD;
+            return;
+        }
+
+        // check region
         System::getRegion($regionId);
         $this->regionId = $regionId;
     }
 
     private function setScoring(?int $scoring): void
     {
-        if (null !== $scoring) {
-            System::getScoring($scoring);
+        if ($scoring === null) {
+            $this->scoring = System::SCORING_OVERALL;
+            return;
         }
 
+        // check scoring
+        System::getScoring($scoring);
         $this->scoring = $scoring;
     }
 }

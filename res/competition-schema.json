@@ -9,7 +9,7 @@
     "additionalProperties": false,
     "properties": {
         "meta": {
-            "$ref": "#/$defs/meta"
+            "$ref": "#/$defs/metaCompetition"
         },
         "data": {
             "type": "object",
@@ -38,7 +38,7 @@
         }
     },
     "$defs": {
-        "meta": {
+        "metaCompetition": {
             "type": "object",
             "required": [
                 "endpoint",
@@ -50,7 +50,8 @@
             "additionalProperties": false,
             "properties": {
                 "endpoint": {
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^competition$"
                 },
                 "discipline": {
                     "type": "string"

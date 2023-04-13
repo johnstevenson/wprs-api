@@ -26,7 +26,7 @@ class Pilots extends Application
     /**
      * @phpstan-return apiData
      */
-    public function getData(?string $rankingDate, int $regionId, ?int $nationId = null, ?int $scoring = null): array
+    public function getData(?string $rankingDate, ?int $regionId, ?int $nationId = null, ?int $scoring = null): array
     {
         $params = new PilotsParams($regionId, $nationId, $scoring);
         $job = $this->getJob($rankingDate, $params);
