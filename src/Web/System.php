@@ -100,6 +100,10 @@ class System
 
         if ($result === 'paragliding-aerobatics') {
             $result = 'paragliding-acro-solo';
+        } elseif ($discipline !== self::DISCIPLINE_PG_XC) {
+            if (substr($result, -3) === '-xc') {
+                $result = substr($result, 0 -3);
+            }
         }
 
         return $result;

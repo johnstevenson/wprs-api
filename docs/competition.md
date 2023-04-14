@@ -124,7 +124,7 @@ missing date values are NOT reported as errors.
 Some competitions may have been unable to run any tasks, and some may be [invalid][comps-invalid].
 As a result there may be several missing value errors.
 
-An invalid competition, or one with no tasks flown, can be identified if `details/tasks` = 0.
+An invalid competition, or one with no tasks, can be identified if `details/tasks` is zero.
 
 ## Parameters
 

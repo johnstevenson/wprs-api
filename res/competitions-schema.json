@@ -54,7 +54,7 @@
                     "pattern": "^competitions$"
                 },
                 "discipline": {
-                    "type": "string"
+                    "$ref": "#/$defs/discipline"
                 },
                 "ranking_date": {
                     "$ref": "#/$defs/dateString"
@@ -146,6 +146,19 @@
         "floatString": {
             "type": "string",
             "pattern": "^\\d+\\.\\d+$"
+        },
+        "discipline": {
+            "type": "string",
+            "enum": [
+                "hang-gliding-class-1",
+                "hang-gliding-class-1-sport",
+                "hang-gliding-class-2",
+                "hang-gliding-class-5",
+                "paragliding-xc",
+                "paragliding-accuracy",
+                "paragliding-acro-solo",
+                "paragliding-acro-syncro"
+            ]
         }
     }
 }

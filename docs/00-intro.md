@@ -2,6 +2,7 @@
 
 * [Overview](#overview)
 * [Output](#output)
+* [Disciplines](#disciplines)
 * [Options](#options)
 * [Filtering output](#filtering-output)
 * [Error handling](#error-handling)
@@ -9,14 +10,13 @@
 ## Overview
 
 This library is based around the concept of endpoints. An endpoint is one of the various WPRS
-rankings (ladders) and the following chapters include full usage documentation and examples for each
-type.
+rankings (ladders) and the following chapters show usage information and examples for each type.
 
 * [Pilots endpoint](pilots.md)
-* [Competition endpoint](competition.md)
 * [Competitions endpoint](competitions.md)
+* [Competition endpoint](competition.md)
 
-This section shows how to get ranking data using an endpoint instance, in two simple steps.
+This section shows how to get ranking data, in two simple steps.
 
 **1.** Create an endpoint instance based on the type of data you want and the WPRS discipline:
 
@@ -37,14 +37,29 @@ $endpoint = Factory::createEndpoint($type, $discipline);
 $data = $endpoint->getData('2023-03-01', ...$params);
 ```
 
+## Disciplines
+
+The following System constants are provided:
+
+```php
+    System::DISCIPLINE_HG_CLASS_1
+    System::DISCIPLINE_HG_CLASS_1_SPORT
+    System::DISCIPLINE_HG_CLASS_2
+    System::DISCIPLINE_HG_CLASS_5
+
+    System::DISCIPLINE_PG_XC
+    System::DISCIPLINE_PG_ACCURACY
+    System::DISCIPLINE_PG_ACRO_SOLO
+    System::DISCIPLINE_PG_ACRO_SYNCRO
+```
+
 ## Output
 The data returned is a PHP array. Its basic structure is defined in [Output data](output.md),
 with more specific details given for each endpoint:
 
-* [Competition output](competition.md#output)
-* [Competitions output](competitions.md#output)
 * [Pilots output](pilots.md#output)
-
+* [Competitions output](competitions.md#output)
+* [Competition output](competition.md#output)
 
 ## Options
 
@@ -59,18 +74,18 @@ $options['curl'] = [CURLOPT_PROXY => 'https://myproxy.com'];
 $endpoint->setOptions($options);
 ```
 
-Any non-curl options can used when filtering output data.
+Any non-curl options will be used when filtering output data.
 
 ## Filtering output
 
-The library allows you to [filter](filter.md) the output data.
+The library allows you to [filter](filter.md) the output data, so you only get the values you need.
 
 ## Error handling
 
 The library will throw an exception if something goes wrong, for example if a download operation
 fails, an HTML element is missing or something unexpected happens.
 
-Although it is not shown in the example code, best practice is to wrap all endpoint methods in a
+Although not shown in the example code, best practice is to wrap all endpoint methods in a
 try...catch statement. `System::getExceptionMessage()` can be used to get an informative message
 from a caught exception.
 

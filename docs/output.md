@@ -9,7 +9,6 @@ The output data is referred to as an `output_array` throughout this documentatio
 
 The data is an object comprising [meta](#meta) and [data](#data) root properties:
 
-
 ```jsonc
 "meta": {
     "endpoint": "",     // endpoint name
@@ -60,10 +59,10 @@ This object has the same properties for all endpoints.
     * nations
 
 * _discipline_ `string`
-    * hang-gliding-class-1-xc
-    * hang-gliding-class-1-sport-xc
-    * hang-gliding-class-2-xc
-    * hang-gliding-class-5-xc
+    * hang-gliding-class-1
+    * hang-gliding-class-1-sport
+    * hang-gliding-class-2
+    * hang-gliding-class-5
     * paragliding-xc
     * paragliding-accuracy
     * paragliding-acro-solo

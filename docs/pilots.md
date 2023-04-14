@@ -26,6 +26,10 @@ getData(
 Returns an [output_array][output] of pilot ranking data. The [parameters](#parameters) are detailed
 below.
 
+The website only lists 20 pilots per page, so downloading the HTML will involve multiple requests.
+The worst case is fetching the world data for `System::DISCIPLINE_PG_XC` which requires more than
+300 requests.
+
 ### getCount()
 
 ```php

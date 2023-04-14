@@ -5,11 +5,11 @@
 * [Filter interface](#filter-interface)
 * [Example](#example)
 
-Output data can be filtered by passing a filter instance to the `Factory::createEndpoint` method.
+Output data can be filtered by passing a _filter_ instance to the `Factory::createEndpoint` method.
 
 ## Filter interface
 
-Your filter must implement the following interface:
+Your _filter_ must implement the following interface:
 
 ```php
 namespace Wprs\Api\Web\Endpoint;
@@ -21,11 +21,12 @@ interface FilterInterface
 }
 ```
 
-* The `filter` method can be used to modify each item before it is added to the `data/items` array of
-the [output_array][output]. To prevent an item being added, return null.
+* The `filter` method can be used to modify each item before it is added to `data/items` in the
+[output_array][output]. To prevent an item being added, return null.
 
-* The `$errors` parameter is an array of missing value [errors][errors] or null. These will be
-included in the [output_array][output] unless modified by the filter method.
+* The `$errors` parameter is an array of missing value [errors][errors], or null. These errors will
+be included in the [output_array][output] unless modified by the filter method. To prevent errors
+being included, set the variable to null.
 
 * The `setOptions` method receives any non-curl [options][options] that have been set, allowing user
 data to be passed data to the filter instance.
@@ -43,10 +44,10 @@ class CompetitionsFilter implements FilterInterface
 {
     public function filter(array $item, ?array &$errors): ?array
     {
-        // we don't care about errors
+        // we don't want errors
         $errors = null;
 
-        // we don't want comps with no tasks
+        // we don't want competitions with no tasks
         if ($item['tasks'] === 0 ) {
             return null;
         }
@@ -79,7 +80,7 @@ use Wprs\Api\Web\System;
 $type = System::ENDPOINT_COMPETITIONS;
 $discipline = System::DISCIPLINE_PG_XC;
 
-// create filter
+// create the filter
 $filter = new CompetitionsFilter();
 
 $endpoint = Factory::createEndpoint($type, $discipline, $filter);

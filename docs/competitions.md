@@ -102,12 +102,12 @@ Unfortunately, invalid competitions are included in the HTML output. These may b
 that were used when updating the system, or events that should not be listed (wrong discipline for
 example).
 
-Events with no tasks flown have always been listed and were easy to identify from the HMTL. But data
-from the new HTML can be inconsistent and the inclusion of invalid competitions has made this
-harder. As a result there may be several missing value errors.
+Events with no tasks have always been listed and were easy to identify from the HMTL. But data from
+the new HTML can be inconsistent and the inclusion of invalid competitions has made this harder.
+As a result there may be several missing value errors.
 
-However, because [missing values][missing] are given a default value, it is possible to
-identify an invalid competition, or one with no tasks flown, if `items/tasks` = 0.
+[Missing values][missing] are given a default value, so an invalid competition, or one with no
+tasks, can be identified if `items/tasks` is zero.
 
 ## Schema
 
