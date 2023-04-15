@@ -58,6 +58,7 @@ class CompetitionsFilter implements FilterInterface
             'end_date' => $item['end_date'],
             'id' => $item['id'],
             'name' => $item['name'],
+            'tasks' => $item['tasks'],
             'pilots' => $item['pilots'],
             'updated' => $item['updated'],
         ];

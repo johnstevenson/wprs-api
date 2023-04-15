@@ -1,0 +1,147 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "Pilots endpoint",
+    "type": "object",
+    "required": [
+        "meta",
+        "data"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "meta": {
+            "$ref": "#/$defs/metaPilots"
+        },
+        "data": {
+            "type": "object",
+            "required": [
+                "details",
+                "items"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "details": {
+                    "$ref": "#/$defs/details"
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/pilot"
+                    }
+                },
+                "errors": {
+                    "type": "null"
+                }
+            }
+        }
+    },
+    "$defs": {
+        "metaPilots": {
+            "type": "object",
+            "required": [
+                "endpoint",
+                "discipline",
+                "ranking_date",
+                "count",
+                "version"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "endpoint": {
+                    "type": "string",
+                    "pattern": "^pilots$"
+                },
+                "discipline": {
+                    "$ref": "#/$defs/discipline"
+                },
+                "ranking_date": {
+                    "$ref": "#/$defs/dateString"
+                },
+                "count": {
+                    "type": "integer"
+                },
+                "version": {
+                    "type": "string"
+                }
+            }
+        },
+        "details": {
+            "type": "object",
+            "required": [
+                "region",
+                "region_id",
+                "scoring"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "region": {
+                    "type": "string"
+                },
+                "region_id": {
+                    "type": "integer"
+                },
+                "nation": {
+                    "type": "string"
+                },
+                "nation_id": {
+                    "type": "integer"
+                },
+                "scoring": {
+                    "type": "string"
+                }
+            }
+        },
+        "pilot": {
+            "type": "object",
+            "required": [
+                "id",
+                "name",
+                "gender",
+                "points",
+                "rank",
+                "rworld"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "gender": {
+                    "type": "string"
+                },
+                "points": {
+                    "$ref": "#/$defs/floatString"
+                },
+                "rank": {
+                    "type": "integer"
+                },
+                "rworld": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dateString": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "floatString": {
+            "type": "string",
+            "pattern": "^\\d+\\.\\d+$"
+        },
+        "discipline": {
+            "type": "string",
+            "enum": [
+                "hang-gliding-class-1",
+                "hang-gliding-class-1-sport",
+                "hang-gliding-class-2",
+                "hang-gliding-class-5",
+                "paragliding-xc",
+                "paragliding-accuracy",
+                "paragliding-acro-solo",
+                "paragliding-acro-syncro"
+            ]
+        }
+    }
+}

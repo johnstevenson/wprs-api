@@ -4,6 +4,7 @@ namespace Wprs\Api\Web;
 
 use Wprs\Api\Http\DownloaderInterface;
 use Wprs\Api\Http\HttpDownloader;
+use Wprs\Api\Http\HttpUtils;
 use Wprs\Api\Http\Response;
 use Wprs\Api\Web\Endpoint\ApiOutput;
 use Wprs\Api\Web\Endpoint\DataCollector;
@@ -98,7 +99,8 @@ abstract class Application
     {
         $rankingDate = System::getRankingDate($rankingDate);
         $query = $params->getQueryParams($rankingDate);
-        $url = $this->buildUrl($query, $path);
+        $path = $path ?? $this->path;
+        $url = HttpUtils::buildQuery($query, $path);
 
         $output = new ApiOutput($this->endpoint, $this->discipline, $rankingDate);
 
@@ -126,7 +128,7 @@ abstract class Application
     private function handleResponses(Task $task, array $responses): void
     {
         foreach ($responses as $index => $response) {
-            $contents = $this->getHtmlFromResponse($response);
+            $contents = HttpUtils::getResponseContent($response);
             $data = $this->parser->parse($contents, $this->filter);
 
             $dataCollector = $task->getDataCollector($index);
@@ -172,71 +174,9 @@ abstract class Application
         return $result;
     }
 
-    private function getHtmlFromResponse(Response $response): string
-    {
-        $result = $response->contents;
-
-        // Check for gzip magic number
-        if ("\x1f\x8b" === substr($result, 0, 2)) {
-            $result = (string) gzdecode($result);
-        }
-
-        return $result;
-    }
-
     private function isMultiPageEndpoint(): bool
     {
         // Currently this is the only endpoint that needs multiple pages
         return $this->endpoint === System::ENDPOINT_PILOTS;
-    }
-
-
-    /**
-     * @param non-empty-array<string, string> $params
-     */
-    private function buildUrl(array $params, ?string $path): string
-    {
-        $path = $path ?? $this->path;
-        $pairs = [];
-
-        foreach ($params as $name => $value) {
-            $name = $this->queryStringEncode($name);
-            $value = $this->queryStringEncode($value);
-            $pairs[] = $name.'='.$value;
-        }
-
-        $query = implode('&', $pairs);
-
-        return $path.'?'.$query;
-    }
-
-    /**
-     * Encodes a query string as per whatwg.org Url standard
-     *
-     * https://url.spec.whatwg.org/
-     *
-     * @param string $value
-     * @return string
-     */
-    private function queryStringEncode(string $value): string
-    {
-        $result = '';
-
-        // query percent-encode set: x22 (") 34, x23 (#) 35, x3C (<) 60, x3E (>) 62
-        $encodeSet = [34, 35, 60, 62];
-
-        for ($i = 0, $len = strlen($value); $i < $len; ++$i) {
-            $c = $value[$i];
-            $dec = ord($c);
-
-            // C0 control or space, upper ascii bound x7E (~) 126
-            if ($dec < 33 || $dec > 126 || in_array($dec, $encodeSet, true)) {
-                $c = '%'.bin2hex($c);
-            }
-
-            $result .= $c;
-        }
-
-        return $result;
     }
 }

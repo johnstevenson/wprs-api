@@ -1,0 +1,125 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "Competitions endpoint",
+    "type": "object",
+    "required": [
+        "meta",
+        "data"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "meta": {
+            "$ref": "#/$defs/metaCompetitions"
+        },
+        "data": {
+            "type": "object",
+            "required": [
+                "details",
+                "items"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "details": {
+                    "type": "null"
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/competition"
+                    }
+                },
+                "errors": {
+                    "type": "null"
+                }
+            }
+        }
+    },
+    "$defs": {
+        "metaCompetitions": {
+            "type": "object",
+            "required": [
+                "endpoint",
+                "discipline",
+                "ranking_date",
+                "count",
+                "version"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "endpoint": {
+                    "type": "string",
+                    "pattern": "^competitions$"
+                },
+                "discipline": {
+                    "$ref": "#/$defs/discipline"
+                },
+                "ranking_date": {
+                    "$ref": "#/$defs/dateString"
+                },
+                "count": {
+                    "type": "integer"
+                },
+                "version": {
+                    "type": "string"
+                }
+            }
+        },
+        "competition": {
+            "type": "object",
+            "required": [
+                "start_date",
+                "end_date",
+                "id",
+                "name",
+                "tasks",
+                "pilots",
+                "updated"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "start_date": {
+                    "$ref": "#/$defs/dateString"
+                },
+                "end_date": {
+                    "$ref": "#/$defs/dateString"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "tasks": {
+                    "type": "integer"
+                },
+                "pilots": {
+                    "type": "integer"
+                },
+                "updated": {
+                    "type": "string"
+                }
+            }
+        },
+        "dateString": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "floatString": {
+            "type": "string",
+            "pattern": "^\\d+\\.\\d+$"
+        },
+        "discipline": {
+            "type": "string",
+            "enum": [
+                "hang-gliding-class-1",
+                "hang-gliding-class-1-sport",
+                "hang-gliding-class-2",
+                "hang-gliding-class-5",
+                "paragliding-xc",
+                "paragliding-accuracy",
+                "paragliding-acro-solo",
+                "paragliding-acro-syncro"
+            ]
+        }
+    }
+}
