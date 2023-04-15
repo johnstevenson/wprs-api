@@ -99,6 +99,7 @@ $data = $endpoint->getData($rankingDate, $compId);
             "td_points": "44.4",
             "score": 3602,
             "pilot": "Gareth Carter",
+            "nation_cc": "AUS",
             "civl_id": 17421
         }
         // more pilot result items

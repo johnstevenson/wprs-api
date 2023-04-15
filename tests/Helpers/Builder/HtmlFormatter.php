@@ -6,6 +6,7 @@ use \DOMElement;
 use \DOMNode;
 use \DOMNodeList;
 
+use Wprs\Api\Web\Endpoint\Utils;
 use Wprs\Api\Web\Endpoint\XPathDom;
 
 class HtmlFormatter
@@ -27,6 +28,7 @@ class HtmlFormatter
         $this->removeElements($xpath, 'ul');
         $this->removeElements($xpath, 'script');
         $this->removeElements($xpath, 'comment()');
+        $this->removeExportWidget($xpath);
 
         return $this->prettify($xpath);
     }
@@ -47,7 +49,7 @@ class HtmlFormatter
                 $node->nodeValue = str_replace('  ', ' ', $node->nodeValue);
             }
 
-            if (strlen($node->nodeValue) === 0) {
+            if (Utils::isEmptyString($node->nodeValue)) {
                 $this->removals[] = $node;
             }
         }
@@ -72,6 +74,30 @@ class HtmlFormatter
             $node->setAttribute('charset', 'UTF-8');
         }
     }
+
+    private function removeExportWidget(XPathDom $xpath): void
+    {
+        // this has a session-generated id which on each build
+        $nodes = $xpath->start()
+            ->with('//div')
+            ->withClassContains('jsExportWidget')
+            ->with('/parent::*')
+            ->query();
+
+        $div = $nodes->item(0);
+
+        if ($div === null) {
+            return;
+        }
+
+        $this->removeChildren($div);
+
+        if (Utils::isEmptyString($div->nodeValue)) {
+            $this->removals[] = $div;
+            $this->removeNodes();
+        }
+    }
+
 
     private function removeElements(XPathDom $xpath, string $type): void
     {

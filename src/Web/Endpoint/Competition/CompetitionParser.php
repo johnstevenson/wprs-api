@@ -250,6 +250,9 @@ class CompetitionParser extends ParserManager
         $key = 'pilot';
         $result[$key] = $this->getLinkValue($columns->item(5), false, $key);
 
+        $key = 'nation_cc';
+        $result[$key] = $this->getTextValue($columns, 6, $key);
+
         $key = 'civl_id';
         $result[$key] = $this->getLinkValue($columns->item(7), true, $key);
 
@@ -341,6 +344,19 @@ class CompetitionParser extends ParserManager
         return $value;
     }
 
+    /**
+     * @param DOMNodeList<DOMNode> $nodes
+     */
+    private function getTextValue(DOMNodeList $nodes, int $index, string $name): string
+    {
+        $value = Utils::getTextFromNodeList($nodes, $index);
+        if ($value === null) {
+            throw new \RuntimeException('pilot '.$name);
+        }
+
+        return $value;
+    }
+
     private function getDateValue(?DOMNode $node, string $name): string
     {
         $value = Utils::getNodeText($node);
@@ -423,6 +439,7 @@ class CompetitionParser extends ParserManager
             'td_points' => $float,
             'score' => $int,
             'pilot' => $string,
+            'nation_cc' => $string,
             'civl_id' => $int,
         ];
     }

@@ -160,6 +160,7 @@
                 "td_points",
                 "score",
                 "pilot",
+                "nation_cc",
                 "civl_id"
             ],
             "additionalProperties": false,
@@ -181,6 +182,10 @@
                 },
                 "pilot": {
                     "type": "string"
+                },
+                "nation_cc": {
+                    "type": "string",
+                    "pattern": "^[A-Z]{3}$"
                 },
                 "civl_id": {
                     "type": "integer"
