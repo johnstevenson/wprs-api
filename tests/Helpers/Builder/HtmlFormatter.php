@@ -77,7 +77,7 @@ class HtmlFormatter
 
     private function removeExportWidget(XPathDom $xpath): void
     {
-        // this has a session-generated id which on each build
+        // this has a session-generated id which changes on each build
         $nodes = $xpath->start()
             ->with('//div')
             ->withClassContains('jsExportWidget')
@@ -92,7 +92,8 @@ class HtmlFormatter
 
         $this->removeChildren($div);
 
-        if (Utils::isEmptyString($div->nodeValue)) {
+        // only remove the parent if it is empty
+        if ($div->nodeValue !== null && Utils::isEmptyString($div->nodeValue)) {
             $this->removals[] = $div;
             $this->removeNodes();
         }

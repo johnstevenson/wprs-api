@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-04/schema#",
-    "title": "Pilots endpoint",
+    "title": "Nations endpoint",
     "type": "object",
     "required": [
         "meta",
@@ -9,7 +9,7 @@
     "additionalProperties": false,
     "properties": {
         "meta": {
-            "$ref": "#/$defs/metaPilots"
+            "$ref": "#/$defs/metaNations"
         },
         "data": {
             "type": "object",
@@ -25,7 +25,7 @@
                 "items": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/$defs/pilot"
+                        "$ref": "#/$defs/nation"
                     }
                 },
                 "errors": {
@@ -35,7 +35,7 @@
         }
     },
     "$defs": {
-        "metaPilots": {
+        "metaNations": {
             "type": "object",
             "required": [
                 "endpoint",
@@ -48,7 +48,7 @@
             "properties": {
                 "endpoint": {
                     "type": "string",
-                    "pattern": "^pilots$"
+                    "pattern": "^nations$"
                 },
                 "discipline": {
                     "$ref": "#/$defs/discipline"
@@ -69,7 +69,7 @@
             "required": [
                 "region",
                 "region_id",
-                "scoring"
+                "count_ww"
             ],
             "additionalProperties": false,
             "properties": {
@@ -85,35 +85,24 @@
                 "nation_id": {
                     "type": "integer"
                 },
-                "scoring": {
-                    "type": "string"
+                "count_ww": {
+                    "type": "integer"
                 }
             }
         },
-        "pilot": {
+        "nation": {
             "type": "object",
             "required": [
-                "civl_id",
-                "name",
-                "gender",
                 "nation",
                 "nation_id",
                 "rank",
-                "xranks",
+                "rank_ww",
+                "pilots",
                 "points",
-                "comps"
+                "scores"
             ],
             "additionalProperties": false,
             "properties": {
-                "civl_id": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "gender": {
-                    "type": "string"
-                },
                 "nation": {
                     "type": "string"
                 },
@@ -123,32 +112,31 @@
                 "rank": {
                     "type": "integer"
                 },
-                "xranks": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/$defs/xrank"
-                    }
+                "rank_ww": {
+                    "type": "integer"
+                },
+                "pilots": {
+                    "type": "integer"
                 },
                 "points": {
                     "$ref": "#/$defs/floatString"
                 },
-                "comps": {
+                "scores": {
                     "type": "array",
                     "minItems": 1,
                     "maxItems": 4,
                     "items": {
-                        "$ref": "#/$defs/comp"
+                        "$ref": "#/$defs/score"
                     }
                 }
             }
         },
-        "comp": {
+        "score": {
             "type": "object",
             "required": [
                 "rank",
                 "points",
-                "name",
-                "id"
+                "name"
             ],
             "additionalProperties": false,
             "properties": {
@@ -160,18 +148,6 @@
                 },
                 "name": {
                     "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                }
-            }
-        },
-        "xrank": {
-            "type": "object",
-            "additionalProperties": false,
-            "patternProperties": {
-                "^wo|wf|wj|co|cf|cj|no$": {
-                    "type": "integer"
                 }
             }
         },

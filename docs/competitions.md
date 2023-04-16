@@ -3,7 +3,7 @@
 # Competitions endpoint
 
 * [Methods](#methods)
-* [Example](#example)
+* [Code](#code)
 * [Output](#output)
 * [Errors](#errors)
 * [Schema](#schema)
@@ -11,7 +11,8 @@
 This endpoint provides a list of all competitions used in a specific ranking period.
 
 ## Methods
-### getData()
+
+### _getData()_
 
 ```php
 getData(?string $rankingDate = null): array
@@ -22,7 +23,7 @@ Returns an [output_array][output] of competitions used in the ranking period.
 The `$rankingDate` parameter is optional and the current ranking date will be used if it is not
 provided. Otherwise it must be a YYYY-MM-DD formatted date string.
 
-## Example
+## Code
 Gets all competitions used in the current ranking.
 
 ```php
@@ -42,12 +43,16 @@ $data = $endpoint->getData();
 
 ## Output
 
-_**data/details**_ is always null.
+### _data/details_
+This is always null.
 
-_**data/items**_ lists the parameters and details of each competition.
+### _data/items_
+Lists the parameters and details of each competition.
 
-_**data/errors**_ lists any [Errors](#errors), or null.
+### _data/errors_
+Lists any [Errors](#errors), or null.
 
+### _Example_
 ```jsonc
 "meta": {
     "endpoint": "competitions",

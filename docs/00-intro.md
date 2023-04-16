@@ -13,6 +13,7 @@ This library is based around the concept of endpoints. An endpoint is one of the
 rankings (ladders) and the following chapters show usage information and examples for each type.
 
 * [Pilots endpoint](pilots.md)
+* [Nations endpoint](nations.md)
 * [Competitions endpoint](competitions.md)
 * [Competition endpoint](competition.md)
 
@@ -58,6 +59,7 @@ The data returned is a PHP array. Its basic structure is defined in [Output data
 with more specific details given for each endpoint:
 
 * [Pilots output](pilots.md#output)
+* [Nations output](nations.md#output)
 * [Competitions output](competitions.md#output)
 * [Competition output](competition.md#output)
 

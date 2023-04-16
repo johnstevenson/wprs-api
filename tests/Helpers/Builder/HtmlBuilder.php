@@ -4,12 +4,15 @@ namespace Wprs\Api\Tests\Helpers\Builder;
 
 use Wprs\Api\Http\HttpDownloader;
 use Wprs\Api\Http\HttpUtils;
+use Wprs\Api\Http\Response;
 use Wprs\Api\Tests\Helpers\Utils;
 use Wprs\Api\Web\Endpoint\Competition\Competition;
 use Wprs\Api\Web\Endpoint\Competition\CompetitionParams;
 use Wprs\Api\Web\Endpoint\Competitions\Competitions;
 use Wprs\Api\Web\Endpoint\Competitions\CompetitionsParams;
 use Wprs\Api\Web\Endpoint\Competitions\CompetitionsParser;
+use Wprs\Api\Web\Endpoint\Nations\Nations;
+use Wprs\Api\Web\Endpoint\Nations\NationsParams;
 use Wprs\Api\Web\Endpoint\Pilots\Pilots;
 use Wprs\Api\Web\Endpoint\Pilots\PilotsParams;
 use Wprs\Api\Web\System;
@@ -18,14 +21,15 @@ class HtmlBuilder
 {
     private int $discipline;
     private int $regionId;
+    private int $compId;
     private string $rankingDate;
-    private BuildConfig $config;
+    private Config $config;
     private HttpDownloader $downloader;
     private HtmlFormatter $formatter;
 
     public function __construct()
     {
-        $this->config = new BuildConfig();
+        $this->config = new Config();
         $this->discipline = $this->config->getDiscipline();
         $this->rankingDate = $this->config->getRankingDate();
         $this->regionId = $this->config->getRegionId();
@@ -38,50 +42,50 @@ class HtmlBuilder
     {
         $pages = $this->getHtmlPages();
 
-        $files = [
-            Utils::getHtmlFile('pilots'),
-            Utils::getHtmlFile('competitions'),
-            Utils::getHtmlFile('competition'),
-        ];
-
-        foreach ($pages as $index => $html) {
+        foreach ($pages as $name => $html) {
             $html = $this->formatter->format($html);
-            $file = $files[$index];
-            file_put_contents($file, $html);
+            $file = Utils::getHtmlFile($name);
+            Utils::saveToFile($file, $html);
         }
 
-        $this->config->save(Utils::getConfigFile());
+        $data = $this->config->getData($this->compId);
+        $configFile = Utils::getConfigFile();
+
+        $json = json_encode($data, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT);
+        Utils::saveToFile($configFile, $json);
     }
 
     /**
      * @return array<string>
      */
-    protected function getHtmlPages(): array
+    private function getHtmlPages(): array
     {
         $urls = [
             $this->getPilotsUrl(),
-            $this->getCompetitionsUrl()
+            $this->getCompetitionsUrl(),
+            $this->getNationsUrl(),
         ];
 
+        $names = ['pilots', 'competitions', 'nations'];
         $pages = [];
 
         $responses = $this->downloader->getBatch($urls);
 
+        /** @var Response $response */
         foreach ($responses as $response) {
-            $pages[] = HttpUtils::getResponseContent($response);
+            $name = $names[$response->id];
+            $pages[$name] = HttpUtils::getResponseContent($response);
         }
 
-        $compId = $this->parseCompetitions($pages[1]);
-        $this->config->setCompId($compId);
-
-        $url = $this->getCompetitionUrl($compId);
+        $this->compId = $this->parseCompetitions($pages['competitions']);
+        $url = $this->getCompetitionUrl($this->compId);
         $response = $this->downloader->get($url);
-        $pages[] = HttpUtils::getResponseContent($response);
+        $pages['competition'] = HttpUtils::getResponseContent($response);
 
         return $pages;
     }
 
-    protected function parseCompetitions(string $html): int
+    private function parseCompetitions(string $html): int
     {
         $parser = new CompetitionsParser();
         $data = $parser->parse($html);
@@ -103,7 +107,7 @@ class HtmlBuilder
         return $compId;
     }
 
-    protected function getCompetitionUrl(int $id): string
+    private function getCompetitionUrl(int $id): string
     {
         $path = System::getPath($this->discipline, Competition::class);
         $params = new CompetitionParams($id);
@@ -112,7 +116,7 @@ class HtmlBuilder
         return HttpUtils::buildQuery($query, $path);
     }
 
-    protected function getCompetitionsUrl(): string
+    private function getCompetitionsUrl(): string
     {
         $path = System::getPath($this->discipline, Competitions::class);
         $params = new CompetitionsParams();
@@ -121,7 +125,16 @@ class HtmlBuilder
         return HttpUtils::buildQuery($query, $path);
     }
 
-    protected function getPilotsUrl(): string
+    private function getNationsUrl(): string
+    {
+        $path = System::getPath($this->discipline, Nations::class);
+        $params = new NationsParams($this->regionId);
+        $query = $params->getQueryParams($this->rankingDate);
+
+        return HttpUtils::buildQuery($query, $path);
+    }
+
+    private function getPilotsUrl(): string
     {
         $path = System::getPath($this->discipline, Pilots::class);
         $params = new PilotsParams($this->regionId);

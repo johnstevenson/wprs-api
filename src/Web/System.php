@@ -28,14 +28,12 @@ class System
         self::DISCIPLINE_PG_ACRO_SYNCRO => 'paragliding-acro-syncro',
     ];
 
-    public const ENDPOINT_PILOT = __NAMESPACE__.'\\Endpoint\\Pilot\\Pilot';
     public const ENDPOINT_PILOTS = __NAMESPACE__.'\\Endpoint\\Pilots\\Pilots';
     public const ENDPOINT_NATIONS = __NAMESPACE__.'\\Endpoint\\Nations\\Nations';
     public const ENDPOINT_COMPETITION = __NAMESPACE__.'\\Endpoint\\Competition\\Competition';
     public const ENDPOINT_COMPETITIONS = __NAMESPACE__.'\\Endpoint\\Competitions\\Competitions';
 
     private const ENDPOINTS = [
-        self::ENDPOINT_PILOT => 'pilot',
         self::ENDPOINT_PILOTS => 'pilots',
         self::ENDPOINT_NATIONS => 'nations',
         self::ENDPOINT_COMPETITION => 'competition',

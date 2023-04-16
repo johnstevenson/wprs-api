@@ -8,7 +8,6 @@ class PilotsFilter implements FilterInterface
 {
     public function filter(array $item, ?array &$errors): ?array
     {
-        $errors = null;
 
         $result = [
             'id' => $item['civl_id'],

@@ -2,7 +2,7 @@
 
 namespace Wprs\Api\Tests\Helpers;
 
-use Wprs\Api\Tests\Helpers\Builder\BuildConfig;
+use Wprs\Api\Tests\Helpers\Builder\Config;
 use Wprs\Api\Web\System;
 
 class Utils
@@ -15,8 +15,7 @@ class Utils
         $html = file_get_contents($file);
 
         if ($html === false) {
-            $message = 'Test not run, unable to open '.$file;
-            throw new \InvalidArgumentException($message);
+            throw new \InvalidArgumentException('Unable to open '.$file);
         }
 
         return $html;
@@ -41,27 +40,29 @@ class Utils
         $file = sprintf('%s%s%s-schema.json', $folder, DIRECTORY_SEPARATOR, $endpoint);
 
         if (!file_exists($file) || !is_readable($file)) {
-            $message = 'Test not run, unable to open '.$file;
-            throw new \InvalidArgumentException($message);
+            throw new \InvalidArgumentException('Unable to open '.$file);
         }
 
         return $file;
     }
 
-    public static function getConfig(): BuildConfig
+    public static function getConfig(): Config
     {
         $file = self::getConfigFile();
 
         $json = file_get_contents($file);
 
         if ($json === false) {
-            $message = 'Test not run, unable to open '.$file;
-            throw new \InvalidArgumentException($message);
+            throw new \InvalidArgumentException('Unable to open '.$file);
         }
 
-        $config = new BuildConfig($json);
+        $data = json_decode($json);
 
-        return $config;
+        if (!($data instanceof \stdClass)) {
+             throw new \RuntimeException(json_last_error_msg());
+        }
+
+        return new Config($data);
     }
 
     public static function getConfigFile(): string
@@ -70,6 +71,13 @@ class Utils
         $file = sprintf('%s%sconfig.json', $folder, DIRECTORY_SEPARATOR);
 
         return $file;
+    }
+
+    public static function saveToFile(string $file, string $data): void
+    {
+        if (file_put_contents($file, $data) === false) {
+            throw new \RuntimeException('Unable to save file: '.$file);
+        }
     }
 
     private static function getFixtureFolder(?string $name): string
@@ -95,8 +103,7 @@ class Utils
         $folder = realpath($path);
 
         if ($folder === false) {
-            $message = 'Test not run, folder does not exists: '.$path;
-            throw new \InvalidArgumentException($message);
+            throw new \InvalidArgumentException('Folder does not exist: '.$path);
         }
 
         return $folder;

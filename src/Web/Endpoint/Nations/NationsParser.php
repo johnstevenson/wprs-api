@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Wprs\Api\Web\Endpoint\Pilots;
+namespace Wprs\Api\Web\Endpoint\Nations;
 
 use \DOMElement;
 use \DOMNode;
@@ -15,7 +15,7 @@ use Wprs\Api\Web\Endpoint\XPathDom;
 /**
  * @phpstan-import-type apiItem from \Wprs\Api\Web\Endpoint\ApiOutput
  */
-class PilotsParser extends ParserManager
+class NationsParser extends ParserManager
 {
     private EventParser $eventParser;
 
@@ -29,29 +29,35 @@ class PilotsParser extends ParserManager
             throw new \RuntimeException('id=rankingTableWrapper');
         }
 
-        $overallCount = $this->getOverallCount($wrapper);
+        list($overallCount, $countWorld) = $this->getOverallCounts($wrapper);
         $dataCollector = new DataCollector($overallCount);
 
         if ($overallCount === 0) {
             return $dataCollector;
         }
 
+        $details = ['count_ww' => $countWorld];
+        $dataCollector->addExtra('details', $details);
+
         $list = $this->xpath->getElementById('w0', $wrapper);
         if ($list === null) {
             throw new \RuntimeException('id=w0');
         }
 
-        $pilotNodes = $this->getPilotList($list);
+        $nationNodes = $this->getNationList($list);
 
-        foreach ($pilotNodes as $node) {
-            $item = $this->parsePilotRow($node);
+        foreach ($nationNodes as $node) {
+            $item = $this->parseNationRow($node);
             $dataCollector->addItem($item, null, $this->filter);
         }
 
         return $dataCollector;
     }
 
-    private function getOverallCount(DOMNode $contextNode): int
+    /**
+     * @return array{0: int, 1: int}
+     */
+    private function getOverallCounts(DOMNode $contextNode): array
     {
         $nodes = $this->xpath->start()
             ->with('//div[@class="table-title-row"]/div')
@@ -61,16 +67,38 @@ class PilotsParser extends ParserManager
 
         $value = Utils::getNumberFromNodeList($nodes);
         if ($value === null) {
-            throw new \RuntimeException('competitions count');
+            throw new \RuntimeException('nations count');
         }
 
-        return (int) $value;
+        $count = (int) $value;
+        $countWorld = $count;
+
+        // get the text outside the span
+        $nodes = $this->xpath->with('/following-sibling::text()')
+            ->query($contextNode);
+
+        $value = Utils::getTextFromNodeList($nodes);
+        if ($value === null || Utils::isEmptyString($value)) {
+            throw new \RuntimeException('nations count_ww');
+        }
+
+        // (worldwide 86)
+        $pattern = '/^\\(\\s*worldwide\\s*(\\d+)\\s*\\)$/';
+        $valid = (bool) preg_match($pattern, $value, $matches);
+
+        if (!$valid) {
+            throw new \RuntimeException('nations count_ww');
+        }
+
+        $countWorld = (int) $matches[1];
+
+        return [$count, $countWorld];
     }
 
     /**
      * @return DOMNodeList<DOMNode>
      */
-    private function getPilotList(DOMNode $contextNode): DOMNodeList
+    private function getNationList(DOMNode $contextNode): DOMNodeList
     {
         $nodes = $this->xpath->start()
             ->with('//div')
@@ -83,36 +111,33 @@ class PilotsParser extends ParserManager
     /**
      * @phpstan-return apiItem
      */
-    private function parsePilotRow(DOMNode $contextNode): array
+    private function parseNationRow(DOMNode $contextNode): array
     {
-        $civlId = $this->getCivlId($contextNode);
-        $columns = $this->getColumns($contextNode, 6, 'pilot row');
+        $nationId = $this->getNationId($contextNode);
+        $columns = $this->getColumns($contextNode, 5, 'nation row');
 
         $rank = $this->getMainRanking($columns->item(0));
-        $xranks = $this->getOtherRankings($columns->item(0));
-        $name = $this->getPilotName($columns->item(1));
-        $gender = $this->getPilotGender($columns->item(2));
-        list($nation, $nationId) = $this->getNation($columns->item(3));
-        $points = $this->getPilotPoints($columns->item(4));
-        $events = $this->getPilotEvents($columns->item(5));
-        $comps = $this->eventParser->getPilotData($events);
+        $rankWorld = $this->getWorldRanking($columns->item(0));
+        $nation = $this->getNationName($columns->item(1));
+        $pilots = $this->getPilots($columns->item(2));
+        $points = $this->getNationPoints($columns->item(3));
+        $events = $this->getNationScores($columns->item(4));
+        $scores = $this->eventParser->getNationData($events);
 
         $item = [
-            'civl_id' => $civlId,
-            'name' => $name,
-            'gender' => $gender,
             'nation' => $nation,
             'nation_id' => $nationId,
             'rank' => $rank,
-            'xranks' => $xranks,
+            'rank_ww' => $rankWorld,
+            'pilots' => $pilots,
             'points' => $points,
-            'comps' => $comps,
+            'scores' => $scores,
         ];
 
         return $item;
     }
 
-    private function getCivlId(DOMNode $contextNode): int
+    private function getNationId(DOMNode $contextNode): int
     {
         $nodes = $this->xpath->start()
             ->with('//@data-id')
@@ -120,10 +145,10 @@ class PilotsParser extends ParserManager
 
         $value = Utils::getNumberFromNodeList($nodes);
         if ($value === null) {
-            throw new \RuntimeException('civl_id');
+            throw new \RuntimeException('nation_id');
         }
 
-        return (int)$value;
+        return (int) $value;
     }
 
     /**
@@ -150,7 +175,7 @@ class PilotsParser extends ParserManager
         }
 
         $nodes = $this->xpath->start()
-            ->with('//div[@class="main-ranking"]')
+            ->with('/text()')
             ->query($contextNode);
 
         $value = Utils::getNumberFromNodeList($nodes);
@@ -158,58 +183,19 @@ class PilotsParser extends ParserManager
             throw new \RuntimeException('rank');
         }
 
-        return (int)$value;
+        return (int) $value;
     }
 
-    /**
-     * @return array<int, non-empty-array<string, int>>
-     */
-    private function getOtherRankings(?DOMNode $contextNode): array
+    private function getWorldRanking(?DOMNode $contextNode): int
     {
         if ($contextNode === null) {
-            throw new \RuntimeException('other rankings div');
+            throw new \RuntimeException('main ranking div');
         }
+
+        $error = 'nation rank_ww';
 
         $nodes = $this->xpath->start()
-            ->with('//div[@class="scoring-category"]')
-            ->query($contextNode);
-
-        $result = [];
-        $error= 'xrank item';
-
-        foreach ($nodes as $node) {
-            $value = Utils::getNodeText($node);
-            if ($value === null) {
-                throw new \RuntimeException($error);
-            }
-
-            $parts = Utils::split(':', $value, 2);
-            if ($parts === null) {
-                throw new \RuntimeException($error);
-            }
-
-            list($rankType, $rank) = $parts;
-
-            if (!Utils::isNumericText($rank)) {
-                throw new \RuntimeException($error);
-            }
-
-            $result[] = [$rankType => (int) $rank];
-        }
-
-        return $result;
-    }
-
-    private function getPilotName(?DOMNode $contextNode): string
-    {
-        $error = 'pilot name';
-
-        if ($contextNode === null) {
-            throw new \RuntimeException($error);
-        }
-
-        $nodes = $this->xpath->start()
-            ->with('//div[@class="pilot-id"]/../a')
+            ->with('/div/text()')
             ->query($contextNode);
 
         $value = Utils::getTextFromNodeList($nodes);
@@ -217,62 +203,68 @@ class PilotsParser extends ParserManager
             throw new \RuntimeException($error);
         }
 
-        return $value;
-    }
-
-    private function getPilotGender(?DOMNode $contextNode): string
-    {
-        $value = Utils::getNodeText($contextNode);
-        if ($value === null) {
-            throw new \RuntimeException('gender');
+        $parts = Utils::split(':', $value, 2);
+        if ($parts === null) {
+            throw new \RuntimeException($error);
         }
 
-        return $value;
+        list($rankType, $rank) = $parts;
+
+        if (!Utils::isNumericText($rank)) {
+            throw new \RuntimeException($error);
+        }
+
+        return (int) $rank;
     }
 
-    /**
-     * @return array{0: string, 1: int}
-     */
-    private function getNation(?DOMNode $contextNode): array
+    private function getNationName(?DOMNode $contextNode): string
     {
-        $error = 'nation details';
+        $error = 'nation';
 
         if ($contextNode === null) {
             throw new \RuntimeException($error);
         }
 
         $nodes = $this->xpath->start()
-            ->with('//a[@data-nation-id]')
+            ->with('/a')
             ->query($contextNode);
 
-        // get nation name
         $value = Utils::getTextFromNodeList($nodes);
-        if ($value === null) {
+        if ($value === null || Utils::isEmptyString($value)) {
             throw new \RuntimeException($error);
         }
 
-        $nation = $value;
-
-        // get nation id
-        $value = Utils::getAttribute($nodes->item(0), 'data-nation-id');
-        if ($value === null) {
-            throw new \RuntimeException($error);
-        }
-
-        if (!Utils::isNumericText($value)) {
-            throw new \RuntimeException('nation_id');
-        }
-
-        $nationId = (int) $value;
-
-        return [$nation, $nationId];
+        return $value;
     }
 
-    private function getPilotPoints(?DOMNode $contextNode): string
+    private function getPilots(?DOMNode $contextNode): int
+    {
+        if ($contextNode === null) {
+            throw new \RuntimeException('pilots div');
+        }
+
+        $nodes = $this->xpath->start()
+            ->with('/text()')
+            ->query($contextNode);
+
+        $value = Utils::getNumberFromNodeList($nodes);
+        if ($value === null) {
+            throw new \RuntimeException('pilots');
+        }
+
+        return (int) $value;
+    }
+
+    private function getNationPoints(?DOMNode $contextNode): string
     {
         $error = 'points';
 
-        $value = Utils::getNodeText($contextNode);
+        $nodes = $this->xpath->start()
+            ->with('/a')
+            ->query($contextNode);
+
+        $value = Utils::getNumberFromNodeList($nodes);
+
         if ($value === null) {
             throw new \RuntimeException($error);
         }
@@ -287,16 +279,17 @@ class PilotsParser extends ParserManager
     /**
      * @return DOMNodeList<DOMNode>
      */
-    private function getPilotEvents(?DOMNode $contextNode): DOMNodeList
+    private function getNationScores(?DOMNode $contextNode): DOMNodeList
     {
-        $error = 'pilot events.';
+        $error = 'nation scores.';
 
         if ($contextNode === null) {
             throw new \RuntimeException($error);
         }
 
         $nodes = $this->xpath->start()
-            ->with('//div[@class="event-wrapper"]')
+            ->with('//div')
+            ->withClassContains('event-wrapper')
             ->query($contextNode);
 
         if ($nodes->length < 1 || $nodes->length > 4) {

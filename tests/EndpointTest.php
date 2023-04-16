@@ -4,8 +4,10 @@ namespace Wprs\Api\Tests;
 
 use JohnStevenson\JsonWorks\Document;
 use PHPUnit\Framework\TestCase;
+use Wprs\Api\Tests\Helpers\Builder\Config;
 use Wprs\Api\Tests\Helpers\Filter\CompetitionFilter;
 use Wprs\Api\Tests\Helpers\Filter\CompetitionsFilter;
+use Wprs\Api\Tests\Helpers\Filter\NationsFilter;
 use Wprs\Api\Tests\Helpers\Filter\PilotsFilter;
 use Wprs\Api\Tests\Helpers\MockDownloader;
 use Wprs\Api\Tests\Helpers\Utils;
@@ -18,17 +20,15 @@ use Wprs\Api\Web\System;
 class EndpointTest extends TestCase
 {
     private int $discipline;
-    private int $regionId;
-    private int $compId;
     private string $rankingDate;
+
+    private Config $config;
 
     public function setUp(): void
     {
-        $config = Utils::getConfig();
-        $this->discipline = $config->getDiscipline();
-        $this->rankingDate = $config->getRankingDate();
-        $this->regionId = $config->getRegionId();
-        $this->compId = $config->getCompId();
+        $this->config = Utils::getConfig();
+        $this->discipline = $this->config->getDiscipline();
+        $this->rankingDate = $this->config->getRankingDate();
     }
 
     public function testPilots(): void
@@ -38,9 +38,10 @@ class EndpointTest extends TestCase
 
         $html = Utils::getHtml($name);
         $downloader = new MockDownloader($html);
+        $regionId = $this->config->getRegionId();
 
         $endpoint = Factory::createEndpoint($type, $this->discipline, null, $downloader);
-        $data = $endpoint->getData($this->rankingDate, $this->regionId);
+        $data = $endpoint->getData($this->rankingDate, $regionId);
         $this->checkData($data, $name);
     }
 
@@ -51,11 +52,41 @@ class EndpointTest extends TestCase
 
         $html = Utils::getHtml($name);
         $downloader = new MockDownloader($html);
+        $regionId = $this->config->getRegionId();
         $filter = new PilotsFilter();
 
         $endpoint = Factory::createEndpoint($type, $this->discipline, $filter, $downloader);
-        $data = $endpoint->getData($this->rankingDate, $this->regionId);
-        $this->checkData($data, $name.'-filter');
+        $data = $endpoint->getData($this->rankingDate, $regionId);
+        $this->checkData($data, $this->getFilterSchema($name));
+    }
+
+    public function testNations(): void
+    {
+        $type = System::ENDPOINT_NATIONS;
+        $name = System::getEndpoint($type);
+
+        $html = Utils::getHtml($name);
+        $downloader = new MockDownloader($html);
+        $regionId = $this->config->getRegionId();
+
+        $endpoint = Factory::createEndpoint($type, $this->discipline, null, $downloader);
+        $data = $endpoint->getData($this->rankingDate, $regionId);
+        $this->checkData($data, $name);
+    }
+
+    public function testNationsWithFilter(): void
+    {
+        $type = System::ENDPOINT_NATIONS;
+        $name = System::getEndpoint($type);
+
+        $html = Utils::getHtml($name);
+        $downloader = new MockDownloader($html);
+        $regionId = $this->config->getRegionId();
+        $filter = new NationsFilter();
+
+        $endpoint = Factory::createEndpoint($type, $this->discipline, $filter, $downloader);
+        $data = $endpoint->getData($this->rankingDate, $regionId);
+        $this->checkData($data, $this->getFilterSchema($name));
     }
 
     public function testCompetitions(): void
@@ -82,7 +113,7 @@ class EndpointTest extends TestCase
 
         $endpoint = Factory::createEndpoint($type, $this->discipline, $filter, $downloader);
         $data = $endpoint->getData($this->rankingDate);
-        $this->checkData($data, $name.'-filter');
+        $this->checkData($data, $this->getFilterSchema($name));
     }
 
     public function testCompetition(): void
@@ -92,9 +123,10 @@ class EndpointTest extends TestCase
 
         $html = Utils::getHtml($name);
         $downloader = new MockDownloader($html);
+        $compId = $this->config->getCompId();
 
         $endpoint = Factory::createEndpoint($type, $this->discipline, null, $downloader);
-        $data = $endpoint->getData($this->rankingDate, $this->compId);
+        $data = $endpoint->getData($this->rankingDate, $compId);
         $this->checkData($data, $name);
     }
 
@@ -105,17 +137,18 @@ class EndpointTest extends TestCase
 
         $html = Utils::getHtml($name);
         $downloader = new MockDownloader($html);
+        $compId = $this->config->getCompId();
         $filter = new CompetitionFilter();
 
         $endpoint = Factory::createEndpoint($type, $this->discipline, $filter, $downloader);
-        $data = $endpoint->getData($this->rankingDate, $this->compId);
-        $this->checkData($data, $name.'-filter');
+        $data = $endpoint->getData($this->rankingDate, $compId);
+        $this->checkData($data, $this->getFilterSchema($name));
     }
 
     /**
      * @param array<string, mixed> $data
      */
-    protected function checkData(array $data, string $name): void
+    private function checkData(array $data, string $name): void
     {
         $document = new Document();
         $document->loadData($data);
@@ -130,6 +163,9 @@ class EndpointTest extends TestCase
         $result = $document->validate();
         self::assertTrue($result, $document->getError());
 
+        $discipline = $document->getValue('/meta/discipline');
+        self::assertEquals($this->config->getActivity(), $discipline);
+
         $date = $document->getValue('/meta/ranking_date');
         self::assertEquals($this->rankingDate, $date);
 
@@ -138,9 +174,11 @@ class EndpointTest extends TestCase
         self::assertIsArray($items);
         self::assertEquals($count, count($items));
 
+
         if (in_array($name, ['competition', 'competition-filter'], true)) {
             $id = $document->getValue('/data/details/id');
-            self::assertEquals($this->compId, $id);
+            $compId = $this->config->getCompId();
+            self::assertEquals($compId, $id);
         }
 
         if ($name === 'competitions-filter') {
@@ -150,5 +188,10 @@ class EndpointTest extends TestCase
                 }
             }
         }
+    }
+
+    private function getFilterSchema(string $name): string
+    {
+        return $name.'-filter';
     }
 }

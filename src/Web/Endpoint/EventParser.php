@@ -20,12 +20,12 @@ class EventParser
      * @param DOMNodeList<DOMNode> $events
      * @return array<int, array{rank: int, points: string, name: string, id: int}>
      */
-    public function getData(DOMNodeList $events): array
+    public function getPilotData(DOMNodeList $events): array
     {
         $result = [];
 
         foreach ($events as $event) {
-            list($rank, $points) = $this->getPilotValues($event);
+            list($rank, $points) = $this->getPilotValues($event, 'pilot event');
             list($name, $id) = $this->getEventValues($event);
 
             $item = [
@@ -42,15 +42,39 @@ class EventParser
     }
 
     /**
+     * @param DOMNodeList<DOMNode> $events
+     * @return array<int, array{rank: int, points: string, name: string}>
+     */
+    public function getNationData(DOMNodeList $events): array
+    {
+        $result = [];
+
+        foreach ($events as $event) {
+            list($rank, $points) = $this->getPilotValues($event, 'nation score');
+            $name = $this->getPilotName($event);
+
+            $item = [
+                'rank' => $rank,
+                'points' => $points,
+                'name' => $name,
+            ];
+
+            $result[] = $item;
+        }
+
+        return $result;
+    }
+
+    /**
      * @return array{0: int, 1: string}
      */
-    private function getPilotValues(DOMNode $contextNode): array
+    private function getPilotValues(DOMNode $contextNode, string $name): array
     {
         $nodes = $this->xpath->start()
             ->with('//div[@class="wrapper-point"]')
             ->query($contextNode);
 
-        $error = 'pilot event values';
+        $error = $name.' values';
 
         $value = Utils::getTextFromNodeList($nodes);
         if ($value === null) {
@@ -63,13 +87,13 @@ class EventParser
         }
 
         if (!Utils::isNumericText($parts[0])) {
-            throw new \RuntimeException('event rank');
+            throw new \RuntimeException($name.' rank');
         }
 
         $rank = (int) $parts[0];
 
         if (!Utils::isNumericText($parts[1])) {
-            throw new \RuntimeException('event points');
+            throw new \RuntimeException($name.' points');
         }
 
         $points = $parts[1];
@@ -103,5 +127,24 @@ class EventParser
         }
 
         return [$name, (int) $id];
+    }
+
+    private function getPilotName(DOMNode $contextNode): string
+    {
+        $nodes = $this->xpath->start()
+            ->with('//div')
+            ->withClassContains('title-event')
+            ->query($contextNode);
+
+        $value = Utils::getTextFromNodeList($nodes);
+        if ($value === null) {
+            throw new \RuntimeException('score name');
+        }
+
+        if (Utils::isEmptyString($value)) {
+            throw new \RuntimeException('score name');
+        }
+
+        return $value;
     }
 }

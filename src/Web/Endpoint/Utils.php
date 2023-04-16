@@ -9,9 +9,9 @@ use \DOMNodeList;
 class Utils
 {
 
-    public static function isEmptyString(?string $value): bool
+    public static function isEmptyString(string $value): bool
     {
-        return $value === null ? true : strlen($value) === 0;
+        return strlen($value) === 0;
     }
 
     public static function isNumericText(?string $value): bool

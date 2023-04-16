@@ -3,7 +3,7 @@
 # Competition endpoint
 
 * [Methods](#methods)
-* [Example](#example)
+* [Code](#code)
 * [Output](#output)
 * [Errors](#errors)
 * [Parameters](#parameters)
@@ -12,7 +12,8 @@
 This endpoint provides data about a specific competition at a specific ranking period.
 
 ## Methods
-### getData()
+
+### _getData()_
 
 ```php
 getData(string $rankingDate, int $id): array
@@ -21,7 +22,7 @@ getData(string $rankingDate, int $id): array
 Returns an [output_array][output] of competition data. The [parameters](#parameters) are detailed
 below.
 
-### getBatch()
+### _getBatch()_
 
 ```php
 getData(string $rankingDate, array $ids): array
@@ -32,7 +33,7 @@ detailed below.
 
 This method is much faster than calling [getData()](#getdata) multiple times.
 
-## Example
+## Code
 
 Gets data about a specific competition at a specific ranking period.
 
@@ -55,11 +56,16 @@ $data = $endpoint->getData($rankingDate, $compId);
 
 ## Output
 
-**_data/details_** is the competition parameters and details.
+### _data/details_
+Reports the competition parameters and other details.
 
-**_data/items_** lists the results for each competitor.
+### _data/items_
+Lists the results for each competitor.
 
-**_data/errors_** lists any [Errors](#errors), or null.
+### _data/errors_
+Lists any [Errors](#errors), or null.
+
+### _Example_
 
 ```jsonc
 "meta": {

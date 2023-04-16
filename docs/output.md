@@ -2,12 +2,10 @@
 
 # Output data
 
-The output data returned from all endpoints is a PHP array. It can be encoded to JSON and we use
-this representation to illustrate it.
+The output data returned from all endpoints is a PHP array which can be encoded to JSON.
 
-The output data is referred to as an `output_array` throughout this documentation.
-
-The data is an object comprising [meta](#meta) and [data](#data) root properties:
+It is referred to as an `output_array` throughout this documentation, but described as a JSON
+object which comprises [meta](#meta) and [data](#data) root properties:
 
 ```jsonc
 "meta": {
@@ -30,7 +28,12 @@ The data is an object comprising [meta](#meta) and [data](#data) root properties
 }
 ```
 
-JSON schemas are provided for all endpoints and can be found in the `res` directory.
+JSON schemas are provided for all endpoints:
+
+* [Pilots JSON Schema](../res/pilots-schema.json)
+* [Nations JSON Schema](../res/nations-schema.json)
+* [Competitions JSON Schema](../res/competitions-schema.json)
+* [Competition JSON Schema](../res/competition-schema.json)
 
 ## Data types
 In addition to container elements (objects and arrays), data types are restricted to string and
@@ -54,9 +57,9 @@ This object has the same properties for all endpoints.
 
 * _endpoint_ `string`
     * pilots
-    * competition
-    * competitions
     * nations
+    * competitions
+    * competition
 
 * _discipline_ `string`
     * hang-gliding-class-1

@@ -3,16 +3,17 @@
 # Pilots endpoint
 
 * [Methods](#methods)
-* [Example](#example)
+* [Code](#code)
 * [Output](#output)
 * [Errors](#errors)
 * [Parameters](#parameters)
 * [Schema](#schema)
 
-This endpoint provides the main pilot ranking data.
+This endpoint provides the main pilot rankings for a specific ranking period.
 
 ## Methods
-### getData()
+
+### _getData()_
 
 ```php
 getData(
@@ -30,7 +31,7 @@ The website only lists 20 pilots per page, so downloading the HTML will involve 
 The worst case is fetching the world data for `System::DISCIPLINE_PG_XC` which requires more than
 300 requests.
 
-### getCount()
+### _getCount()_
 
 ```php
 getCount(
@@ -44,7 +45,7 @@ getCount(
 Returns the number of pilots in the ranking by downloading a single page. The
 [parameters](#parameters) are detailed below.
 
-## Example
+## Code
 
 Gets the ranking of all UK pilots (nation id 223) in Europe for the current ranking period.
 
@@ -69,12 +70,17 @@ $data = $endpoint->getData(null, $regionId, $nationId);
 
 ## Output
 
-**_data/details_** is the name and id of the region and nation, and the scoring category. If a
-_nation_id_ is not used, the nation name will be an empty string and its id will be 0.
+### _data/details_
+Reports the name and id of the region and nation, and the scoring category. If a _nation_id_ is not
+used, the nation name will be an empty string and its id will be 0.
 
-**_data/items_** lists the ranking data and competition scores for each pilot.
+### _data/items_
+Lists the ranking data and competition scores for each pilot.
 
-**_data/errors_** is always null.
+### _data/errors_
+This is always null.
+
+### _Example_
 
 ```jsonc
 "meta": {
@@ -121,8 +127,9 @@ _nation_id_ is not used, the nation name will be an empty string and its id will
 }
 ```
 
-### xranks
-This property is an array of the pilot's main rankings in relation to the criteria being used.
+### _xranks_
+This property, at `items/xranks`, is an array of the pilot's main rankings in relation to the
+criteria being used.
 
 When world region and overall scoring is used, this array will be empty because there are no other
 rankings to show.
@@ -152,7 +159,7 @@ This endpoint will always throw an exception if a value is missing.
 A YYYY-MM-DD formatted date string, or null to use the current ranking period.
 
 ### _regionId_
-One of the following System constants, or the default `System::REGION_WORLD`:
+One of the following constants, or null for the default `System::REGION_WORLD`:
 
 ```php
     System::REGION_WORLD
@@ -167,7 +174,7 @@ The nation id or null. There is currently no easy way to obtain a list of nation
 use the Nations endpoint.
 
 ### _scoring_
-One of the following System constants, or the default `System::SCORING_OVERALL`:
+One of the following constants, or null for the default `System::SCORING_OVERALL`:
 
 ```php
     System::SCORING_OVERALL
@@ -181,4 +188,3 @@ One of the following System constants, or the default `System::SCORING_OVERALL`:
 
 [docs]: 00-intro.md
 [output]: output.md#output-data
-[schema]: ../res/pilots-schema.json

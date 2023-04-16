@@ -11,4 +11,3 @@ use Wprs\Api\Tests\Helpers\Builder\HtmlBuilder;
 $builder = new HtmlBuilder();
 
 $builder->build();
-
