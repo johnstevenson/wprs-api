@@ -15,8 +15,4 @@ class NationsFilter implements FilterInterface
             'rank' => $item['rank'],
         ];
     }
-
-    public function setOptions(array $options): void
-    {
-    }
 }

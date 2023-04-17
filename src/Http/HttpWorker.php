@@ -40,10 +40,7 @@ class HttpWorker
         $this->gzip = (bool) ($version['libz_version'] ?? null);
     }
 
-    /**
-     * @param array<int, mixed> $options
-     */
-    public function download(Job $job, array $options): void
+    public function download(Job $job): void
     {
         $ch = curl_init($job->url);
 
@@ -64,8 +61,8 @@ class HttpWorker
         curl_setopt($ch, CURLOPT_TIMEOUT, 300);
 
         // User curl options next
-        if (count($options) !== 0) {
-            curl_setopt_array($ch, $options);
+        if (count($job->curlOptions) !== 0) {
+            curl_setopt_array($ch, $job->curlOptions);
         }
 
         curl_setopt($ch, CURLOPT_SHARE, $this->shareHandle);
@@ -214,7 +211,7 @@ class HttpWorker
         } // no sleep for the first retry
 
         $this->closeBodyHandle($job);
-        $this->download($job, $job->options);
+        $this->download($job);
     }
 
     private function retryFromCurlError(Job $job, int $errno, string $error): bool

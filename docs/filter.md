@@ -17,7 +17,6 @@ namespace Wprs\Api\Web\Endpoint;
 interface FilterInterface
 {
     public function filter(array $item, ?array &$errors): ?array;
-    public function setOptions(array $options): void;
 }
 ```
 
@@ -27,9 +26,6 @@ interface FilterInterface
 * The `$errors` parameter is an array of missing value [errors][errors], or null. These errors will
 be included in the [output_array][output] unless modified by the filter method. To prevent errors
 being included, set the variable to null.
-
-* The `setOptions` method receives any non-curl [options][options] that have been set, allowing user
-data to be passed data to the filter instance.
 
 ## Example
 
@@ -65,15 +61,13 @@ class CompetitionsFilter implements FilterInterface
 
         return $result;
     }
-
-    public function setOptions(array $options): void {}
 }
 ```
 
 ### Usage
 
 ```php
-require __DIR__.'/app/vendor/autoload.php';
+require __DIR__.'/vendor/autoload.php';
 
 use Wprs\Api\Web\Factory;
 use Wprs\Api\Web\System;

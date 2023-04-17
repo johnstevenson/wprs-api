@@ -23,11 +23,19 @@ Returns an [output_array][output] of competitions used in the ranking period.
 The `$rankingDate` parameter is optional and the current ranking date will be used if it is not
 provided. Otherwise it must be a YYYY-MM-DD formatted date string.
 
+### _setCurlOptions()_
+
+```php
+setCurlOptions(array $options): void
+```
+
+See [Curl options][options]
+
 ## Code
 Gets all competitions used in the current ranking.
 
 ```php
-require __DIR__.'/app/vendor/autoload.php';
+require __DIR__.'/vendor/autoload.php';
 
 use Wprs\Api\Web\Factory;
 use Wprs\Api\Web\System;
@@ -43,16 +51,6 @@ $data = $endpoint->getData();
 
 ## Output
 
-### _data/details_
-This is always null.
-
-### _data/items_
-Lists the parameters and details of each competition.
-
-### _data/errors_
-Lists any [Errors](#errors), or null.
-
-### _Example_
 ```jsonc
 "meta": {
     "endpoint": "competitions",
@@ -89,6 +87,14 @@ Lists any [Errors](#errors), or null.
     ]
 }
 ```
+### _data/details_
+This is always null.
+
+### _data/items_
+Lists the parameters and details of each competition.
+
+### _data/errors_
+Lists any [Errors](#errors), or null.
 
 ## Errors
 
@@ -119,5 +125,6 @@ tasks, can be identified if `items/tasks` is zero.
 [Competitions JSON Schema](../res/competitions-schema.json)
 
 [docs]: 00-intro.md
+[options]: 00-intro.md#curl-options
 [output]: output.md#output-data
 [missing]: output.md#missing-values

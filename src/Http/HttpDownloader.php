@@ -14,10 +14,11 @@ class HttpDownloader implements DownloaderInterface
     private array $jobs = [];
     private int $runningJobs = 0;
     private int $maxJobs = 12;
+
     /**
      * @var array<int, mixed>
      */
-    private array $options;
+    private array $curlOptions = [];
 
     private ResponseCollector $responseCollector;
     private HttpWorker $httpWorker;
@@ -31,26 +32,17 @@ class HttpDownloader implements DownloaderInterface
         $this->httpWorker = new HttpWorker();
     }
 
-    /**
-     * @param array<int, mixed> $options
-     */
-    public function get(string $url, array $options = []): Response
+    public function get(string $url): Response
     {
-        $this->options = $this->formatOptions($options);
-        $this->queueJob(0, $url, $this->options);
+        $this->queueJob(0, $url);
         $this->wait();
 
         return $this->responseCollector->getAll()[0];
 
     }
 
-    /**
-     * @param array<string> $urls
-     * @param array<int, mixed> $options
-     */
-    public function getBatch(array $urls, array $options = []): array
+    public function getBatch(array $urls): array
     {
-        $this->options = $this->formatOptions($options);
         $last = count($urls);
         $max = 50;
         $count = 0;
@@ -58,7 +50,7 @@ class HttpDownloader implements DownloaderInterface
         foreach ($urls as $index => $url) {
             ++$count;
 
-            $this->queueJob($index, $url, $this->options);
+            $this->queueJob($index, $url);
 
             if (0 === $count % $max || $count === $last) {
                 $this->wait();
@@ -72,12 +64,14 @@ class HttpDownloader implements DownloaderInterface
         return $this->responseCollector->getAll();
     }
 
-    /**
-     * @param array<int, mixed> $options
-     */
-    private function queueJob(int $index, string $url, array $options): void
+    public function setCurlOptions(array $curlOptions): void
     {
-        $job = new Job($index, $url, $options);
+        $this->curlOptions = $this->setUserAgent($curlOptions);
+    }
+
+    private function queueJob(int $index, string $url): void
+    {
+        $job = new Job($index, $url, $this->curlOptions);
         $this->jobs[$index] = $job;
 
         if ($this->runningJobs < $this->maxJobs) {
@@ -126,7 +120,7 @@ class HttpDownloader implements DownloaderInterface
         // start job
         $job->status = self::STATUS_STARTED;
         ++$this->runningJobs;
-        $this->httpWorker->download($job, $this->options);
+        $this->httpWorker->download($job);
     }
 
     private function wait(): void
@@ -162,15 +156,15 @@ class HttpDownloader implements DownloaderInterface
     }
 
     /**
-     * @param array<int, mixed> $options
+     * @param array<int, mixed> $curlOptions
      * @return array<int, mixed>
      */
-    private function formatOptions(array $options): array
+    private function setUserAgent(array $curlOptions): array
     {
-        if (!array_key_exists(CURLOPT_USERAGENT, $options)) {
-            $options[CURLOPT_USERAGENT] = 'Needs-An-API/1.0';
+        if (!array_key_exists(CURLOPT_USERAGENT, $curlOptions)) {
+            $curlOptions[CURLOPT_USERAGENT] = 'Needs-An-API/1.0';
         }
 
-        return $options;
+        return $curlOptions;
     }
 }

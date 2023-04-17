@@ -23,12 +23,20 @@ getData(?string $rankingDate, ?int $regionId): array
 Returns an [output_array][output] of nation ranking data. The [parameters](#parameters) are detailed
 below.
 
+### _setCurlOptions()_
+
+```php
+setCurlOptions(array $options): void
+```
+
+See [Curl options][options]
+
 ## Code
 
 Gets the nations ranking of all pilots in Europe for the current ranking period.
 
  ```php
-require __DIR__.'/app/vendor/autoload.php';
+require __DIR__.'/vendor/autoload.php';
 
 use Wprs\Api\Web\Factory;
 use Wprs\Api\Web\System;
@@ -47,27 +55,9 @@ $data = $endpoint->getData(null, $regionId);
 
 ## Output
 
-### _data/details_
-Reports the name and id of the region, and `count_ww` which is the number of worldwide nations in
-this ranking. If the region is World, this will be the same value as `meta/count`.
-
-### _data/items_
-Lists the nation ranking data and the scores from the top four pilots.
-
-* The worldwide ranking of each nation is always shown in `items/rank_ww`. If the region is World,
-this will be the same value as
-`items/rank`.
-
-* The worldwide ranking of each pilot is given in `items/scores/rank`.
-
-### _data/errors_
-This is always null.
-
-### _Example_
-
 ```jsonc
 "meta": {
-    "endpoint": "pilots",
+    "endpoint": "nations",
     "discipline": "paragliding-xc",
     "ranking_date": "2023-03-01",
     "count": 43,
@@ -102,6 +92,22 @@ This is always null.
 }
 ```
 
+### _data/details_
+Reports the name and id of the region, and `count_ww` which is the number of worldwide nations in
+this ranking. If the region is World, this will be the same value as `meta/count`.
+
+### _data/items_
+Lists the nation ranking data and the scores from the top four pilots.
+
+* The worldwide ranking of each nation is always shown in `items/rank_ww`. If the region is World,
+this will be the same value as
+`items/rank`.
+
+* The worldwide ranking of each pilot is given in `items/scores/rank`.
+
+### _data/errors_
+This is always null.
+
 ## Errors
 This endpoint will always throw an exception if a value is missing.
 
@@ -126,4 +132,5 @@ One of the following constants, or null for the default `System::REGION_WORLD`:
 [Nations JSON Schema](../res/nations-schema.json)
 
 [docs]: 00-intro.md
+[options]: 00-intro.md#curl-options
 [output]: output.md#output-data

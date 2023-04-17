@@ -33,12 +33,20 @@ detailed below.
 
 This method is much faster than calling [getData()](#getdata) multiple times.
 
+### _setCurlOptions()_
+
+```php
+setCurlOptions(array $options): void
+```
+
+See [Curl options][options]
+
 ## Code
 
 Gets data about a specific competition at a specific ranking period.
 
 ```php
-require __DIR__.'/app/vendor/autoload.php';
+require __DIR__.'/vendor/autoload.php';
 
 use Wprs\Api\Web\Factory;
 use Wprs\Api\Web\System;
@@ -55,17 +63,6 @@ $data = $endpoint->getData($rankingDate, $compId);
 ```
 
 ## Output
-
-### _data/details_
-Reports the competition parameters and other details.
-
-### _data/items_
-Lists the results for each competitor.
-
-### _data/errors_
-Lists any [Errors](#errors), or null.
-
-### _Example_
 
 ```jsonc
 "meta": {
@@ -116,6 +113,15 @@ Lists any [Errors](#errors), or null.
 }
 ```
 
+### _data/details_
+Reports the competition parameters and other details.
+
+### _data/items_
+Lists the results for each competitor.
+
+### _data/errors_
+Lists any [Errors](#errors), or null.
+
 ## Errors
 
 An exception will be thrown if the following details values are missing or invalid:
@@ -152,6 +158,7 @@ An array of integer competition ids.
 [Competition JSON Schema](../res/competition-schema.json)
 
 [docs]: 00-intro.md
+[options]: 00-intro.md#curl-options
 [output]: output.md#output-data
 [comps-invalid]: competitions.md#invalid-competitions
 [comps-output]: competitions.md#output

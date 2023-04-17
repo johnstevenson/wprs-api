@@ -34,8 +34,4 @@ class PilotsFilter implements FilterInterface
 
         return $result;
     }
-
-    public function setOptions(array $options): void
-    {
-    }
 }

@@ -16,13 +16,14 @@
     ],
     "require": {
         "php": "^7.4 || ^8.0",
+        "ext-curl": "*",
         "composer/ca-bundle": "^1.3"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.6",
         "phpstan/phpstan": "^1.0",
         "phpstan/phpstan-strict-rules": "^1.1",
-        "johnstevenson/json-works": "2.1.x-dev"
+        "johnstevenson/json-works": "^2.1"
     },
     "autoload": {
         "psr-4": {

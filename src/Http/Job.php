@@ -10,7 +10,7 @@ class Job
     /**
      * @var array<int, mixed>
      */
-    public array $options;
+    public array $curlOptions;
     public int $curlId;
     /**
      * @var \CurlHandle|null
@@ -24,14 +24,14 @@ class Job
     public Response $response;
 
     /**
-     * @param array<int, mixed> $options
+     * @param array<int, mixed> $curlOptions
      */
-    public function __construct(int $id, string $url, array $options)
+    public function __construct(int $id, string $url, array $curlOptions)
     {
         $this->status = HttpDownloader::STATUS_QUEUED;
         $this->id = $id;
         $this->url = $url;
-        $this->options = $options;
+        $this->curlOptions = $curlOptions;
         $this->retries = 0;
     }
 }

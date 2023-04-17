@@ -9,6 +9,10 @@ class MockDownloader implements DownloaderInterface
 {
     private string $html;
     private ?int $statusCode = null;
+    /**
+     * @var array<int, mixed>
+     */
+    private array $curlOptions;
 
     /**
      * @param string|int $value
@@ -23,14 +27,14 @@ class MockDownloader implements DownloaderInterface
         }
 
     }
-    public function get(string $url, array $options = []): Response
+    public function get(string $url): Response
     {
         $result = $this->getBatch([$url]);
 
         return $result[0];
     }
 
-    public function getBatch(array $urls, array $options = []): array
+    public function getBatch(array $urls): array
     {
         $url = $urls[0] ?? null;
 
@@ -46,5 +50,18 @@ class MockDownloader implements DownloaderInterface
         $response = new Response(0, $url, $this->html);
 
         return [$response];
+    }
+
+    public function setCurlOptions(array $curlOptions): void
+    {
+        $this->curlOptions = $curlOptions;
+    }
+
+    /**
+     * @return array<int, mixed>
+     */
+    public function getCurlOptions(): array
+    {
+        return $this->curlOptions;
     }
 }

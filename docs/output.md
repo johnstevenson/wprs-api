@@ -4,8 +4,9 @@
 
 The output data returned from all endpoints is a PHP array which can be encoded to JSON.
 
-It is referred to as an `output_array` throughout this documentation, but described as a JSON
-object which comprises [meta](#meta) and [data](#data) root properties:
+It is referred to as an `output_array` throughout the documentation, but described as a JSON object.
+
+This object comprises a [meta](#meta) and a [data](#data) root property:
 
 ```jsonc
 "meta": {
@@ -27,6 +28,13 @@ object which comprises [meta](#meta) and [data](#data) root properties:
     ]
 }
 ```
+
+Specific information can be found in the endpoint documentation:
+
+* [Pilots output](pilots.md#output)
+* [Nations output](nations.md#output)
+* [Competitions output](competitions.md#output)
+* [Competition output](competition.md#output)
 
 JSON schemas are provided for all endpoints:
 

@@ -3,7 +3,7 @@
 * [Overview](#overview)
 * [Output](#output)
 * [Disciplines](#disciplines)
-* [Options](#options)
+* [Curl options](#curl-options)
 * [Filtering output](#filtering-output)
 * [Error handling](#error-handling)
 
@@ -22,7 +22,7 @@ This section shows how to get ranking data, in two simple steps.
 **1.** Create an endpoint instance based on the type of data you want and the WPRS discipline:
 
  ```php
-require __DIR__.'/app/vendor/autoload.php';
+require __DIR__.'/vendor/autoload.php';
 
 use Wprs\Api\Web\Factory;
 use Wprs\Api\Web\System;
@@ -63,20 +63,23 @@ with more specific details given for each endpoint:
 * [Competitions output](competitions.md#output)
 * [Competition output](competition.md#output)
 
-## Options
+## Curl options
 
-All endpoints have a `setOptions` method that accepts an array of user options. These are primarily
-intended for additional curl options that might be needed, identified by the `'curl'` key:
+The library uses `curl` under the hood, coupled with `composer/ca-bundle` for cross-platform
+certificate location. If this doesn't work for your configuration, you can supply additional
+options using the `setCurlOptions()` method which is available on all endpoints.
+
+This method takes an array of options that will be passed to PHP's _curl_setopt_array()_.
+
+### User-Agent
+The library sets this request header to `Needs-An-API/1.0`. To change it to something else:
 
 ```php
 $endpoint = Factory::createEndpoint($type, $discipline);
 
-/** @var array<string, mixed> */
-$options['curl'] = [CURLOPT_PROXY => 'https://myproxy.com'];
-$endpoint->setOptions($options);
+$options[CURLOPT_USERAGENT] = 'My-User-Agent/1.0';
+$endpoint->setCurlOptions($options);
 ```
-
-Any non-curl options will be used when filtering output data.
 
 ## Filtering output
 
@@ -93,8 +96,8 @@ from a caught exception.
 
 ```php
 try {
-    $data = $endpoint->getData('2023-03-01', ...$params);
+    $data = $endpoint->getData(...$params);
 } catch (\Exception $e) {
-    error = System::getExceptionMessage($e);
+    $error = System::getExceptionMessage($e);
 }
 ```

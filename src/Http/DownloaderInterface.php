@@ -4,15 +4,16 @@ namespace Wprs\Api\Http;
 
 interface DownloaderInterface
 {
-    /**
-     * @param array<int, mixed> $options
-     */
-    public function get(string $url, array $options = []): Response;
+    public function get(string $url): Response;
 
     /**
      * @param array<string> $urls
-     * @param array<int, mixed> $options
      * @return array<Response>
      */
-    public function getBatch(array $urls, array $options = []): array;
+    public function getBatch(array $urls): array;
+
+    /**
+     * @param array<int, mixed> $curlOptions
+     */
+    public function setCurlOptions(array $curlOptions): void;
 }

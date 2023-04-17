@@ -14,9 +14,4 @@ interface FilterInterface
      * @phpstan-return apiItem|null
      */
     public function filter(array $item, ?array &$errors): ?array;
-
-    /**
-     * @param array<string, mixed> $options
-     */
-    public function setOptions(array $options): void;
 }

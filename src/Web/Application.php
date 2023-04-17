@@ -23,10 +23,6 @@ abstract class Application
     private int $discipline;
     private string $endpoint;
     private string $path;
-    /**
-     * @var array<int, mixed>
-     */
-    private array $options = [];
     private bool $restricted = false;
 
     private ParserInterface $parser;
@@ -49,24 +45,18 @@ abstract class Application
     }
 
     /**
-     * @param array<string, mixed> $options
+     * @param array<int, mixed> $curlOptions
      */
-    public function setOptions(array $options): self
+    public function setCurlOptions(array $curlOptions): self
     {
-        $curlOptions = $options['curl'] ?? null;
-
-        if (is_array($curlOptions)) {
-            $this->options = $curlOptions;
-            unset($options['curl']);
-        }
-
-        if (count($options) !== 0 && $this->filter !==  null) {
-            $this->filter->setOptions($options);
-        }
+        $this->downloader->setCurlOptions($curlOptions);
 
         return $this;
     }
 
+    /**
+     * @internal
+     */
     public function setRestricted(): self
     {
         $this->restricted = true;
@@ -110,7 +100,7 @@ abstract class Application
     private function runTask(Task $task): void
     {
         try {
-            $responses = $this->downloader->getBatch($task->getUrls(), $this->options);
+            $responses = $this->downloader->getBatch($task->getUrls());
         } catch (\RuntimeException $e) {
             throw new WprsException('Download error:', $e);
         }

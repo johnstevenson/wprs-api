@@ -45,12 +45,20 @@ getCount(
 Returns the number of pilots in the ranking by downloading a single page. The
 [parameters](#parameters) are detailed below.
 
+### _setCurlOptions()_
+
+```php
+setCurlOptions(array $options): void
+```
+
+See [Curl options][options]
+
 ## Code
 
 Gets the ranking of all UK pilots (nation id 223) in Europe for the current ranking period.
 
  ```php
-require __DIR__.'/app/vendor/autoload.php';
+require __DIR__.'/vendor/autoload.php';
 
 use Wprs\Api\Web\Factory;
 use Wprs\Api\Web\System;
@@ -69,18 +77,6 @@ $data = $endpoint->getData(null, $regionId, $nationId);
 ```
 
 ## Output
-
-### _data/details_
-Reports the name and id of the region and nation, and the scoring category. If a _nation_id_ is not
-used, the nation name will be an empty string and its id will be 0.
-
-### _data/items_
-Lists the ranking data and competition scores for each pilot.
-
-### _data/errors_
-This is always null.
-
-### _Example_
 
 ```jsonc
 "meta": {
@@ -126,6 +122,16 @@ This is always null.
     "errors": null
 }
 ```
+
+### _data/details_
+Reports the name and id of the region and nation, and the scoring category. If a _nation_id_ is not
+used, the nation name will be an empty string and its id will be 0.
+
+### _data/items_
+Lists the ranking data and competition scores for each pilot.
+
+### _data/errors_
+This is always null.
 
 ### _xranks_
 This property, at `items/xranks`, is an array of the pilot's main rankings in relation to the
@@ -187,4 +193,5 @@ One of the following constants, or null for the default `System::SCORING_OVERALL
 [Pilots JSON Schema](../res/pilots-schema.json)
 
 [docs]: 00-intro.md
+[options]: 00-intro.md#curl-options
 [output]: output.md#output-data

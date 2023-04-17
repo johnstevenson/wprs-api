@@ -21,6 +21,10 @@ class EndpointTest extends TestCase
 {
     private int $discipline;
     private string $rankingDate;
+    /**
+     * @var array<int, mixed>
+     */
+    private array $curlOptions;
 
     private Config $config;
 
@@ -29,6 +33,7 @@ class EndpointTest extends TestCase
         $this->config = Utils::getConfig();
         $this->discipline = $this->config->getDiscipline();
         $this->rankingDate = $this->config->getRankingDate();
+        $this->curlOptions = [CURLOPT_USERAGENT => 'My-User-Agent/1.0'];
     }
 
     public function testPilots(): void
@@ -41,8 +46,11 @@ class EndpointTest extends TestCase
         $regionId = $this->config->getRegionId();
 
         $endpoint = Factory::createEndpoint($type, $this->discipline, null, $downloader);
+        $endpoint->setCurlOptions($this->curlOptions);
+
         $data = $endpoint->getData($this->rankingDate, $regionId);
         $this->checkData($data, $name);
+        self::assertSame($this->curlOptions, $downloader->getCurlOptions());
     }
 
     public function testPilotsWithFilter(): void
@@ -56,6 +64,7 @@ class EndpointTest extends TestCase
         $filter = new PilotsFilter();
 
         $endpoint = Factory::createEndpoint($type, $this->discipline, $filter, $downloader);
+
         $data = $endpoint->getData($this->rankingDate, $regionId);
         $this->checkData($data, $this->getFilterSchema($name));
     }
@@ -70,8 +79,11 @@ class EndpointTest extends TestCase
         $regionId = $this->config->getRegionId();
 
         $endpoint = Factory::createEndpoint($type, $this->discipline, null, $downloader);
+        $endpoint->setCurlOptions($this->curlOptions);
+
         $data = $endpoint->getData($this->rankingDate, $regionId);
         $this->checkData($data, $name);
+        self::assertSame($this->curlOptions, $downloader->getCurlOptions());
     }
 
     public function testNationsWithFilter(): void
@@ -85,6 +97,7 @@ class EndpointTest extends TestCase
         $filter = new NationsFilter();
 
         $endpoint = Factory::createEndpoint($type, $this->discipline, $filter, $downloader);
+
         $data = $endpoint->getData($this->rankingDate, $regionId);
         $this->checkData($data, $this->getFilterSchema($name));
     }
@@ -98,8 +111,11 @@ class EndpointTest extends TestCase
         $downloader = new MockDownloader($html);
 
         $endpoint = Factory::createEndpoint($type, $this->discipline, null, $downloader);
+        $endpoint->setCurlOptions($this->curlOptions);
+
         $data = $endpoint->getData($this->rankingDate);
         $this->checkData($data, $name);
+        self::assertSame($this->curlOptions, $downloader->getCurlOptions());
     }
 
     public function testCompetitionsWithFilter(): void
@@ -112,6 +128,7 @@ class EndpointTest extends TestCase
         $filter = new CompetitionsFilter();
 
         $endpoint = Factory::createEndpoint($type, $this->discipline, $filter, $downloader);
+
         $data = $endpoint->getData($this->rankingDate);
         $this->checkData($data, $this->getFilterSchema($name));
     }
@@ -126,8 +143,11 @@ class EndpointTest extends TestCase
         $compId = $this->config->getCompId();
 
         $endpoint = Factory::createEndpoint($type, $this->discipline, null, $downloader);
+        $endpoint->setCurlOptions($this->curlOptions);
+
         $data = $endpoint->getData($this->rankingDate, $compId);
         $this->checkData($data, $name);
+        self::assertSame($this->curlOptions, $downloader->getCurlOptions());
     }
 
     public function testCompetitionWithFilter(): void
@@ -141,6 +161,7 @@ class EndpointTest extends TestCase
         $filter = new CompetitionFilter();
 
         $endpoint = Factory::createEndpoint($type, $this->discipline, $filter, $downloader);
+
         $data = $endpoint->getData($this->rankingDate, $compId);
         $this->checkData($data, $this->getFilterSchema($name));
     }
