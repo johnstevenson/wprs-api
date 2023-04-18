@@ -1,5 +1,10 @@
 # wprs-api
 
+[![packagist](https://img.shields.io/packagist/v/wprs/api)](https://packagist.org/packages/wprs/api)
+[![Continuous Integration](https://github.com/johnstevenson/wprs-api/actions/workflows/continuous-integration.yml/badge.svg?branch=main)](https://github.com/johnstevenson/wprs-api/actions?query=branch:main)
+![license](https://img.shields.io/github/license/johnstevenson/wprs-api.svg)
+![php](https://img.shields.io/packagist/php-v/wprs/api?colorB=8892BF)
+
 A PHP library to scrape data from the FAI CIVL [World Ranking System (WPRS)][wprs]
 
 ## Installation
