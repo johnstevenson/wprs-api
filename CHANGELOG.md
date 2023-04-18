@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+## 0.1.1 - 2023-04-18
+  * Fixed: Normalized downloader error messages
+
 ## 0.1.0 - 2023-04-17
   * Added: Initial release
 
