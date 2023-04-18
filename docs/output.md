@@ -2,9 +2,8 @@
 
 # Output data
 
-The output data returned from all endpoints is a PHP array which can be encoded to JSON.
-
-It is referred to as an `output_array` throughout the documentation, but described as a JSON object.
+The output data returned from all endpoints is a PHP array, which can be encoded to JSON. It is
+referred to as an `output_array` throughout the documentation, but is described as a JSON object.
 
 This object comprises a [meta](#meta) and a [data](#data) root property:
 

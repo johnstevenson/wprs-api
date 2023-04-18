@@ -9,15 +9,15 @@
 
 ## Overview
 
-This library is based around the concept of endpoints. An endpoint is one of the various WPRS
-rankings (ladders) and the following chapters show usage information and examples for each type.
+This library is based around endpoints, which mainly represent the various WPRS rankings
+(ladders). The following chapters give usage information and examples for each type.
 
 * [Pilots endpoint](pilots.md)
 * [Nations endpoint](nations.md)
 * [Competitions endpoint](competitions.md)
 * [Competition endpoint](competition.md)
 
-This section shows how to get ranking data, in two simple steps.
+Meanwhile, this section outlines the general process of getting ranking data, in two simple steps.
 
 **1.** Create an endpoint instance based on the type of data you want and the WPRS discipline:
 
@@ -65,14 +65,15 @@ with more specific details given for each endpoint:
 
 ## Curl options
 
-The library uses `curl` under the hood, coupled with `composer/ca-bundle` for cross-platform
-certificate location. If this doesn't work for your configuration, you can supply additional
+The library uses _curl_ under the hood, coupled with `composer/ca-bundle` for cross-platform
+certificate discovery. If this doesn't work with your setup, you can supply additional _curl_
 options using the `setCurlOptions()` method which is available on all endpoints.
 
-This method takes an array of options that will be passed to PHP's _curl_setopt_array()_.
+This method takes an array of options which will be passed internally to the PHP function
+[curl_setopt_array()][curlsetopts].
 
 ### User-Agent
-The library sets this request header to `Needs-An-API/1.0`. To change it to something else:
+This request header is set to `Needs-An-API/1.0`, but you can change it to something else:
 
 ```php
 $endpoint = Factory::createEndpoint($type, $discipline);
@@ -83,14 +84,15 @@ $endpoint->setCurlOptions($options);
 
 ## Filtering output
 
-The library allows you to [filter](filter.md) the output data, so you only get the values you need.
+The library allows you to [filter](filter.md) the output data, so that you only get the values you
+need.
 
 ## Error handling
 
 The library will throw an exception if something goes wrong, for example if a download operation
 fails, an HTML element is missing or something unexpected happens.
 
-Although not shown in the example code, best practice is to wrap all endpoint methods in a
+Although not shown in the code examples, best practice is to wrap all endpoint methods in a
 try...catch statement. `System::getExceptionMessage()` can be used to get an informative message
 from a caught exception.
 
@@ -101,3 +103,5 @@ try {
     $error = System::getExceptionMessage($e);
 }
 ```
+
+[curlsetopts]: https://www.php.net/manual/en/function.curl-setopt-array.php
