@@ -7,6 +7,7 @@ use Wprs\Api\Tests\Helpers\Filter\PilotsFilter;
 use Wprs\Api\Tests\Helpers\MockDownloader;
 use Wprs\Api\Web\Endpoint\Competitions\Competitions;
 use Wprs\Api\Web\Endpoint\Competition\Competition;
+use Wprs\Api\Web\Endpoint\Nations\Nations;
 use Wprs\Api\Web\Endpoint\Pilots\Pilots;
 use Wprs\Api\Web\Factory;
 use Wprs\Api\Web\System;
@@ -23,6 +24,19 @@ class FactoryTest extends TestCase
         $endpoint = Factory::createEndpoint($class, $discipline);
 
         self::assertInstanceOf($class, $endpoint);
+    }
+
+    /**
+     * @return array<string, array<string>>
+     */
+    public static function endpointProvider(): array
+    {
+        return [
+            'pilots'        => [Pilots::class],
+            'nations'       => [Nations::class],
+            'competitions'  => [Competitions::class],
+            'competition'   => [Competition::class],
+        ];
     }
 
     public function testFactoryInvalid(): void
@@ -61,17 +75,5 @@ class FactoryTest extends TestCase
         $property->setAccessible(true);
         $instance = $property->getValue($endpoint);
         self::assertEquals($downloader, $instance);
-    }
-
-    /**
-     * @return array<string, array<string>>
-     */
-    public static function endpointProvider(): array
-    {
-        return [
-            'pilots'        => [Pilots::class],
-            'competitions'  => [Competitions::class],
-            'competition'   => [Competition::class],
-        ];
     }
 }

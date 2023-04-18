@@ -45,7 +45,7 @@ class HttpWorker
         $ch = curl_init($job->url);
 
         if ($ch === false) {
-            throw new \RuntimeException('curl_init failed with: '.$job->url);
+            throw new \RuntimeException('curl_init failed, url: '.$job->url);
         }
 
         $job->curlHandle = $ch;
@@ -112,7 +112,7 @@ class HttpWorker
                         continue;
                     }
 
-                    $msg = sprintf('curl error %d: %s (%s)', $errno, $error, $job->url);
+                    $msg = sprintf('curl error %d: %s, url: %s', $errno, $error, $job->url);
                     throw new \RuntimeException($msg);
                 }
 
@@ -126,7 +126,7 @@ class HttpWorker
                         continue;
                     }
 
-                    $msg = sprintf('http error %d downloading %s', $statusCode, $job->url);
+                    $msg = sprintf('http status %d, url: %s', $statusCode, $job->url);
                     throw new \RuntimeException($msg);
                 }
 
@@ -178,7 +178,8 @@ class HttpWorker
     private function openBodyHandle(Job $job)
     {
         if (false === ($handle = @fopen('php://temp/maxmemory:524288', 'w+b'))) {
-            throw new \RuntimeException('Failed to open body stream');
+            $msg = sprintf('Failed to open body stream, url: %s', $job->url);
+            throw new \RuntimeException($msg);
         }
 
         return $handle;

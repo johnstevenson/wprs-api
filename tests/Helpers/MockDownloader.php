@@ -39,12 +39,12 @@ class MockDownloader implements DownloaderInterface
         $url = $urls[0] ?? null;
 
         if ($url === null) {
-            throw new \RuntimeException('urls array cannot be empty');
+            throw new \InvalidArgumentException('Test not run, urls array cannot be empty');
         }
 
         if ($this->statusCode !== null) {
-            $msg = sprintf('http error %d downloading %s', $this->statusCode, $url);
-            throw new \RuntimeException();
+            $msg = sprintf('http status %d, url: %s', $this->statusCode, $url);
+            throw new \RuntimeException($msg);
         }
 
         $response = new Response(0, $url, $this->html);

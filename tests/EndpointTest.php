@@ -11,9 +11,6 @@ use Wprs\Api\Tests\Helpers\Filter\NationsFilter;
 use Wprs\Api\Tests\Helpers\Filter\PilotsFilter;
 use Wprs\Api\Tests\Helpers\MockDownloader;
 use Wprs\Api\Tests\Helpers\Utils;
-use Wprs\Api\Web\Endpoint\Competitions\Competitions;
-use Wprs\Api\Web\Endpoint\Competition\Competition;
-use Wprs\Api\Web\Endpoint\Pilots\Pilots;
 use Wprs\Api\Web\Factory;
 use Wprs\Api\Web\System;
 
@@ -66,7 +63,23 @@ class EndpointTest extends TestCase
         $endpoint = Factory::createEndpoint($type, $this->discipline, $filter, $downloader);
 
         $data = $endpoint->getData($this->rankingDate, $regionId);
-        $this->checkData($data, $this->getFilterSchema($name));
+        $this->checkData($data, $this->getFilterName($name));
+    }
+
+    public function testPilotsHttpError(): void
+    {
+        $type = System::ENDPOINT_PILOTS;
+        $name = System::getEndpoint($type);
+
+        $html = Utils::getHtml($name);
+        $downloader = new MockDownloader(400);
+        $regionId = $this->config->getRegionId();
+
+        self::expectException(\Wprs\Api\Web\WprsException::class);
+        self::expectExceptionMessage('http status 400');
+
+        $endpoint = Factory::createEndpoint($type, $this->discipline, null, $downloader);
+        $data = $endpoint->getData($this->rankingDate, $regionId);
     }
 
     public function testNations(): void
@@ -99,7 +112,23 @@ class EndpointTest extends TestCase
         $endpoint = Factory::createEndpoint($type, $this->discipline, $filter, $downloader);
 
         $data = $endpoint->getData($this->rankingDate, $regionId);
-        $this->checkData($data, $this->getFilterSchema($name));
+        $this->checkData($data, $this->getFilterName($name));
+    }
+
+    public function testNationsHttpError(): void
+    {
+        $type = System::ENDPOINT_NATIONS;
+        $name = System::getEndpoint($type);
+
+        $html = Utils::getHtml($name);
+        $downloader = new MockDownloader(400);
+        $regionId = $this->config->getRegionId();
+
+        self::expectException(\Wprs\Api\Web\WprsException::class);
+        self::expectExceptionMessage('http status 400');
+
+        $endpoint = Factory::createEndpoint($type, $this->discipline, null, $downloader);
+        $data = $endpoint->getData($this->rankingDate, $regionId);
     }
 
     public function testCompetitions(): void
@@ -130,7 +159,22 @@ class EndpointTest extends TestCase
         $endpoint = Factory::createEndpoint($type, $this->discipline, $filter, $downloader);
 
         $data = $endpoint->getData($this->rankingDate);
-        $this->checkData($data, $this->getFilterSchema($name));
+        $this->checkData($data, $this->getFilterName($name));
+    }
+
+    public function testCompetitionsHttpError(): void
+    {
+        $type = System::ENDPOINT_COMPETITIONS;
+        $name = System::getEndpoint($type);
+
+        $html = Utils::getHtml($name);
+        $downloader = new MockDownloader(400);
+
+        self::expectException(\Wprs\Api\Web\WprsException::class);
+        self::expectExceptionMessage('http status 400');
+
+        $endpoint = Factory::createEndpoint($type, $this->discipline, null, $downloader);
+        $data = $endpoint->getData($this->rankingDate);
     }
 
     public function testCompetition(): void
@@ -163,7 +207,23 @@ class EndpointTest extends TestCase
         $endpoint = Factory::createEndpoint($type, $this->discipline, $filter, $downloader);
 
         $data = $endpoint->getData($this->rankingDate, $compId);
-        $this->checkData($data, $this->getFilterSchema($name));
+        $this->checkData($data, $this->getFilterName($name));
+    }
+
+    public function testCompetitionHttpError(): void
+    {
+        $type = System::ENDPOINT_COMPETITION;
+        $name = System::getEndpoint($type);
+
+        $html = Utils::getHtml($name);
+        $downloader = new MockDownloader(400);
+        $compId = $this->config->getCompId();
+
+        self::expectException(\Wprs\Api\Web\WprsException::class);
+        self::expectExceptionMessage('http status 400');
+
+        $endpoint = Factory::createEndpoint($type, $this->discipline, null, $downloader);
+        $data = $endpoint->getData($this->rankingDate, $compId);
     }
 
     /**
@@ -196,13 +256,13 @@ class EndpointTest extends TestCase
         self::assertEquals($count, count($items));
 
 
-        if (in_array($name, ['competition', 'competition-filter'], true)) {
+        if (in_array($name, ['competition', $this->getFilterName('competition')], true)) {
             $id = $document->getValue('/data/details/id');
             $compId = $this->config->getCompId();
             self::assertEquals($compId, $id);
         }
 
-        if ($name === 'competitions-filter') {
+        if ($name === $this->getFilterName('competitions')) {
             foreach ($items as $item) {
                 if ($item->tasks === 0) {
                     self::fail('tasks must not be zero');
@@ -211,7 +271,7 @@ class EndpointTest extends TestCase
         }
     }
 
-    private function getFilterSchema(string $name): string
+    private function getFilterName(string $name): string
     {
         return $name.'-filter';
     }

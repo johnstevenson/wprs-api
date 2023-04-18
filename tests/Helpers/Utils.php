@@ -3,6 +3,10 @@
 namespace Wprs\Api\Tests\Helpers;
 
 use Wprs\Api\Tests\Helpers\Builder\Config;
+use Wprs\Api\Web\Endpoint\Competitions\Competitions;
+use Wprs\Api\Web\Endpoint\Competition\Competition;
+use Wprs\Api\Web\Endpoint\Nations\Nations;
+use Wprs\Api\Web\Endpoint\Pilots\Pilots;
 use Wprs\Api\Web\System;
 
 class Utils

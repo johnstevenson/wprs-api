@@ -5,11 +5,13 @@ namespace Wprs\Api\Tests;
 use PHPUnit\Framework\TestCase;
 use Wprs\Api\Tests\Helpers\Filter\CompetitionFilter;
 use Wprs\Api\Tests\Helpers\Filter\CompetitionsFilter;
+use Wprs\Api\Tests\Helpers\Filter\NationsFilter;
 use Wprs\Api\Tests\Helpers\Filter\PilotsFilter;
 use Wprs\Api\Tests\Helpers\Utils;
 use Wprs\Api\Web\Endpoint\DataCollector;
 use Wprs\Api\Web\Endpoint\Competitions\CompetitionsParser;
 use Wprs\Api\Web\Endpoint\Competition\CompetitionParser;
+use Wprs\Api\Web\Endpoint\Nations\NationsParser;
 use Wprs\Api\Web\Endpoint\Pilots\PilotsParser;
 
 class ParserTest extends TestCase
@@ -40,6 +42,35 @@ class ParserTest extends TestCase
         self::assertCount(6, $item);
 
         $expected = ['id', 'name', 'gender', 'points', 'rank', 'rworld'];
+        $this->checkExpectedProperties($expected, $item);
+    }
+
+    public function testNations(): void
+    {
+        $html = Utils::getHtml('nations');
+        $parser = new NationsParser();
+        $dataCollector = $parser->parse($html);
+
+        $count = $dataCollector->getItemCount();
+        $items = $dataCollector->getItems();
+        self::assertCount($count, $items);
+    }
+
+    public function testNationsWithFilter(): void
+    {
+        $html = Utils::getHtml('nations');
+        $parser = new NationsParser();
+        $filter = new NationsFilter();
+        $dataCollector = $parser->parse($html, $filter);
+
+        $count = $dataCollector->getItemCount();
+        $items = $dataCollector->getItems();
+        self::assertCount($count, $items);
+
+        $item = $items[0];
+        self::assertCount(4, $item);
+
+        $expected = ['id', 'name', 'points', 'rank'];
         $this->checkExpectedProperties($expected, $item);
     }
 
