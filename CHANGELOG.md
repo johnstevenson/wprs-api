@@ -1,4 +1,6 @@
 ## [Unreleased]
+  * Fixed: Handling inconsistent Competitions html output
+  * Added: System::toJson() method for json output
   * Added: getBatch() methods to all endpoints
 
 ## 0.1.1 - 2023-04-18

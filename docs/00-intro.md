@@ -63,6 +63,15 @@ with more specific details given for each endpoint:
 * [Competitions output](competitions.md#output)
 * [Competition output](competition.md#output)
 
+You can get JSON output by passing the data to `System::toJson()`:
+
+```php
+$data = $endpoint->getData(...$params);
+
+// get prettified JSON
+$json = System::toJson($data, true);
+```
+
 ## Curl options
 
 The library uses _curl_ under the hood, coupled with `composer/ca-bundle` for cross-platform
@@ -73,7 +82,8 @@ This method takes an array of options which will be passed internally to the PHP
 [curl_setopt_array()][curlsetopts].
 
 ### User-Agent
-This request header is set to `Needs-An-API/1.0`, but you can change it to something else:
+This request header is set to `Needs-An-API/1.0 (packagist.org; wprs/api)`, but you can change it to
+something else:
 
 ```php
 $endpoint = Factory::createEndpoint($type, $discipline);

@@ -163,7 +163,8 @@ class HttpDownloader implements DownloaderInterface
     private function setUserAgent(array $curlOptions): array
     {
         if (!array_key_exists(CURLOPT_USERAGENT, $curlOptions)) {
-            $curlOptions[CURLOPT_USERAGENT] = 'Needs-An-API/1.0';
+            $ua = 'Needs-An-API/1.0 (packagist.org; wprs/api)';
+            $curlOptions[CURLOPT_USERAGENT] = $ua;
         }
 
         return $curlOptions;

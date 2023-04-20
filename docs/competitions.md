@@ -129,7 +129,12 @@ the new HTML can be inconsistent and the inclusion of invalid competitions has m
 As a result there may be several missing value errors.
 
 [Missing values][missing] are given a default value, so an invalid competition, or one with no
-tasks, can be identified if `items/tasks` is zero.
+tasks, can be identified if one of the following is zero:
+
+* `items/pn`
+* `items/td`
+* `items/tasks`
+* `items/pilots`
 
 ## Schema
 
