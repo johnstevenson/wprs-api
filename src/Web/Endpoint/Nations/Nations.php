@@ -28,18 +28,40 @@ class Nations extends Application
      */
     public function getData(?string $rankingDate, ?int $regionId): array
     {
-        $params = new NationsParams($regionId);
-        $job = $this->getJob($rankingDate, $params);
+        $rankingDate = System::getRankingDate($rankingDate);
+        $results = $this->getBatch([$rankingDate], $regionId);
 
-        $results = parent::run([$job->getUrl()]);
+        return $results[0];
+    }
 
-        /** @var \Wprs\Api\Web\Endpoint\DataCollector */
-        $data = $results[0];
+    /**
+     * @param array<string> $rankingDates
+     * @phpstan-return non-empty-array<apiData>
+     */
+    public function getBatch(array $rankingDates, ?int $regionId): array
+    {
+        $results = [];
+        $urls = [];
+        $jobs = [];
 
-        // details are the params values plus count_ww from details
-        $details = array_merge($job->getDetails(), $data->getExtrasItem('details'));
-        $items = $data->getItems();
+        System::checkParams($rankingDates, System::PARAM_DATE);
 
-        return $job->getData($data, $details);
+        foreach ($rankingDates as $rankingDate) {
+            $params = new NationsParams($regionId);
+            $job = $this->getJob($rankingDate, $params);
+            $urls[] = $job->getUrl();
+            $jobs[] = $job;
+        }
+
+        $dataSets = parent::run($urls);
+
+        foreach ($dataSets as $index => $data) {
+            $job = $jobs[$index];
+            // details are the params values plus count_ww from details
+            $details = array_merge($job->getDetails(), $data->getExtrasItem('details'));
+            $results[] = $job->getData($data, $details);
+        }
+
+        return $results;
     }
 }

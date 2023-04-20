@@ -2,6 +2,11 @@
 
 namespace Wprs\Api\Web;
 
+use Wprs\Api\Web\Endpoint\Competitions\Competitions;
+use Wprs\Api\Web\Endpoint\Competition\Competition;
+use Wprs\Api\Web\Endpoint\Nations\Nations;
+use Wprs\Api\Web\Endpoint\Pilots\Pilots;
+
 class System
 {
     public const URL_RANKING = 'https://civlcomps.org/ranking';
@@ -28,10 +33,10 @@ class System
         self::DISCIPLINE_PG_ACRO_SYNCRO => 'paragliding-acro-syncro',
     ];
 
-    public const ENDPOINT_PILOTS = __NAMESPACE__.'\\Endpoint\\Pilots\\Pilots';
-    public const ENDPOINT_NATIONS = __NAMESPACE__.'\\Endpoint\\Nations\\Nations';
-    public const ENDPOINT_COMPETITION = __NAMESPACE__.'\\Endpoint\\Competition\\Competition';
-    public const ENDPOINT_COMPETITIONS = __NAMESPACE__.'\\Endpoint\\Competitions\\Competitions';
+    public const ENDPOINT_PILOTS = Pilots::class;
+    public const ENDPOINT_NATIONS = Nations::class;
+    public const ENDPOINT_COMPETITION = Competition::class;
+    public const ENDPOINT_COMPETITIONS = Competitions::class;
 
     private const ENDPOINTS = [
         self::ENDPOINT_PILOTS => 'pilots',
@@ -63,6 +68,9 @@ class System
         self::SCORING_FEMALE => 'female',
         self::SCORING_JUNIOR => 'junior',
     ];
+
+    public const PARAM_DATE = 0;
+    public const PARAM_ID = 1;
 
     private const API_VERSION = '1.0';
 
@@ -100,7 +108,7 @@ class System
             $result = 'paragliding-acro-solo';
         } elseif ($discipline !== self::DISCIPLINE_PG_XC) {
             if (substr($result, -3) === '-xc') {
-                $result = substr($result, 0 -3);
+                $result = substr($result, 0, -3);
             }
         }
 
@@ -140,10 +148,57 @@ class System
         }
 
         if (false === $date) {
-            throw new \RuntimeException('Invalid rankingDate: '.$rankingDate);
+            throw new \RuntimeException('Invalid ranking date: '.$rankingDate);
         }
 
         return $date->format('Y-m-01');
+    }
+
+    /**
+     * Checks batch parameter values
+     *
+     * @param array<mixed> $values
+     * @throws \RuntimeException
+     */
+    public static function checkParams(array $values, int $type): void
+    {
+        $isRankingDate = $type === self::PARAM_DATE;
+        $name = $isRankingDate ? 'ranking date' : 'competition id';
+        $valuesCount = count($values);
+
+        if ($valuesCount === 0) {
+            throw new \RuntimeException(sprintf('Missing %ss', $name));
+        }
+
+        foreach ($values as $value) {
+            // check for null first
+            if ($value === null) {
+                throw new \RuntimeException(sprintf('Invalid %s: null', $name));
+            }
+
+            $result = false;
+            $errorValue = gettype($value);
+
+            if ($isRankingDate) {
+                if (is_string($value)) {
+                    $errorValue = $value;
+                    $rankingDate = self::getRankingDate($value);
+                    $result = $value === $rankingDate;
+                }
+            } else {
+                $result = is_int($value);
+            }
+
+            if (!$result) {
+                throw new \RuntimeException(sprintf('Invalid %s: %s', $name, $errorValue));
+            }
+        }
+
+        $unique = array_unique($values);
+
+        if (count($unique) !== $valuesCount) {
+            throw new \RuntimeException(sprintf('Duplicate %ss', $name));
+        }
     }
 
     public static function getScoring(int $scoring): string
@@ -171,5 +226,22 @@ class System
         }
 
         return WprsException::formatMessage($e);
+    }
+
+    /**
+     * @param array<mixed> $data
+     */
+    public static function toJson(array $data, bool $pretty): string
+    {
+        $options = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE;
+        $options |= $pretty ? JSON_PRETTY_PRINT : 0;
+
+        $result = json_encode($data, $options);
+
+        if ($result === false) {
+            throw new \RuntimeException(json_last_error_msg());
+        }
+
+        return $result;
     }
 }

@@ -28,27 +28,52 @@ class Pilots extends Application
      */
     public function getData(?string $rankingDate, ?int $regionId, ?int $nationId = null, ?int $scoring = null): array
     {
-        $params = new PilotsParams($regionId, $nationId, $scoring);
-        $job = $this->getJob($rankingDate, $params);
+        $rankingDate = System::getRankingDate($rankingDate);
+        $results = $this->getBatch([$rankingDate], $regionId, $nationId, $scoring);
 
-        $results = parent::run([$job->getUrl()]);
+        return $results[0];
+    }
 
-        /** @var \Wprs\Api\Web\Endpoint\DataCollector */
-        $data = $results[0];
+    /**
+     * @param array<string> $rankingDates
+     * @phpstan-return non-empty-array<apiData>
+     */
+    public function getBatch(array $rankingDates, ?int $regionId, ?int $nationId = null, ?int $scoring = null): array
+    {
+        $results = [];
+        $urls = [];
+        $jobs = [];
 
-        // details are the params values
-        $details = $job->getDetails();
-        $items = $data->getItems();
+        System::checkParams($rankingDates, System::PARAM_DATE);
 
-        // Add nation name if nation id was requested
-        if ($nationId !== null && isset($items[0]['nation'])) {
-            // for phpstan
-            if (is_string($items[0]['nation'])) {
-                $details['nation'] = $items[0]['nation'];
-            }
+        foreach ($rankingDates as $rankingDate) {
+            $params = new PilotsParams($regionId, $nationId, $scoring);
+            $job = $this->getJob($rankingDate, $params);
+            $urls[] = $job->getUrl();
+            $jobs[] = $job;
         }
 
-        return $job->getData($data, $details);
+        $dataSets = parent::run($urls);
+
+        foreach ($dataSets as $index => $data) {
+            $job = $jobs[$index];
+
+            // details are the params values
+            $details = $job->getDetails();
+            $items = $data->getItems();
+
+            // add nation name if nation id was requested
+            if ($nationId !== null && isset($items[0]['nation'])) {
+                // for phpstan
+                if (is_string($items[0]['nation'])) {
+                    $details['nation'] = $items[0]['nation'];
+                }
+            }
+
+            $results[] = $job->getData($data, $details);
+        }
+
+        return $results;
     }
 
     public function getCount(?string $rankingDate, int $regionId, ?int $nationId = null, ?int $scoring = null): int

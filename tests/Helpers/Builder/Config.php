@@ -10,9 +10,12 @@ class Config
 {
     private int $discipline;
     private string $activity;
-    private int $regionId;
-    private int $compId;
     private string $rankingDate;
+    private int $regionId;
+    private ?int $nationId;
+    private int $pilotsCount;
+    private int $pilotsMax;
+    private int $compId;
 
     public function __construct(?stdClass $data = null)
     {
@@ -21,13 +24,18 @@ class Config
             $this->activity = $data->activity;
             $this->rankingDate = $data->rankingDate;
             $this->regionId = $data->regionId;
+            $this->nationId = $data->nationId;
+            $this->pilotsCount = $data->pilotsCount;
+            $this->pilotsMax = $data->pilotsMax;
             $this->compId = $data->compId;
-
         } else {
             $this->discipline = System::DISCIPLINE_PG_XC;
             $this->activity = System::getDisciplineForDisplay($this->discipline);
             $this->rankingDate = System::getRankingDate(null);
             $this->regionId = System::REGION_EUROPE;
+            $this->nationId = 233;
+            $this->pilotsCount = 0;
+            $this->pilotsMax = 0;
             $this->compId = 0;
         }
     }
@@ -47,6 +55,11 @@ class Config
         return $this->regionId;
     }
 
+    public function getNationId(): ?int
+    {
+        return $this->nationId;
+    }
+
     public function getRankingDate(): string
     {
         return $this->rankingDate;
@@ -57,16 +70,23 @@ class Config
         return $this->compId;
     }
 
-    public function setCompId(int $id): void
+    public function getPilotsCount(): int
     {
-        $this->compId = $id;
+        return $this->pilotsCount;
+    }
+
+    public function getPilotsMax(): int
+    {
+        return $this->pilotsMax;
     }
 
     /**
      * @return array<string, mixed>
      */
-    public function getData(int $compId): array
+    public function getData(int $pilotsCount, int $pilotsMax, int $compId): array
     {
+        $this->pilotsCount = $pilotsCount;
+        $this->pilotsMax = $pilotsMax;
         $this->compId = $compId;
 
         return get_object_vars($this);

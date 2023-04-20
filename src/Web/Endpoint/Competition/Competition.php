@@ -5,6 +5,7 @@ namespace Wprs\Api\Web\Endpoint\Competition;
 use Wprs\Api\Http\DownloaderInterface;
 use Wprs\Api\Web\Application;
 use Wprs\Api\Web\Endpoint\FilterInterface;
+use Wprs\Api\Web\System;
 
 /**
  * @phpstan-import-type apiData from \Wprs\Api\Web\Endpoint\ApiOutput
@@ -41,7 +42,7 @@ class Competition extends Application
         $urls = [];
         $jobs = [];
 
-        $this->checkValues($ids);
+        System::checkParams($ids, System::PARAM_ID);
 
         foreach ($ids as $id) {
             $params = new CompetitionParams($id);
@@ -60,29 +61,5 @@ class Competition extends Application
         }
 
         return $results;
-    }
-
-    /**
-     * @param array<mixed> $ids
-     */
-    private function checkValues(array $ids): void
-    {
-        $idCount = count($ids);
-
-        if ($idCount === 0) {
-            throw new \RuntimeException('Missing ids');
-        }
-
-        foreach ($ids as $id) {
-            if (!is_int($id)) {
-                throw new \RuntimeException('id must be an int, got '.gettype($id));
-            }
-        }
-
-        $unique = array_unique($ids);
-
-        if (count($unique) !== $idCount) {
-            throw new \RuntimeException('Duplicate ids');
-        }
     }
 }

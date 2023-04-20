@@ -10,26 +10,27 @@ class HttpDownloader implements DownloaderInterface
     public const STATUS_FAILED = 4;
     public const STATUS_ABORTED = 5;
 
+    /**
+     * @var array<int, mixed>
+     */
+    protected array $curlOptions = [];
+
     /** @var array<Job> */
     private array $jobs = [];
     private int $runningJobs = 0;
     private int $maxJobs = 12;
 
-    /**
-     * @var array<int, mixed>
-     */
-    private array $curlOptions = [];
-
     private ResponseCollector $responseCollector;
-    private HttpWorker $httpWorker;
+    private WorkerInterface $httpWorker;
 
-    public function __construct()
+    public function __construct(?WorkerInterface $worker = null)
     {
         if (!extension_loaded('curl')) {
             throw new \RuntimeException('curl extension is missing');
         }
+
+        $this->httpWorker = $worker ?? new HttpWorker();
         $this->responseCollector = new ResponseCollector();
-        $this->httpWorker = new HttpWorker();
     }
 
     public function get(string $url): Response

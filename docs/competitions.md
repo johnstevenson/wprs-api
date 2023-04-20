@@ -23,6 +23,17 @@ Returns an [output_array][output] of competitions used in the ranking period.
 The `$rankingDate` parameter is optional and the current ranking date will be used if it is not
 provided. Otherwise it must be a YYYY-MM-DD formatted date string.
 
+### _getBatch()_
+
+```php
+getData(array $rankingDates): array
+```
+
+Return an array of [output_arrays][output] of competitions used in the specified ranking periods.
+`$rankingDates` must be an array of YYYY-MM-01 formatted date strings.
+
+This method is much faster than calling [getData()](#getdata) multiple times.
+
 ### _setCurlOptions()_
 
 ```php

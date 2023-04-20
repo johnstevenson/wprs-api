@@ -23,6 +23,17 @@ getData(?string $rankingDate, ?int $regionId): array
 Returns an [output_array][output] of nation ranking data. The [parameters](#parameters) are detailed
 below.
 
+### _getBatch()_
+
+```php
+getBatch(array $rankingDates, ?int $regionId): array
+```
+
+Return an array of [output_arrays][output] of nation ranking data for the specified ranking periods.
+The [parameters](#parameters) are detailed below.
+
+This method is much faster than calling [getData()](#getdata) multiple times.
+
 ### _setCurlOptions()_
 
 ```php
@@ -115,6 +126,9 @@ This endpoint will always throw an exception if a value is missing.
 
 ### _rankingDate_
 A YYYY-MM-DD formatted date string, or null to use the current ranking period.
+
+### _rankingDates_
+An array of YYYY-MM-01 formatted date strings.
 
 ### _regionId_
 One of the following constants, or null for the default `System::REGION_WORLD`:

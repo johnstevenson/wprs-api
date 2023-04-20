@@ -84,6 +84,18 @@ class Utils
         }
     }
 
+    public static function getExpectedUrlCount(Config $config): int
+    {
+        $itemCount = $config->getPilotsMax();
+        $overallCount = $config->getPilotsCount();
+
+        if ($overallCount === 0 || $itemCount === 0) {
+            throw new \RuntimeException('Unexpected zero count value');
+        }
+
+        return (int) ceil($overallCount / $itemCount);
+    }
+
     private static function getFixtureFolder(?string $name): string
     {
         $path = sprintf('%s/../Fixtures', __DIR__);

@@ -41,13 +41,17 @@ class EndpointTest extends TestCase
         $html = Utils::getHtml($name);
         $downloader = new MockDownloader($html);
         $regionId = $this->config->getRegionId();
+        $nationId = $this->config->getNationId();
 
         $endpoint = Factory::createEndpoint($type, $this->discipline, null, $downloader);
         $endpoint->setCurlOptions($this->curlOptions);
 
-        $data = $endpoint->getData($this->rankingDate, $regionId);
+        $data = $endpoint->getData($this->rankingDate, $regionId, $nationId);
         $this->checkData($data, $name);
         self::assertSame($this->curlOptions, $downloader->getCurlOptions());
+
+        $expectedRequests = Utils::getExpectedUrlCount($this->config);
+        self::assertEquals($expectedRequests, $downloader->getUrlCount());
     }
 
     public function testPilotsWithFilter(): void
@@ -58,11 +62,12 @@ class EndpointTest extends TestCase
         $html = Utils::getHtml($name);
         $downloader = new MockDownloader($html);
         $regionId = $this->config->getRegionId();
+        $nationId = $this->config->getNationId();
         $filter = new PilotsFilter();
 
         $endpoint = Factory::createEndpoint($type, $this->discipline, $filter, $downloader);
 
-        $data = $endpoint->getData($this->rankingDate, $regionId);
+        $data = $endpoint->getData($this->rankingDate, $regionId, $nationId);
         $this->checkData($data, $this->getFilterName($name));
     }
 
@@ -74,12 +79,28 @@ class EndpointTest extends TestCase
         $html = Utils::getHtml($name);
         $downloader = new MockDownloader(400);
         $regionId = $this->config->getRegionId();
+        $nationId = $this->config->getNationId();
 
         self::expectException(\Wprs\Api\Web\WprsException::class);
         self::expectExceptionMessage('http status 400');
 
         $endpoint = Factory::createEndpoint($type, $this->discipline, null, $downloader);
-        $data = $endpoint->getData($this->rankingDate, $regionId);
+        $data = $endpoint->getData($this->rankingDate, $regionId, $nationId);
+    }
+
+    public function testPilotsGetCount(): void
+    {
+        $type = System::ENDPOINT_PILOTS;
+        $name = System::getEndpoint($type);
+
+        $html = Utils::getHtml($name);
+        $downloader = new MockDownloader($html);
+        $regionId = $this->config->getRegionId();
+        $nationId = $this->config->getNationId();
+
+        $endpoint = Factory::createEndpoint($type, $this->discipline, null, $downloader);
+        $count = $endpoint->getCount($this->rankingDate, $regionId, $nationId);
+        self::assertEquals($count, $this->config->getPilotsCount());
     }
 
     public function testNations(): void
@@ -254,7 +275,6 @@ class EndpointTest extends TestCase
         $items = $document->getValue('/data/items');
         self::assertIsArray($items);
         self::assertEquals($count, count($items));
-
 
         if (in_array($name, ['competition', $this->getFilterName('competition')], true)) {
             $id = $document->getValue('/data/details/id');

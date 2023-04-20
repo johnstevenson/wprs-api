@@ -15,7 +15,8 @@
             "type": "object",
             "required": [
                 "details",
-                "items"
+                "items",
+                "errors"
             ],
             "additionalProperties": false,
             "properties": {
@@ -57,7 +58,7 @@
                     "$ref": "#/$defs/discipline"
                 },
                 "ranking_date": {
-                    "$ref": "#/$defs/dateString"
+                    "$ref": "#/$defs/periodString"
                 },
                 "count": {
                     "type": "integer"
@@ -191,6 +192,10 @@
                     "type": "integer"
                 }
             }
+        },
+        "periodString": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-01$"
         },
         "dateString": {
             "type": "string",

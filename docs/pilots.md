@@ -27,9 +27,27 @@ getData(
 Returns an [output_array][output] of pilot ranking data. The [parameters](#parameters) are detailed
 below.
 
+#### Warning
 The website only lists 20 pilots per page, so downloading the HTML will involve multiple requests.
-The worst case is fetching the world data for `System::DISCIPLINE_PG_XC` which requires more than
+The worst case is fetching the World data for `System::DISCIPLINE_PG_XC` which requires more than
 300 requests.
+
+### _getBatch()_
+
+```php
+getBatch(
+    array $rankingDates,
+    ?int $regionId,
+    ?int $nationId = null,
+    ?int $scoring = null
+): array
+```
+
+Returns an array of [output_arrays][output] of pilot ranking data for the specified ranking periods.
+The [parameters](#parameters) are detailed below.
+
+This method is much faster than calling [getData()](#getdata) multiple times, but please see the
+[warning](#warning);
 
 ### _getCount()_
 
@@ -163,6 +181,9 @@ This endpoint will always throw an exception if a value is missing.
 
 ### _rankingDate_
 A YYYY-MM-DD formatted date string, or null to use the current ranking period.
+
+### _rankingDates_
+An array of YYYY-MM-01 formatted date strings.
 
 ### _regionId_
 One of the following constants, or null for the default `System::REGION_WORLD`:

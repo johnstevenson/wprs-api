@@ -1,4 +1,5 @@
 ## [Unreleased]
+  * Added: getBatch() methods to all endpoints
 
 ## 0.1.1 - 2023-04-18
   * Fixed: Normalized downloader error messages

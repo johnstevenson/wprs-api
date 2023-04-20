@@ -4,7 +4,7 @@ namespace Wprs\Api\Http;
 
 use Composer\CaBundle\CaBundle;
 
-class HttpWorker
+class HttpWorker implements WorkerInterface
 {
     /** @var array<Job> */
     private array $jobs = [];

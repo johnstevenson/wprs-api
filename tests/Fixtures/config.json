@@ -1,7 +1,10 @@
 {
     "discipline": 1,
     "activity": "paragliding-xc",
+    "rankingDate": "2023-04-01",
     "regionId": 1,
-    "compId": 6577,
-    "rankingDate": "2023-04-01"
+    "nationId": 233,
+    "pilotsCount": 188,
+    "pilotsMax": 20,
+    "compId": 6577
 }

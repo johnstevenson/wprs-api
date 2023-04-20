@@ -13,6 +13,7 @@ use Wprs\Api\Web\Endpoint\Job;
 use Wprs\Api\Web\Endpoint\ParamsInterface;
 use Wprs\Api\Web\Endpoint\ParserInterface;
 use Wprs\Api\Web\Endpoint\Task;
+use Wprs\Api\Web\System;
 
 /**
  * @phpstan-import-type apiDetails from \Wprs\Api\Web\Endpoint\ApiOutput
