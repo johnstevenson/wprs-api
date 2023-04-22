@@ -82,7 +82,7 @@ This method takes an array of options which will be passed internally to the PHP
 [curl_setopt_array()][curlsetopts].
 
 ### User-Agent
-This request header is set to `Needs-An-API/1.0 (packagist.org; wprs/api)`, but you can change it to
+This request header is set to `Needs-An-API/1.1 (packagist.org; wprs/api)`, but you can change it to
 something else:
 
 ```php

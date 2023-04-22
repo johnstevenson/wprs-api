@@ -39,7 +39,7 @@ abstract class Application
         $this->discipline = $discipline;
         $this->parser = $parser;
         $this->filter = $filter;
-        $this->downloader = $downloader ?? new HttpDownloader();
+        $this->downloader = $downloader ?? new HttpDownloader(System::getUserAgent());
 
         $this->endpoint = get_class($this);
         $this->path = System::getPath($discipline, $this->endpoint);

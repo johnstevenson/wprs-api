@@ -88,7 +88,7 @@ This object has the same properties for all endpoints.
     * number of items in `data/items`
 
 * _version_ `string`
-    * currently 1.0
+    * currently 1.1
 
 ## data
 This object has the same three properties for all endpoints, namely the [details](#details),

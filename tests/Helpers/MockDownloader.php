@@ -36,7 +36,7 @@ class MockDownloader extends HttpDownloader
             $worker = null;
         }
 
-        parent::__construct($worker);
+        parent::__construct(null, $worker);
     }
 
     public function get(string $url): Response

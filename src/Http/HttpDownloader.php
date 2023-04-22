@@ -19,18 +19,21 @@ class HttpDownloader implements DownloaderInterface
     private array $jobs = [];
     private int $runningJobs = 0;
     private int $maxJobs = 12;
+    private ?string $userAgent;
 
     private ResponseCollector $responseCollector;
     private WorkerInterface $httpWorker;
 
-    public function __construct(?WorkerInterface $worker = null)
+    public function __construct(?string $userAgent = null, ?WorkerInterface $worker = null)
     {
         if (!extension_loaded('curl')) {
             throw new \RuntimeException('curl extension is missing');
         }
 
+        $this->userAgent = $userAgent;
         $this->httpWorker = $worker ?? new HttpWorker();
         $this->responseCollector = new ResponseCollector();
+        $this->setUserAgent();
     }
 
     public function get(string $url): Response
@@ -67,7 +70,8 @@ class HttpDownloader implements DownloaderInterface
 
     public function setCurlOptions(array $curlOptions): void
     {
-        $this->curlOptions = $this->setUserAgent($curlOptions);
+        $this->curlOptions = $curlOptions;
+        $this->setUserAgent();
     }
 
     private function queueJob(int $index, string $url): void
@@ -156,17 +160,14 @@ class HttpDownloader implements DownloaderInterface
         $this->responseCollector->getAll();
     }
 
-    /**
-     * @param array<int, mixed> $curlOptions
-     * @return array<int, mixed>
-     */
-    private function setUserAgent(array $curlOptions): array
+    private function setUserAgent(): void
     {
-        if (!array_key_exists(CURLOPT_USERAGENT, $curlOptions)) {
-            $ua = 'Needs-An-API/1.0 (packagist.org; wprs/api)';
-            $curlOptions[CURLOPT_USERAGENT] = $ua;
+        if ($this->userAgent === null) {
+            return;
         }
 
-        return $curlOptions;
+        if (!array_key_exists(CURLOPT_USERAGENT, $this->curlOptions)) {
+            $this->curlOptions[CURLOPT_USERAGENT] = $this->userAgent;
+        }
     }
 }

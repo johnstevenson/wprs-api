@@ -72,7 +72,7 @@ class System
     public const PARAM_DATE = 0;
     public const PARAM_ID = 1;
 
-    private const API_VERSION = '1.0';
+    private const API_VERSION = '1.1';
 
     public static function getPath(int $discipline, string $endPoint): string
     {
@@ -87,6 +87,11 @@ class System
     public static function getVersion(): string
     {
         return self::API_VERSION;
+    }
+
+    public static function getUserAgent(): string
+    {
+        return sprintf('Needs-An-API/%s (packagist.org; wprs/api)', self::API_VERSION);
     }
 
     public static function getDiscipline(int $discipline): string
