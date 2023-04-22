@@ -71,6 +71,7 @@ $data = $endpoint->getData(null, $regionId);
     "endpoint": "nations",
     "discipline": "paragliding-xc",
     "ranking_date": "2023-03-01",
+    "updated": "2023-03-01T04:05:00Z",
     "count": 43,
     "version": "1.0"
 }

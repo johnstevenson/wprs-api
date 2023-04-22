@@ -44,12 +44,12 @@ class CompetitionsFilter implements FilterInterface
         $errors = null;
 
         // we don't want competitions with no tasks
-        $keys = ['pn', 'td', 'tasks', 'pilots'];
-
-        foreach ($keys as $key) {
-            if ($item[$key] == 0) {
-                return null;
-            }
+        if ($item['pn'] === '0.0'
+            || $item['td'] === '0.0'
+            || $item['tasks'] === 0
+            || $item['pilots'] === 0
+        ) {
+            return null;
         }
 
         // we just want these properties

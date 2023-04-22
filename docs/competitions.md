@@ -67,6 +67,7 @@ $data = $endpoint->getData();
     "endpoint": "competitions",
     "discipline": "paragliding-xc",
     "ranking_date": "2023-03-01",
+    "updated": "2023-03-01T04:05:00Z",
     "count": 354,
     "version": "1.0"
 },

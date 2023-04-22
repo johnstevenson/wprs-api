@@ -56,7 +56,7 @@ $type = System::ENDPOINT_COMPETITION;
 // set discipline, ranking period and competition id
 $discipline = System::DISCIPLINE_PG_XC;
 $rankingDate = '2023-03-01';
-$compId = 6234;
+$compId = 6321;
 
 $endpoint = Factory::createEndpoint($type, $discipline);
 $data = $endpoint->getData($rankingDate, $compId);
@@ -69,6 +69,7 @@ $data = $endpoint->getData($rankingDate, $compId);
     "endpoint": "competition",
     "discipline": "paragliding-xc",
     "ranking_date": "2023-03-01",
+    "updated": "2023-03-01T04:05:00Z",
     "count": 90,
     "version": "1.0"
 }

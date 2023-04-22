@@ -23,7 +23,7 @@ class HtmlFormatter
 
         $this->removeHeadElements($xpath);
         $this->removeElements($xpath, 'header');
-        $this->removeElements($xpath, 'form');
+        //$this->removeElements($xpath, 'form');
         $this->removeElements($xpath, 'footer');
         $this->removeElements($xpath, 'ul');
         $this->removeElements($xpath, 'script');

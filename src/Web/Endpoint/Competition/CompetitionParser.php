@@ -24,8 +24,10 @@ class CompetitionParser extends ParserManager
             throw new \RuntimeException('id=rankingTableWrapper');
         }
 
+        $updated = $this->getRankingUpdated($wrapper);
+
         $overallCount = $this->getOverallCount($wrapper);
-        $dataCollector = new DataCollector($overallCount);
+        $dataCollector = new DataCollector($overallCount, $updated);
 
         // Get comp name - throws if missing or empty
         $compName = $this->getCompName($wrapper);

@@ -10,11 +10,95 @@
           <div class="rankings-wrapper">
             <div id="rankingTableWrapper" data-pjax-container="" data-pjax-push-state="" data-pjax-replace-state="" data-pjax-timeout="0" data-url="https://civlcomps.org/ranking/paragliding-xc/pilots">
               <div class="header-rankings">
-                <div class="jsSearchFormWrapper"/>
+                <div class="jsSearchFormWrapper">
+                  <form id="jsPilotsSearchForm" class="searchForm" action="https://civlcomps.org/ranking/paragliding-xc/pilots" method="GET" data-pjax="1">
+                    <input type="hidden" id="jsFilterByNation" name="search[nation_id]" value="233"/>
+                    <div class="search-pilots">
+                      <div>
+                        <h2>Europe Overall : United Kingdom</h2>
+                        <div class="text-muted">Ranking updated: Apr 1, 2023 03:05</div>
+                      </div>
+                      <div>
+                        <div class="form-group field-search-profile_id">
+                          <div id="widget-search-profile_id">
+                            <div class="searchInput autocompleteSearch">
+                              <input type="text" id="search-profile_id" class="jsReloadForm form-control ems-autocomplete" name="search[profile_id]" placeholder="Search by Name or CIVL ID" data-values="[]"/>
+                            </div>
+                          </div>
+                          <div class="invalid-feedback"/>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="search-date">
+                      <div>
+                        <div class="form-group field-search-rankingdate required">
+                          <input type="hidden" id="rankingDatePicker" class="jsReloadForm" name="search[rankingDate]" value="2023-04-01" aria-required="true"/>
+                          <div class="invalid-feedback"/>
+                        </div>
+                      </div>
+                      <div class="link-search">
+                        <a href="https://civlcomps.org/ranking/paragliding-xc/competitions?rankingDate=2023-04-01" data-pjax="0">Competitions used in ranking</a>
+                        <a href="https://civlcomps.org/ranking/paragliding-xc/nations?rankingDate=2023-04-01" data-pjax="0">Nations ranking</a>
+                      </div>
+                    </div>
+                    <div class="filter-pilots">
+                      <div class="vertical-align ">
+                        <span class="label">Ranking Continent:</span>
+                        <div class="form-group field-search-continent_id">
+                          <input type="hidden" name="search[continent_id]" value=""/>
+                          <div id="search-continent_id" class="jsReloadForm jsFilerByContinent" role="radiogroup">
+                            <div class="custom-control custom-radio custom-control-inline">
+                              <input type="radio" id="i0" class="custom-control-input" name="search[continent_id]" value="0"/>
+                              <label class="custom-control-label" for="i0">World</label>
+                            </div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                              <input type="radio" id="i1" class="custom-control-input" name="search[continent_id]" value="1" checked="checked"/>
+                              <label class="custom-control-label" for="i1">Europe</label>
+                            </div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                              <input type="radio" id="i2" class="custom-control-input" name="search[continent_id]" value="2"/>
+                              <label class="custom-control-label" for="i2">Africa</label>
+                            </div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                              <input type="radio" id="i3" class="custom-control-input" name="search[continent_id]" value="3"/>
+                              <label class="custom-control-label" for="i3">Asia-Oceania</label>
+                            </div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                              <input type="radio" id="i4" class="custom-control-input" name="search[continent_id]" value="4"/>
+                              <label class="custom-control-label" for="i4">Pan America</label>
+                              <div class="invalid-feedback"/>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="vertical-align ">
+                        <span class="label">Ranking Type:</span>
+                        <div class="form-group field-search-scoringcategory">
+                          <input type="hidden" name="search[scoringCategory]" value=""/>
+                          <div id="search-scoringcategory" class="jsReloadForm" role="radiogroup">
+                            <div class="custom-control custom-radio custom-control-inline">
+                              <input type="radio" id="i5" class="custom-control-input" name="search[scoringCategory]" value="0" checked="checked"/>
+                              <label class="custom-control-label" for="i5">Overall</label>
+                            </div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                              <input type="radio" id="i6" class="custom-control-input" name="search[scoringCategory]" value="female"/>
+                              <label class="custom-control-label" for="i6">Women</label>
+                            </div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                              <input type="radio" id="i7" class="custom-control-input" name="search[scoringCategory]" value="junior"/>
+                              <label class="custom-control-label" for="i7">Junior U-26</label>
+                              <div class="invalid-feedback"/>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </form>
+                </div>
               </div>
               <div class="table-title-row">
                 <div class="count-pilots pull-left"><span class="label">Number of pilots:</span><span class="count">188</span>(
- World overall 6398, World female 504, World junior 245, Continent overall 3561, Continent female 294, Continent junior 141 )</div>
+ World overall 6398, World female 504, World junior 245, Continent overall 3562, Continent female 294, Continent junior 141 )</div>
               </div>
               <div class="table-cell-title">
                 <div class="row">

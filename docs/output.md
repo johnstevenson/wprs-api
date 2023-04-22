@@ -12,6 +12,7 @@ This object comprises a [meta](#meta) and a [data](#data) root property:
     "endpoint": "",     // endpoint name
     "discipline": "",   // discipline
     "ranking_date": "", // ranking period
+    "updated": "",      // date-time of ranking update
     "count": 0,         // count of objects in data/items
     "version": "1.0"    // api version
 },
@@ -62,13 +63,13 @@ reported in the [errors](#errors) property and given one of the following values
 ## meta
 This object has the same properties for all endpoints.
 
-* _endpoint_ `string`
+* _endpoint_ `string` One of:
     * pilots
     * nations
     * competitions
     * competition
 
-* _discipline_ `string`
+* _discipline_ `string` One of:
     * hang-gliding-class-1
     * hang-gliding-class-1-sport
     * hang-gliding-class-2
@@ -79,8 +80,10 @@ This object has the same properties for all endpoints.
     * paragliding-acro-syncro
 
 * _ranking_date_ `string`
-    * formatted YYYY-MM-DD
+    * formatted YYYY-MM-01
 
+* _updated_ `string`
+    * formatted YYYY-MM-DDTHH:MM:SSZ
 * _count_ `integer`
     * number of items in `data/items`
 

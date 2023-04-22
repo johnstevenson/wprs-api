@@ -27,6 +27,7 @@ class HtmlBuilder
     private int $pilotsCount;
     private int $pilotsMax;
     private string $rankingDate;
+    private string $updated;
     private Config $config;
     private HttpDownloader $downloader;
     private HtmlFormatter $formatter;
@@ -53,7 +54,7 @@ class HtmlBuilder
             Utils::saveToFile($file, $html);
         }
 
-        $data = $this->config->getData($this->pilotsCount, $this->pilotsMax, $this->compId);
+        $data = $this->config->getData($this->updated, $this->pilotsCount, $this->pilotsMax, $this->compId);
         $configFile = Utils::getConfigFile();
 
         $json = json_encode($data, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT);
@@ -82,8 +83,8 @@ class HtmlBuilder
             $pages[$name] = HttpUtils::getResponseContent($response);
         }
 
-        list($this->pilotsCount, $this->pilotsMax) = $this->parsePilots($pages['pilots']);
-        $this->compId = $this->parseCompetitions($pages['competitions']);
+        $this->parsePilots($pages['pilots']);
+        $this->parseCompetitions($pages['competitions']);
         $url = $this->getCompetitionUrl($this->compId);
         $response = $this->downloader->get($url);
         $pages['competition'] = HttpUtils::getResponseContent($response);
@@ -91,18 +92,17 @@ class HtmlBuilder
         return $pages;
     }
 
-    /**
-     * @return array{0: int, 1: int}
-     */
-    private function parsePilots(string $html): array
+    private function parsePilots(string $html): void
     {
         $parser = new PilotsParser();
         $data = $parser->parse($html);
 
-        return [$data->getOverallCount(), $data->getItemCount()];
+        $this->updated = $data->getUpdated();
+        $this->pilotsCount = $data->getOverallCount();
+        $this->pilotsMax = $data->getItemCount();
     }
 
-    private function parseCompetitions(string $html): int
+    private function parseCompetitions(string $html): void
     {
         $parser = new CompetitionsParser();
         $data = $parser->parse($html);
@@ -121,7 +121,7 @@ class HtmlBuilder
             throw new \RuntimeException('Unable to find a comp id');
         }
 
-        return $compId;
+        $this->compId = $compId;
     }
 
     private function getCompetitionUrl(int $id): string

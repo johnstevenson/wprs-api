@@ -11,6 +11,7 @@ class Config
     private int $discipline;
     private string $activity;
     private string $rankingDate;
+    private string $updated;
     private int $regionId;
     private ?int $nationId;
     private int $pilotsCount;
@@ -23,6 +24,7 @@ class Config
             $this->discipline = $data->discipline;
             $this->activity = $data->activity;
             $this->rankingDate = $data->rankingDate;
+            $this->updated = $data->updated;
             $this->regionId = $data->regionId;
             $this->nationId = $data->nationId;
             $this->pilotsCount = $data->pilotsCount;
@@ -32,6 +34,7 @@ class Config
             $this->discipline = System::DISCIPLINE_PG_XC;
             $this->activity = System::getDisciplineForDisplay($this->discipline);
             $this->rankingDate = System::getRankingDate(null);
+            $this->updated = '';
             $this->regionId = System::REGION_EUROPE;
             $this->nationId = 233;
             $this->pilotsCount = 0;
@@ -80,11 +83,17 @@ class Config
         return $this->pilotsMax;
     }
 
+    public function getUpdated(): string
+    {
+        return $this->updated;
+    }
+
     /**
      * @return array<string, mixed>
      */
-    public function getData(int $pilotsCount, int $pilotsMax, int $compId): array
+    public function getData(string $updated, int $pilotsCount, int $pilotsMax, int $compId): array
     {
+        $this->updated = $updated;
         $this->pilotsCount = $pilotsCount;
         $this->pilotsMax = $pilotsMax;
         $this->compId = $compId;

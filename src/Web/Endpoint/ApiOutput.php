@@ -55,6 +55,7 @@ class ApiOutput
             'endpoint' => $this->endpoint,
             'discipline' => $this->discipline,
             'ranking_date' => $this->rankingDate,
+            'updated' => $dataCollector->getUpdated(),
             'count' => $dataCollector->getItemCount(),
             'version' => $this->version,
         ];

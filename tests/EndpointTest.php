@@ -271,6 +271,9 @@ class EndpointTest extends TestCase
         $date = $document->getValue('/meta/ranking_date');
         self::assertEquals($this->rankingDate, $date);
 
+        $updated = $document->getValue('/meta/updated');
+        self::assertEquals($this->config->getUpdated(), $updated);
+
         $count = $document->getValue('/meta/count');
         $items = $document->getValue('/data/items');
         self::assertIsArray($items);

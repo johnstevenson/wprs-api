@@ -45,6 +45,18 @@ class Utils
         return $date->format('Y-m-d');
     }
 
+    public static function formatDateTime(string $value, string $format): ?string
+    {
+        $tz = new \DateTimeZone('UTC');
+        $date = \DateTimeImmutable::createFromFormat($format, $value, $tz);
+
+        if ($date === false) {
+            return null;
+        }
+
+        return $date->format('Y-m-d\Th:i:s\Z');
+    }
+
     public static function makeDetailsError(string $key): string
     {
         return sprintf('details/%s', $key);
@@ -56,6 +68,8 @@ class Utils
     }
 
     /**
+     * Splits a string, returning null if the expected condition is not met
+     *
      * @phpstan-param non-empty-string $separator
      * @return array<int, string>|null
      */
@@ -63,7 +77,12 @@ class Utils
     {
         $result = array_map('trim', explode($separator, $value));
 
-        if (count($result) !== $expected) {
+        // allow unlimted parts if $expected is -1
+        if ($expected === -1) {
+            if (count($result) < 2) {
+                $result = null;
+            }
+        } elseif (count($result) !== $expected) {
             $result = null;
         }
 

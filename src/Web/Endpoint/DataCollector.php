@@ -12,6 +12,7 @@ class DataCollector
     private int $overallCount = 0;
     private int $itemCount = 0;
     private int $filteredCount = 0;
+    private ?string $updated;
     /** @phpstan-var array<apiItem> */
     private array $items = [];
     /** @phpstan-var array<string, dataExtra> */
@@ -19,9 +20,10 @@ class DataCollector
     /** @phpstan-var apiErrors */
     private array $errors = [];
 
-    public function __construct(int $overallCount)
+    public function __construct(int $overallCount, ?string $updated = null)
     {
         $this->overallCount = $overallCount;
+        $this->updated = $updated;
     }
 
     /**
@@ -126,5 +128,10 @@ class DataCollector
     public function getProcessedCount(): int
     {
         return $this->itemCount + $this->filteredCount;
+    }
+
+    public function getUpdated(): string
+    {
+        return (string) $this->updated;
     }
 }

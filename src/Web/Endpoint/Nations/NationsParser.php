@@ -29,8 +29,10 @@ class NationsParser extends ParserManager
             throw new \RuntimeException('id=rankingTableWrapper');
         }
 
+        $updated = $this->getRankingUpdated($wrapper);
+
         list($overallCount, $countWorld) = $this->getOverallCounts($wrapper);
-        $dataCollector = new DataCollector($overallCount);
+        $dataCollector = new DataCollector($overallCount, $updated);
 
         if ($overallCount === 0) {
             return $dataCollector;

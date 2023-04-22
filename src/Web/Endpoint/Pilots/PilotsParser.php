@@ -29,8 +29,10 @@ class PilotsParser extends ParserManager
             throw new \RuntimeException('id=rankingTableWrapper');
         }
 
+        $updated = $this->getRankingUpdated($wrapper);
+
         $overallCount = $this->getOverallCount($wrapper);
-        $dataCollector = new DataCollector($overallCount);
+        $dataCollector = new DataCollector($overallCount, $updated);
 
         if ($overallCount === 0) {
             return $dataCollector;

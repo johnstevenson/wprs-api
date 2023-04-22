@@ -1,4 +1,5 @@
 ## [Unreleased]
+  * Added: New 'updated' property to meta data
   * Fixed: Handling inconsistent Competitions html output
   * Added: System::toJson() method for json output
   * Added: getBatch() methods to all endpoints
