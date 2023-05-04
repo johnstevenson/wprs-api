@@ -119,9 +119,7 @@ abstract class Application
     private function handleResponses(Task $task, array $responses): void
     {
         foreach ($responses as $index => $response) {
-            $contents = HttpUtils::getResponseContent($response);
-            $data = $this->parser->parse($contents, $this->filter);
-
+            $data = $this->getData($response);
             $dataCollector = $task->getDataCollector($index);
 
             if ($dataCollector === null) {
@@ -136,6 +134,20 @@ abstract class Application
 
             $dataCollector->addData($data);
         }
+    }
+
+    private function getData(Response $response): DataCollector
+    {
+        $contents = HttpUtils::getResponseContent($response);
+
+        try {
+            $result = $this->parser->parse($contents, $this->filter);
+        } catch(WprsException $e) {
+            $message = sprintf('%s.', $response->url);
+            throw new WprsException($message);
+        }
+
+        return $result;
     }
 
     /**
