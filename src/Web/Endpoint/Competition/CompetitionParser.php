@@ -391,8 +391,9 @@ class CompetitionParser extends ParserManager
              $value = Utils::getTextFromNodeList($nodes);
         }
 
+        // these values can be empty
         if ($value === null) {
-            throw new \RuntimeException($name);
+            $value = '';
         }
 
         return $value;
