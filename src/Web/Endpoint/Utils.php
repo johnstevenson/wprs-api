@@ -54,7 +54,7 @@ class Utils
             return null;
         }
 
-        return $date->format('Y-m-d\Th:i:s\Z');
+        return $date->format('Y-m-d\TH:i:s\Z');
     }
 
     public static function makeDetailsError(string $key): string

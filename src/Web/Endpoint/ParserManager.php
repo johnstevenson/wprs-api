@@ -68,6 +68,6 @@ abstract class ParserManager implements ParserInterface
 
         $date = $parts[1].':'.$parts[2];
 
-        return Utils::formatDateTime($date, 'M j, Y h:i');
+        return Utils::formatDateTime($date, 'M j, Y H:i');
     }
 }
