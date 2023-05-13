@@ -122,8 +122,8 @@ $data = $endpoint->getData(null, $regionId, $nationId);
             "nation_id": 233,
             "rank": 1,
             "xranks": [
-                { "co": "15" },
-                { "wo": "15" }
+                { "co": 15 },
+                { "wo": 15 }
             ],
             "points": "355.9",
             "comps": [

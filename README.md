@@ -24,7 +24,7 @@ $ composer require wprs/api
 The original [WPRS][wprs-original] stopped receiving updates when a new system was introduced in
 2021. Despite hopes that a basic API (at minimum) would be provided, this did not happen.
 
-This library provides an API for page-scraping the new web site and it is hoped that it may lead to
+This library provides an API for page-scraping the new web site. It is hoped that this may lead to
 a proper API in the future.
 
 ## Usage
