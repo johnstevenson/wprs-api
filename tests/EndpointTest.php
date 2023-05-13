@@ -50,6 +50,10 @@ class EndpointTest extends TestCase
         $this->checkData($data, $name);
         self::assertSame($this->curlOptions, $downloader->getCurlOptions());
 
+        $info = $endpoint->getRequestInfo();
+        self::assertGreaterThan(0, $info->getCount());
+        self::assertGreaterThan(0.0, $info->getTime());
+
         $expectedRequests = Utils::getExpectedUrlCount($this->config);
         self::assertEquals($expectedRequests, $downloader->getUrlCount());
     }
@@ -74,9 +78,6 @@ class EndpointTest extends TestCase
     public function testPilotsHttpError(): void
     {
         $type = System::ENDPOINT_PILOTS;
-        $name = System::getEndpoint($type);
-
-        $html = Utils::getHtml($name);
         $downloader = new MockDownloader(400);
         $regionId = $this->config->getRegionId();
         $nationId = $this->config->getNationId();
@@ -118,6 +119,10 @@ class EndpointTest extends TestCase
         $data = $endpoint->getData($this->rankingDate, $regionId);
         $this->checkData($data, $name);
         self::assertSame($this->curlOptions, $downloader->getCurlOptions());
+
+        $info = $endpoint->getRequestInfo();
+        self::assertGreaterThan(0, $info->getCount());
+        self::assertGreaterThan(0.0, $info->getTime());
     }
 
     public function testNationsWithFilter(): void
@@ -139,9 +144,6 @@ class EndpointTest extends TestCase
     public function testNationsHttpError(): void
     {
         $type = System::ENDPOINT_NATIONS;
-        $name = System::getEndpoint($type);
-
-        $html = Utils::getHtml($name);
         $downloader = new MockDownloader(400);
         $regionId = $this->config->getRegionId();
 
@@ -166,6 +168,10 @@ class EndpointTest extends TestCase
         $data = $endpoint->getData($this->rankingDate);
         $this->checkData($data, $name);
         self::assertSame($this->curlOptions, $downloader->getCurlOptions());
+
+        $info = $endpoint->getRequestInfo();
+        self::assertGreaterThan(0, $info->getCount());
+        self::assertGreaterThan(0.0, $info->getTime());
     }
 
     public function testCompetitionsWithFilter(): void
@@ -186,9 +192,6 @@ class EndpointTest extends TestCase
     public function testCompetitionsHttpError(): void
     {
         $type = System::ENDPOINT_COMPETITIONS;
-        $name = System::getEndpoint($type);
-
-        $html = Utils::getHtml($name);
         $downloader = new MockDownloader(400);
 
         self::expectException(\Wprs\Api\Web\WprsException::class);
@@ -213,6 +216,10 @@ class EndpointTest extends TestCase
         $data = $endpoint->getData($this->rankingDate, $compId);
         $this->checkData($data, $name);
         self::assertSame($this->curlOptions, $downloader->getCurlOptions());
+
+        $info = $endpoint->getRequestInfo();
+        self::assertGreaterThan(0, $info->getCount());
+        self::assertGreaterThan(0.0, $info->getTime());
     }
 
     public function testCompetitionWithFilter(): void
@@ -234,9 +241,6 @@ class EndpointTest extends TestCase
     public function testCompetitionHttpError(): void
     {
         $type = System::ENDPOINT_COMPETITION;
-        $name = System::getEndpoint($type);
-
-        $html = Utils::getHtml($name);
         $downloader = new MockDownloader(400);
         $compId = $this->config->getCompId();
 

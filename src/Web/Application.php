@@ -13,7 +13,6 @@ use Wprs\Api\Web\Endpoint\Job;
 use Wprs\Api\Web\Endpoint\ParamsInterface;
 use Wprs\Api\Web\Endpoint\ParserInterface;
 use Wprs\Api\Web\Endpoint\Task;
-use Wprs\Api\Web\System;
 
 /**
  * @phpstan-import-type apiDetails from \Wprs\Api\Web\Endpoint\ApiOutput
@@ -29,6 +28,7 @@ abstract class Application
     private ParserInterface $parser;
     private ?FilterInterface $filter;
     private DownloaderInterface $downloader;
+    private RequestInfo $requestInfo;
 
     public function __construct(
         int $discipline,
@@ -41,8 +41,14 @@ abstract class Application
         $this->filter = $filter;
         $this->downloader = $downloader ?? new HttpDownloader(System::getUserAgent());
 
+        $this->requestInfo = new RequestInfo(0, 0.0);
         $this->endpoint = get_class($this);
         $this->path = System::getPath($discipline, $this->endpoint);
+    }
+
+    public function getRequestInfo(): RequestInfo
+    {
+        return $this->requestInfo;
     }
 
     /**
@@ -82,6 +88,8 @@ abstract class Application
         if ($task->hasExtraUrls()) {
             $this->runTask($task);
         }
+
+        $this->requestInfo = $task->getRequestInfo();
 
         return $task->getResults();
     }

@@ -2,6 +2,8 @@
 
 namespace Wprs\Api\Web\Endpoint;
 
+use Wprs\Api\Web\RequestInfo;
+
 class Task
 {
     private const PHASE_INIT = 0;
@@ -9,6 +11,7 @@ class Task
     private const PHASE_EXTRA = 2;
 
     private int $phase;
+    private float $startTime;
 
     /** @var array<string> */
     public array $urls = [];
@@ -33,6 +36,8 @@ class Task
             $this->urls[] = $url;
             $this->items[] = null;
         }
+
+        $this->startTime = microtime(true);
     }
 
     /**
@@ -70,6 +75,14 @@ class Task
         }
 
         return $this->items[$index];
+    }
+
+    public function getRequestInfo(): RequestInfo
+    {
+        $count = count($this->urls) + count($this->extraUrls);
+        $time = microtime(true) - $this->startTime;
+
+        return new RequestInfo($count, $time);
     }
 
     /**
